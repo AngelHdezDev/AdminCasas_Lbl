@@ -242,7 +242,7 @@
                     </div>
                 </div>
 
-                <form action="{{ route('propiedades.store') }}" method="POST" id="formPropiedad">
+                <form action="{{route('propiedades.store')}}" method="POST" id="formPropiedad">
                     @csrf
                     <input type="hidden" name="_method" id="methodField" value="POST">
 

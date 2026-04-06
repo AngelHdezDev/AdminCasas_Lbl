@@ -13,6 +13,7 @@ use App\Http\Requests\Marca\StoreMarcaRequest;
 use App\Http\Requests\Marca\UpdateMarcaRequest;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\RedirectResponse;
 
 
 class PropertyController extends Controller
@@ -23,17 +24,14 @@ class PropertyController extends Controller
     {
         $this->service = $service;
     }
-  
 
-    public function store(StorePropertyRequest $request): JsonResponse
+
+    public function store(StorePropertyRequest $request): RedirectResponse
     {
-
         $property = $this->service->createProperty($request->validated());
 
-        return response()->json([
-            'message' => 'Propiedad registrada con éxito',
-            'data' => $property
-        ], 201);
+        return redirect()->route('propiedades.index')
+            ->with('success', 'Propiedad registrada con éxito');
     }
 
     public function index()

@@ -52,8 +52,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 modalTitle.textContent = 'Nueva Propiedad';
                 btnText.textContent = 'Registrar Propiedad';
                 btnIcon.className = 'bi bi-plus-lg';
-                methodField.value = 'POST';
-                formPropiedad.action = "{{ route('propiedades.store') }}";
                 formPropiedad.reset();
                 
                 // Valores por defecto para creación

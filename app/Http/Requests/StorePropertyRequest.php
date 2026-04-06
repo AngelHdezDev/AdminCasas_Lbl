@@ -32,6 +32,7 @@ class StorePropertyRequest extends FormRequest
             'type' => 'required|in:house,apartment,land,commercial',
             'description' => 'nullable|string',
             'neighborhood' => 'nullable|string',
+            'parking_spots' => 'required|integer|min:0',
         ];
     }
 }
