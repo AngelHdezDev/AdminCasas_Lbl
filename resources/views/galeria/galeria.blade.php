@@ -3,7 +3,7 @@
 @section('title', 'Galería de Imágenes - VMS')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/galeria.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/galeria.css') }}">
 @endpush
 
 @section('content')
@@ -16,14 +16,14 @@
                     <h1 class="page-title">Galería de Imágenes</h1>
                     <p class="page-subtitle">
                         <!-- {{  $imagenes->total() }} imágenes en total · 
-                        {{ $imagenesAsignadas ?? 0 }} asignadas ·  -->
+                                {{ $imagenesAsignadas ?? 0 }} asignadas ·  -->
                         {{  $imagenes->total()}} imagenes sin asignar
                     </p>
                 </div>
-                <!-- <button class="btn-upload" data-bs-toggle="modal" data-bs-target="#modalUpload">
+                <button class="btn-upload" data-bs-toggle="modal" data-bs-target="#modalUpload">
                     <i class="bi bi-cloud-arrow-up"></i>
                     Subir Imágenes
-                </button> -->
+                </button>
             </div>
         </div>
     </div>
@@ -33,17 +33,18 @@
         <div class="container-fluid px-4">
             <div class="filters-inner">
                 <!-- <select class="filter-select" id="filterVehiculo">
-                    <option value="">Todos los vehículos</option>
-                    <option value="sin-asignar">Sin asignar</option>
-                    @foreach($vehiculos ?? [] as $vehiculo)
-                        <option value="{{ $vehiculo->id_auto }}">
-                            {{ $vehiculo->marca->nombre ?? '' }} {{ $vehiculo->modelo }} {{ $vehiculo->year }}
-                        </option>
-                    @endforeach
-                </select> -->
+                            <option value="">Todos los vehículos</option>
+                            <option value="sin-asignar">Sin asignar</option>
+                            @foreach($vehiculos ?? [] as $vehiculo)
+                                <option value="{{ $vehiculo->id_auto }}">
+                                    {{ $vehiculo->marca->nombre ?? '' }} {{ $vehiculo->modelo }} {{ $vehiculo->year }}
+                                </option>
+                            @endforeach
+                        </select> -->
                 <span class="filters-count">
                     Mostrando <span id="countVisible">{{ count($imagenes ?? []) }}</span> imágenes
                 </span>
+
             </div>
         </div>
     </div>
@@ -53,89 +54,82 @@
         <div class="container-fluid px-4">
 
             @if(isset($imagenes) && count($imagenes) > 0)
-            <div class="gallery-grid" id="galleryGrid">
-                @foreach($imagenes as $imagen)
-                <div class="gallery-item" data-vehiculo="{{ $imagen->id_auto ?? 'sin-asignar' }}">
-                    <div class="image-container">
-                        
-                        <img src="{{ asset('storage/' . $imagen->ruta_archivo) }}" alt="{{ $imagen->nombre_original }}">
-                        <div class="image-overlay"></div>
-                        
-                        @if($imagen->id_auto)
-                            <span class="status-badge assigned">
-                                <i class="bi bi-check-circle-fill"></i>
-                                Asignada
-                            </span>
-                        @else
-                            <span class="status-badge unassigned">
-                                <i class="bi bi-exclamation-circle-fill"></i>
-                                Sin asignar
-                            </span>
-                        @endif
+                <div class="gallery-grid" id="galleryGrid">
+                    @foreach($imagenes as $imagen)
+                        <div class="gallery-item" data-vehiculo="{{ $imagen->id_auto ?? 'sin-asignar' }}">
+                            <div class="image-container">
 
-                        <div class="image-actions">
-                            <button class="btn-image-action" title="Ver imagen" onclick="viewImage('{{ asset('storage/' . $imagen->ruta_archivo) }}')">
-                                <i class="bi bi-eye"></i>
-                            </button>
-                    
-                            <form action="{{ route('galeria.destroy', $imagen->id) }}" method="POST" class="delete-form">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" class="btn-image-action delete btn-delete" title="Eliminar">
-                                    <i class="bi bi-trash"></i> 
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+                                <img src="{{ asset('storage/' . $imagen->path) }}" alt="{{ $imagen->nombre_original }}">
+                                <div class="image-overlay"></div>
 
-                    <div class="gallery-body">
-                        <div class="image-info">
-                            <div class="image-name">
-                                <i class="bi bi-file-image"></i>
-                                Archivo
-                            </div>
-                            <div class="image-filename" title="{{ $imagen->nombre }}">
-                                {{ $imagen->nombre }}
-                            </div>
-                        </div>
+                                @if($imagen->id_auto)
+                                    <span class="status-badge assigned">
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        Asignada
+                                    </span>
+                                @else
+                                    <span class="status-badge unassigned">
+                                        <i class="bi bi-exclamation-circle-fill"></i>
+                                        Sin asignar
+                                    </span>
+                                @endif
 
-                        <form action="{{ route('galeria.asignar', $imagen->id) }}" method="POST" class="assign-form"> 
-                            @csrf
-                            
-                            <div class="vehicle-select-group">
-                                <label class="vehicle-select-label">Asignar a vehículo</label>
-                                <div class="select-with-button">
-                                    <select class="vehicle-select" name="id_auto" data-original="{{ $imagen->id_auto ?? '' }}">
-                                        <option value="">— Sin asignar —</option>
-                                        @foreach($vehiculos ?? [] as $vehiculo)
-                                            <option value="{{ $vehiculo->id_auto }}" 
-                                                {{ $imagen->id_auto == $vehiculo->id_auto ? 'selected' : '' }}>
-                                                {{ $vehiculo->marca->nombre ?? '' }} {{ $vehiculo->modelo }} ({{ $vehiculo->year }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <button type="submit" class="btn-assign" disabled>
-                                        <i class="bi bi-check-lg"></i>
-                                        <span>Confirmar</span>
+                                <div class="image-actions">
+                                    <button class="btn-image-action" title="Ver imagen"
+                                        onclick="viewImage('{{ asset('storage/' . $imagen->ruta_archivo) }}')">
+                                        <i class="bi bi-eye"></i>
                                     </button>
+
+                                    <form action="{{ route('galeria.destroy', $imagen->id) }}" method="POST" class="delete-form">
+                                        @csrf
+                                        @method('DELETE') 
+                                        <button type="button" class="btn-image-action delete btn-delete" title="Eliminar">
+                                            <i class="bi bi-trash"></i> 
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
-                        </form>
-                    </div>
+
+                            <div class="gallery-body">
+                                <div class="image-info">
+                                    <div class="image-name">
+                                        <i class="bi bi-file-image"></i>
+                                        Archivo
+                                    </div>
+                                    <div class="image-filename" title="{{ $imagen->nombre }}">
+                                        {{ $imagen->nombre }}
+                                    </div>
+                                </div>
+
+                                <form action="{{ route('galeria.asignar', $imagen->id) }}" method="POST" class="assign-form">
+                                    @csrf
+                                    <div class="vehicle-select-group">
+                                        <select class="vehicle-select" name="property_id">
+                                            <option value="">— Sin asignar —</option>
+                                            @foreach($properties as $property)
+                                                <option value="{{ $property->id }}" {{ $imagen->property_id == $property->id ? 'selected' : '' }}>
+                                                    {{ $property->title }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <button type="submit" class="btn-assign">Confirmar</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
-                @endforeach
-            </div>
             @else
-            <div class="empty-state">
-                <div class="empty-icon">
-                    <i class="bi bi-images"></i>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="bi bi-images"></i>
+                    </div>
+                    <div class="empty-title">Sin imágenes en la galería</div>
+                    <p class="empty-text">Sube las primeras imágenes para comenzar.</p>
+                    <button class="btn-upload mx-auto" data-bs-toggle="modal" data-bs-target="#modalUpload">
+                        <i class="bi bi-cloud-arrow-up"></i> Subir Imágenes
+                    </button>
                 </div>
-                <div class="empty-title">Sin imágenes en la galería</div>
-                <p class="empty-text">Sube las primeras imágenes para comenzar.</p>
-                <!-- <button class="btn-upload mx-auto" data-bs-toggle="modal" data-bs-target="#modalUpload">
-                    <i class="bi bi-cloud-arrow-up"></i> Subir Imágenes
-                </button> -->
-            </div>
             @endif
 
         </div>
@@ -144,11 +138,11 @@
                 <div class="w-100">
                     @if($imagenes->total() > 0)
                         <div class="pagination-info">
-                            Mostrando <strong>{{ $imagenes->firstItem() }}</strong> a <strong>{{ $imagenes->lastItem() }}</strong> 
-                            de <strong>{{ $imagenes->total() }}</strong> imágenes 
+                            Mostrando <strong>{{ $imagenes->firstItem() }}</strong> a <strong>{{ $imagenes->lastItem() }}</strong>
+                            de <strong>{{ $imagenes->total() }}</strong> imágenes
                         </div>
                     @endif
-                    
+
                     <div class="d-flex justify-content-center">
                         {{-- Mantenemos la consistencia con bootstrap-4 como en tu ejemplo --}}
                         {{ $imagenes->appends(request()->query())->links('pagination::bootstrap-4') }}
@@ -156,6 +150,47 @@
                 </div>
             </div>
         @endif
+    </div>
+
+    <div class="modal fade" id="modalUpload" tabindex="-1" aria-labelledby="modalUploadLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-white border-bottom-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="modalUploadLabel" style="color: var(--gray-800);">
+                        <i class="bi bi-cloud-arrow-up me-2 text-gold"></i>Subir Multimedia
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body pt-3">
+                    <form action="{{ route('galeria.store') }}" method="POST" enctype="multipart/form-data" id="formUpload">
+                        @csrf
+                        <div class="upload-drop-zone" id="dropZone">
+                            <div class="upload-icon">
+                                <i class="bi bi-images"></i>
+                            </div>
+                            <div class="upload-text">
+                                <p class="mb-1"><strong>Arrastra tus fotos aquí</strong></p>
+                                <p class="text-muted small">o haz clic para explorar archivos</p>
+                            </div>
+                            <input type="file" name="imagenes[]" id="imagenes" multiple accept="image/*" class="d-none">
+                        </div>
+
+                        <div id="previewContainer" class="mt-3" style="display: none;">
+                            <p class="text-muted small mb-2 fw-medium">Archivos listos para subir:</p>
+                            <div id="fileList" class="file-list-scroll" style="max-height: 200px; overflow-y: auto;">
+                            </div>
+                        </div>
+
+                        <div class="d-grid mt-4">
+                            <button type="submit" class="btn-upload w-100 py-2" id="btnUpload" disabled>
+                                <i class="bi bi-upload"></i> Subir Imágenes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -186,4 +221,3 @@
     @endif
 
 @endsection
-

@@ -514,3 +514,39 @@ body {
         opacity: 1;
     }
 }
+
+.upload-drop-zone {
+    border: 2px dashed var(--gray-200);
+    background: var(--gray-50);
+    border-radius: 12px;
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-drop-zone:hover {
+    background: #fff;
+    border-color: #b89c6a; /* Color dorado/old money */
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    color: #b89c6a;
+    margin-bottom: 0.5rem;
+}
+
+.file-list-scroll::-webkit-scrollbar {
+    width: 6px;
+}
+
+.file-list-scroll::-webkit-scrollbar-thumb {
+    background: #eee;
+    border-radius: 10px;
+}
+
+.btn-upload:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}

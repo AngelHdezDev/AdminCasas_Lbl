@@ -8,7 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AutoController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PropertyController;
-
+use App\Http\Controllers\GaleriaController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -46,7 +46,8 @@ Route::post('/marcas', [MarcaController::class, 'store'])->middleware('auth')->n
 Route::put('/marcas/{id}', [MarcaController::class, 'update'])->middleware('auth')->name('marcas.update');
 Route::delete('/marcas/{id}', [MarcaController::class, 'changeStatus'])->middleware('auth')->name('marcas.changeStatus');
 
-// Ruta para galería
-Route::get('/galeria', [GalleryController::class, 'index'])->middleware('auth')->name('galeria.index');
-Route::post('/admin/asignar-foto/{id}', [GalleryController::class, 'asignar'])->middleware('auth')->name('galeria.asignar');
-Route::delete('/admin/eliminar-foto-temporal/{id}', [GalleryController::class, 'destroy'])->middleware('auth')->name('galeria.destroy');
+
+Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index');
+Route::post('/galeria', [GaleriaController::class, 'store'])->name('galeria.store');
+Route::post('/galeria/asignar/{id}', [GaleriaController::class, 'asignar'])->name('galeria.asignar');
+Route::delete('/galeria/{id}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
