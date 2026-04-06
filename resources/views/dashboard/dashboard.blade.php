@@ -93,7 +93,7 @@
                             <i class="bi bi-clock-history"></i>
                             Vehículos Recientes
                         </h2>
-                        <a href="{{ route('autos.index') }}" class="card-link">
+                        <a href="{{ route('propiedades.index') }}" class="card-link">
                             Ver todos →
                         </a>
                     </div>

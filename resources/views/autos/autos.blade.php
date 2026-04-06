@@ -37,40 +37,43 @@
 
                 <div class="search-box">
                     <i class="bi bi-search"></i>
-                    <input type="text" name="search" class="search-input" placeholder="Buscar modelo, color, año..."
-                        value="{{ request('search') }}" id="searchInput">
+                    <input type="text" name="search" class="search-input"
+                        placeholder="Buscar por título, descripción o calle..." value="{{ request('search') }}"
+                        id="searchInput">
                 </div>
 
-                <select class="filter-select" name="marca" onchange="this.form.submit()">
-                    <option value="">Todas las marcas</option>
-                    @foreach($marcas ?? [] as $marca)
-                        <option value="{{ $marca->id_marca }}" {{ request('marca') == $marca->id_marca ? 'selected' : '' }}>
-                            {{ $marca->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-
-                <select class="filter-select" name="tipo" onchange="this.form.submit()">
+                <select class="filter-select" name="type" onchange="this.form.submit()">
                     <option value="">Todos los tipos</option>
-                    @foreach($tipos ?? [] as $tipo)
-                        <option value="{{ $tipo->tipo }}" {{ request('tipo') == $tipo->tipo ? 'selected' : '' }}>
-                            {{ $tipo->tipo }}
+                    <option value="house" {{ request('type') == 'house' ? 'selected' : '' }}>Casas</option>
+                    <option value="apartment" {{ request('type') == 'apartment' ? 'selected' : '' }}>Departamentos
+                    </option>
+                    <option value="terreno" {{ request('type') == 'terreno' ? 'selected' : '' }}>Terrenos</option>
+                    <option value="local" {{ request('type') == 'local' ? 'selected' : '' }}>Locales</option>
+                </select>
+
+                <select class="filter-select" name="neighborhood" onchange="this.form.submit()">
+                    <option value="">Todas las zonas</option>
+                    @foreach($neighborhoods ?? [] as $neighborhood)
+                        <option value="{{ $neighborhood }}" {{ request('neighborhood') == $neighborhood ? 'selected' : '' }}>
+                            {{ $neighborhood }}
                         </option>
                     @endforeach
                 </select>
 
-                <select class="filter-select" name="consignacion" onchange="this.form.submit()">
-                    <option value="">Todos</option>
-                    <option value="1" {{ request('consignacion') === '1' ? 'selected' : '' }}>En consignación</option>
-                    <option value="0" {{ request('consignacion') === '0' ? 'selected' : '' }}>Propios</option>
+                <select class="filter-select" name="contract_type" onchange="this.form.submit()">
+                    <option value="">Cualquier operación</option>
+                    <option value="sale" {{ request('contract_type') == 'sale' ? 'selected' : '' }}>En Venta</option>
+                    <option value="rent" {{ request('contract_type') == 'rent' ? 'selected' : '' }}>En Renta</option>
                 </select>
 
                 <span class="filters-count">
                     Mostrando <span>{{ $properties->total() }}</span> propiedades
                 </span>
 
-                @if(request()->anyFilled(['search', 'marca', 'tipo', 'consignacion']))
-                    <a href="{{ route('autos.index') }}" class="btn btn-sm btn-outline-secondary">Limpiar</a>
+                @if(request()->anyFilled(['search', 'type', 'neighborhood', 'contract_type']))
+                    <a href="{{ route('propiedades.index') }}" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Limpiar
+                    </a>
                 @endif
             </form>
         </div>
@@ -219,8 +222,8 @@
     </div>
 
     <!-- 
-                             MODAL — NUEVO VEHÍCULO
-                        -->
+                                 MODAL — NUEVO VEHÍCULO
+                            -->
     <div class="modal fade" id="modalPropiedad" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl ">
             <div class="modal-content">

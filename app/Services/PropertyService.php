@@ -15,11 +15,36 @@ class PropertyService
         return Property::create($data);
     }
 
-    public function getAllPaginated($perPage = 10)
+    public function getAllPaginated($perPage = 10, $filters = [])
     {
-        return Property::with('images')
-            ->where('active', true) 
-            ->orderBy('created_at', 'desc')
+        $query = Property::with('images')
+            ->where('active', true);
+
+        if (!empty($filters['search'])) {
+            $query->where(function ($q) use ($filters) {
+                $search = $filters['search'];
+                $q->where('title', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%")
+                    ->orWhere('address', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // 2. Filtro por Tipo (Casa, Departamento, etc.)
+        if (!empty($filters['type'])) {
+            $query->where('type', $filters['type']);
+        }
+
+        // 3. Filtro por Colonia (Neighborhood)
+        if (!empty($filters['neighborhood'])) {
+            $query->where('neighborhood', $filters['neighborhood']);
+        }
+
+        // // 4. Filtro por Operación (Venta o Renta)
+        // if (!empty($filters['contract_type'])) {
+        //     $query->where('contract_type', $filters['contract_type']);
+        // }
+
+        return $query->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }
 

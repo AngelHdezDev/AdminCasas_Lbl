@@ -35,13 +35,11 @@ class PropertyController extends Controller
             ->with('success', 'Propiedad registrada con éxito');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $properties = $this->service->getAllPaginated(12);
-
+        $properties = $this->service->getAllPaginated(10, $request->all());
         return view('autos.autos', compact('properties'));
     }
-
     public function update(UpdatePropertyRequest $request, $id): RedirectResponse
     {
         // Buscamos la propiedad manualmente por el ID de la ruta
