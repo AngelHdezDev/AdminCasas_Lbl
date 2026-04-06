@@ -14,29 +14,18 @@
             <div class="page-header-inner">
                 <div>
                     <div class="breadcrumb-custom">
-                        <a href="{{ route('autos.index') }}">
+                        <a href="{{ route('propiedades.index') }}">
                             <i class="bi bi-arrow-left"></i>
-                            Volver a vehículos
+                            Volver a propiedades
                         </a>
                     </div>
-                    <h1 class="page-title">{{ $auto->marca->nombre ?? '' }} {{ $auto->modelo }}</h1>
+                    <h1 class="page-title">{{ $property->title }}</h1>
                     <p class="page-subtitle">
-                        {{ $auto->year }} · {{ $auto->tipo }} · {{ $auto->color }}
+                        {{ ucfirst($property->type) }} · {{ $property->neighborhood }} ·
+                        ${{ number_format($property->price, 2) }}
                     </p>
                 </div>
                 <div class="header-actions">
-                    <!-- <a class="btn-header btn-secondary">
-                                                    <i class="bi bi-pencil"></i>
-                                                    Editar Vehículo
-                                                </a>
-                                                <form action="{{ route('autos.destroy', $auto->id_auto) }}" method="POST" class="d-inline delete-form">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="button" class="btn-header btn-danger btn-delete">
-                                                        <i class="bi bi-trash"></i>
-                                                        Eliminar
-                                                    </button>
-                                                </form> -->
                 </div>
             </div>
         </div>
@@ -47,188 +36,129 @@
         <div class="container-fluid px-4">
             <div class="row g-4">
 
-                <!-- COLUMNA PRINCIPAL: Galería e Información -->
                 <div class="col-12 col-lg-8">
 
-                    <!-- Galería de Imágenes -->
                     <div class="content-card">
                         <div class="card-body-custom p-0">
-                            @if($auto->imagenes->count() > 0)
+                            @if($property->images->count() > 0)
                                 <div class="gallery-main">
                                     <div class="gallery-featured" id="galleryFeatured">
-                                        <img src="{{ asset('storage/' . $auto->imagenes->first()->imagen) }}"
-                                            alt="{{ $auto->marca->nombre ?? '' }} {{ $auto->modelo }}" id="featuredImage">
+                                        <img src="{{ asset('storage/' . $property->images->first()->path) }}"
+                                            alt="{{ $property->title }}" id="featuredImage">
                                         <button class="btn-fullscreen" onclick="viewFullscreen()">
                                             <i class="bi bi-arrows-fullscreen"></i>
                                         </button>
                                     </div>
-                                    @if($auto->imagenes->count() > 0)
-                                        <div class="gallery-thumbnails">
-                                            @foreach($auto->imagenes as $index => $imagen)
-                                                <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}"
-                                                    data-imagen-id="{{ $imagen->id_imagen }}">
-                                                    <img src="{{ asset('storage/' . $imagen->imagen) }}" alt="Imagen {{ $index + 1 }}"
-                                                        onclick="changeImage('{{ asset('storage/' . $imagen->imagen) }}', this.parentElement)">
+                                    <div class="gallery-thumbnails">
+                                        @foreach($property->images as $index => $image)
+                                            <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}"
+                                                data-imagen-id="{{ $image->id }}">
+                                                <img src="{{ asset('storage/' . $image->path) }}" alt="Imagen {{ $index + 1 }}"
+                                                    onclick="changeImage('{{ asset('storage/' . $image->path) }}', this.parentElement)">
 
-                                                    <!-- Badge de portada -->
-                                                    @if($imagen->thumbnail)
-                                                        <span class="badge-portada">
-                                                            <i class="bi bi-star-fill"></i>
-                                                            Portada
-                                                        </span>
-                                                    @endif
+                                                @if($image->is_featured)
+                                                    <span class="badge-portada">
+                                                        <i class="bi bi-star-fill"></i>
+                                                        Portada
+                                                    </span>
+                                                @endif
 
-                                                    <!-- Botones de acción -->
-                                                    <div class="thumbnail-actions">
-                                                        <!-- Botón marcar como portada -->
-                                                        @if(!$imagen->thumbnail)
-                                                            <form action="{{ route('autos.imagen.portada', $imagen->id_imagen) }}" method="POST" class="d-inline">
-                                                                @csrf
-                                                                @method('PATCH')
-                                                                <button type="submit" class="btn-portada-thumbnail"
-                                                                    title="Marcar como portada">
-                                                                    <i class="bi bi-star"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endif
-
-                                                        <!-- Botón eliminar -->
-                                                        <form action="{{ route('autos.imagen.delete', $imagen->id_imagen) }}"
-                                                            method="POST" class="delete-image-form">
+                                                <div class="thumbnail-actions">
+                                                    @if(!$image->is_featured)
+                                                        <form action="{{ route('propiedades.imagen.portada', $image->id) }}"
+                                                            method="POST" class="d-inline">
                                                             @csrf
-                                                            @method('DELETE')
-                                                            <button type="button" class="btn-delete-thumbnail" title="Eliminar imagen">
-                                                                <i class="bi bi-trash"></i>
+                                                            @method('PATCH')
+                                                            <button type="submit" class="btn-portada-thumbnail"
+                                                                title="Marcar como portada">
+                                                                <i class="bi bi-star"></i>
                                                             </button>
                                                         </form>
-                                                    </div>
+                                                    @endif
+
+                                                    <form action="{{ route('propiedades.imagen.delete', $image->id) }}"
+                                                        method="POST" class="delete-image-form">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="btn-delete-thumbnail" title="Eliminar imagen">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </form>
                                                 </div>
-                                            @endforeach
-                                        </div>
-                                    @endif
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                             @else
                                 <div class="gallery-empty-large">
                                     <i class="bi bi-image"></i>
-                                    <p>Este vehículo no tiene imágenes</p>
+                                    <p>Esta propiedad no tiene imágenes</p>
                                 </div>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Especificaciones Técnicas -->
                     <div class="content-card">
                         <div class="card-header-custom">
                             <h2 class="card-title-custom">
-                                <i class="bi bi-gear-wide-connected"></i>
-                                Especificaciones Técnicas
+                                <i class="bi bi-house-door"></i>
+                                Detalles de la Propiedad
                             </h2>
                         </div>
                         <div class="card-body-custom">
                             <div class="specs-grid">
                                 <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-tag"></i>
-                                    </div>
+                                    <div class="spec-icon"><i class="bi bi-rulers"></i></div>
                                     <div class="spec-content">
-                                        <div class="spec-label">Marca</div>
-                                        <div class="spec-value">{{ $auto->marca->nombre ?? '—' }}</div>
+                                        <div class="spec-label">Terreno</div>
+                                        <div class="spec-value">{{ $property->m2_land }} m²</div>
                                     </div>
                                 </div>
 
                                 <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-calendar3"></i>
-                                    </div>
+                                    <div class="spec-icon"><i class="bi bi-building"></i></div>
                                     <div class="spec-content">
-                                        <div class="spec-label">Año</div>
-                                        <div class="spec-value">{{ $auto->year }}</div>
+                                        <div class="spec-label">Construcción</div>
+                                        <div class="spec-value">{{ $property->m2_construction }} m²</div>
                                     </div>
                                 </div>
 
                                 <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-truck"></i>
-                                    </div>
+                                    <div class="spec-icon"><i class="bi bi-door-open"></i></div>
                                     <div class="spec-content">
-                                        <div class="spec-label">Tipo</div>
-                                        <div class="spec-value">{{ $auto->tipo }}</div>
+                                        <div class="spec-label">Habitaciones</div>
+                                        <div class="spec-value">{{ $property->bedrooms }}</div>
                                     </div>
                                 </div>
 
                                 <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-palette"></i>
-                                    </div>
+                                    <div class="spec-icon"><i class="bi bi-droplet"></i></div>
                                     <div class="spec-content">
-                                        <div class="spec-label">Color</div>
-                                        <div class="spec-value">{{ $auto->color }}</div>
+                                        <div class="spec-label">Baños</div>
+                                        <div class="spec-value">{{ $property->bathrooms }}</div>
                                     </div>
                                 </div>
 
                                 <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-gear"></i>
-                                    </div>
+                                    <div class="spec-icon"><i class="bi bi-p-square"></i></div>
                                     <div class="spec-content">
-                                        <div class="spec-label">Transmisión</div>
-                                        <div class="spec-value">{{ $auto->transmision }}</div>
+                                        <div class="spec-label">Estacionamientos</div>
+                                        <div class="spec-value">{{ $property->parking_spots }}</div>
                                     </div>
                                 </div>
 
                                 <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-fuel-pump"></i>
-                                    </div>
+                                    <div class="spec-icon"><i class="bi bi-geo-alt"></i></div>
                                     <div class="spec-content">
-                                        <div class="spec-label">Combustible</div>
-                                        <div class="spec-value">{{ $auto->combustible }}</div>
-                                    </div>
-                                </div>
-
-                                <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-speedometer"></i>
-                                    </div>
-                                    <div class="spec-content">
-                                        <div class="spec-label">Kilometraje</div>
-                                        <div class="spec-value">
-                                            @if($auto->ocultar_kilometraje)
-                                                <span class="badge-oculto">
-                                                    <i class="bi bi-eye-slash"></i> Oculto
-                                                </span>
-                                            @else
-                                                {{ number_format($auto->kilometraje) }} km
-                                            @endif
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="spec-item">
-                                    <div class="spec-icon">
-                                        <i class="bi bi-bookmark-star"></i>
-                                    </div>
-                                    <div class="spec-content">
-                                        <div class="spec-label">Estado</div>
-                                        <div class="spec-value">
-                                            @if($auto->consignacion)
-                                                <span class="badge-consignacion">
-                                                    <i class="bi bi-bookmark-star-fill"></i> Consignación
-                                                </span>
-                                            @else
-                                                <span class="badge-propio">
-                                                    <i class="bi bi-check-circle-fill"></i> Propio
-                                                </span>
-                                            @endif
-                                        </div>
+                                        <div class="spec-label">Colonia</div>
+                                        <div class="spec-value">{{ $property->neighborhood }}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Descripción -->
-                    @if($auto->descripcion)
+                    @if($property->description)
                         <div class="content-card">
                             <div class="card-header-custom">
                                 <h2 class="card-title-custom">
@@ -237,31 +167,29 @@
                                 </h2>
                             </div>
                             <div class="card-body-custom">
-                                <p class="description-text">{{ $auto->descripcion }}</p>
+                                <p class="description-text">{{ $property->description }}</p>
                             </div>
                         </div>
                     @endif
 
                 </div>
 
-                <!-- COLUMNA LATERAL: Información de Venta -->
                 <div class="col-12 col-lg-4">
 
-                    <!-- Precio -->
                     <div class="content-card price-card">
                         <div class="card-body-custom text-center">
-                            <div class="price-label">Precio de Venta</div>
-                            <div class="price-value">${{ number_format($auto->precio, 2) }}</div>
-                            @if($auto->consignacion)
+                            <div class="price-label">Precio de {{ $property->contract_type == 'sale' ? 'Venta' : 'Renta' }}
+                            </div>
+                            <div class="price-value">${{ number_format($property->price, 2) }}</div>
+                            @if($property->is_featured)
                                 <div class="price-note">
-                                    <i class="bi bi-info-circle"></i>
-                                    Vehículo en consignación
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    Propiedad Destacada
                                 </div>
                             @endif
                         </div>
                     </div>
 
-                    <!-- Detalles Adicionales -->
                     <div class="content-card">
                         <div class="card-header-custom">
                             <h2 class="card-title-custom">
@@ -272,46 +200,27 @@
                         <div class="card-body-custom">
                             <div class="info-list">
                                 <div class="info-item">
-                                    <div class="info-icon">
-                                        <i class="bi bi-calendar-plus"></i>
-                                    </div>
+                                    <div class="info-icon"><i class="bi bi-calendar-plus"></i></div>
                                     <div class="info-content">
                                         <div class="info-label">Fecha de registro</div>
-                                        <div class="info-value">{{ $auto->created_at}}</div>
-                                        <div class="info-sub">{{ $auto->created_at}}</div>
+                                        <div class="info-value">{{ $property->created_at->format('d/m/Y') }}</div>
+                                        <div class="info-sub">{{ $property->created_at->diffForHumans() }}</div>
                                     </div>
                                 </div>
 
                                 <div class="info-item">
-                                    <div class="info-icon">
-                                        <i class="bi bi-person"></i>
-                                    </div>
+                                    <div class="info-icon"><i class="bi bi-person"></i></div>
                                     <div class="info-content">
-                                        <div class="info-label">Registrado por</div>
-                                        <div class="info-value">{{ $auto->creator->nombre ?? 'Sistema' }}</div>
+                                        <div class="info-label">Agente responsable</div>
+                                        <div class="info-value">{{ $property->user->name ?? 'Sistema' }}</div>
                                     </div>
                                 </div>
 
-                                @if($auto->updated_at != $auto->created_at)
-                                    <div class="info-item">
-                                        <div class="info-icon">
-                                            <i class="bi bi-pencil-square"></i>
-                                        </div>
-                                        <div class="info-content">
-                                            <div class="info-label">Última actualización</div>
-                                            <div class="info-value">{{ $auto->updated_at }}</div>
-                                            <div class="info-sub">{{ $auto->updated_at }}</div>
-                                        </div>
-                                    </div>
-                                @endif
-
                                 <div class="info-item">
-                                    <div class="info-icon">
-                                        <i class="bi bi-images"></i>
-                                    </div>
+                                    <div class="info-icon"><i class="bi bi-images"></i></div>
                                     <div class="info-content">
                                         <div class="info-label">Imágenes</div>
-                                        <div class="info-value">{{ $auto->imagenes->count() }} fotos</div>
+                                        <div class="info-value">{{ $property->images->count() }} fotos</div>
                                     </div>
                                 </div>
                             </div>
@@ -319,7 +228,6 @@
                     </div>
 
                 </div>
-
             </div>
         </div>
     </div>
