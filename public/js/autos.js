@@ -1,89 +1,80 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const modalVehiculo = document.getElementById('modalNuevoVehiculo');
-    const formVehiculo = document.getElementById('formVehiculo');
+    const modalPropiedad = document.getElementById('modalPropiedad');
+    const formPropiedad = document.getElementById('formPropiedad');
 
-    if (modalVehiculo) {
-        modalVehiculo.addEventListener('show.bs.modal', function(event) {
+    if (modalPropiedad) {
+        modalPropiedad.addEventListener('show.bs.modal', function(event) {
             const button = event.relatedTarget;
-            const autoId = button.getAttribute('data-id');
+            const id = button.getAttribute('data-id');
 
             const modalTitle = document.getElementById('modalTitle');
             const methodField = document.getElementById('methodField');
             const btnText = document.getElementById('btnSubmitText');
             const btnIcon = document.getElementById('btnSubmitIcon');
 
-            if (autoId) {
-                // Modo edición
-                modalTitle.textContent = 'Editar Vehículo';
+            if (id) {
+                // MODO EDICIÓN
+                modalTitle.textContent = 'Editar Propiedad';
                 btnText.textContent = 'Guardar Cambios';
                 btnIcon.className = 'bi bi-check-lg';
                 methodField.value = 'PUT';
-                formVehiculo.action = `/autos/${autoId}`;
+                formPropiedad.action = `/propiedades/${id}`;
 
-                // Array de campos que son inputs/textareas normales
-                const textFields = ['modelo', 'year', 'color', 'kilometraje', 'precio', 'descripcion'];
+                // Campos de texto y números
+                const fields = [
+                    'title', 'neighborhood', 'address', 'm2_land', 
+                    'm2_construction', 'bedrooms', 'bathrooms', 
+                    'parking_spots', 'price', 'description'
+                ];
 
-                // Procesar campos de texto normales
-                textFields.forEach(field => {
+                fields.forEach(field => {
                     const input = document.getElementById(field);
                     if (input) {
                         input.value = button.getAttribute(`data-${field}`) || '';
                     }
                 });
 
-                // Procesar selects (campos que usan <select>)
-                const selectFields = ['id_marca', 'tipo', 'transmision', 'combustible'];
-                
-                selectFields.forEach(field => {
+                // Selects
+                const selects = ['type', 'contract_type'];
+                selects.forEach(field => {
                     const select = document.getElementById(field);
                     if (select) {
-                        const value = button.getAttribute(`data-${field}`);
-                        if (value) {
-                            select.value = value;
-                            select.dispatchEvent(new Event('change'));
-                        }
+                        select.value = button.getAttribute(`data-${field}`);
                     }
                 });
 
-                // Checkboxes
-                document.getElementById('ocultar_kilometraje').checked = button.getAttribute('data-ocultar') === '1';
-                document.getElementById('consignacion').checked = button.getAttribute('data-consignacion') === '1';
+                // Checkboxes (Booleans)
+                document.getElementById('is_featured').checked = button.getAttribute('data-is_featured') == '1';
+                document.getElementById('show_address').checked = button.getAttribute('data-show_address') == '1';
 
             } else {
-                // Modo creación
+                // MODO CREACIÓN
                 modalTitle.textContent = 'Nueva Propiedad';
                 btnText.textContent = 'Registrar Propiedad';
                 btnIcon.className = 'bi bi-plus-lg';
                 methodField.value = 'POST';
-                formVehiculo.action = "/autos";
-                formVehiculo.reset();
+                formPropiedad.action = "{{ route('propiedades.store') }}";
+                formPropiedad.reset();
+                
+                // Valores por defecto para creación
+                document.getElementById('show_address').checked = true;
+                document.getElementById('is_featured').checked = false;
             }
         });
     }
 
-    // Resto de tu código (búsqueda, eliminación)...
-    const searchInput = document.getElementById('searchInput');
-    const filterForm = document.getElementById('filterForm');
-    if (searchInput && filterForm) {
-        searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                filterForm.submit();
-            }
-        });
-    }
-
+    // Lógica de SweetAlert para eliminar (si usas SweetAlert2)
     document.addEventListener('submit', function(e) {
         if (e.target && e.target.classList.contains('form-eliminar')) {
             e.preventDefault();
             const form = e.target;
             Swal.fire({
                 title: '¿Estás seguro?',
-                text: "El vehículo se eliminará permanentemente.",
+                text: "La propiedad se eliminará permanentemente.",
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar'
             }).then((result) => {

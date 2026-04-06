@@ -22,7 +22,7 @@
                         @endif
                     </p>
                 </div>
-                <button class="btn-new-vehicle" data-bs-toggle="modal" data-bs-target="#modalNuevoVehiculo">
+                <button class="btn-new-vehicle" data-bs-toggle="modal" data-bs-target="#modalPropiedad">
                     <i class="bi bi-plus-lg"></i>
                     Agregar Propiedad
                 </button>
@@ -153,10 +153,20 @@
                                                 </a>
 
                                                 <a class="btn-action btn-edit" title="Editar" data-bs-toggle="modal"
-                                                    data-bs-target="#modalNuevaPropiedad" data-id="{{ $property->id }}" {{-- Pasa
-                                                    aquí todos los datos para el JS de edición --}}
-                                                    data-title="{{ $property->title }}" data-price="{{ $property->price }}"
-                                                    style="cursor: pointer;">
+                                                    data-bs-target="#modalPropiedad" data-id="{{ $property->id }}"
+                                                    data-title="{{ $property->title }}"
+                                                    data-neighborhood="{{ $property->neighborhood }}"
+                                                    data-type="{{ $property->type }}" data-address="{{ $property->address }}"
+                                                    data-m2_land="{{ $property->m2_land }}"
+                                                    data-m2_construction="{{ $property->m2_construction }}"
+                                                    data-bedrooms="{{ $property->bedrooms }}"
+                                                    data-bathrooms="{{ $property->bathrooms }}"
+                                                    data-parking_spots="{{ $property->parking_spots }}"
+                                                    data-contract_type="{{ $property->contract_type }}"
+                                                    data-price="{{ $property->price }}"
+                                                    data-is_featured="{{ $property->is_featured }}"
+                                                    data-show_address="{{ $property->show_address }}"
+                                                    data-description="{{ $property->description }}" style="cursor: pointer;">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
@@ -209,9 +219,9 @@
     </div>
 
     <!-- 
-                         MODAL — NUEVO VEHÍCULO
-                    -->
-    <div class="modal fade" id="modalNuevoVehiculo" tabindex="-1" aria-hidden="true">
+                             MODAL — NUEVO VEHÍCULO
+                        -->
+    <div class="modal fade" id="modalPropiedad" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl ">
             <div class="modal-content">
 
