@@ -18,6 +18,7 @@ class PropertyService
     public function getAllPaginated($perPage = 10)
     {
         return Property::with('images')
+            ->where('active', true) 
             ->orderBy('created_at', 'desc')
             ->paginate($perPage);
     }

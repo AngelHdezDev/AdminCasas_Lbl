@@ -60,4 +60,16 @@ class PropertyController extends Controller
 
         return view('autos.autosDetail', compact('property'));
     }
+
+    public function destroy($id)
+    {
+        $property = Property::findOrFail($id);
+
+        $property->update([
+            'active' => false
+        ]);
+
+        return redirect()->route('propiedades.index')
+            ->with('success', 'La propiedad ha sido dada de baja correctamente.');
+    }
 }

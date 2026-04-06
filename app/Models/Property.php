@@ -10,7 +10,7 @@ class Property extends Model
     protected $fillable = [
         'title', 'description', 'price', 'bedrooms', 'bathrooms', 
         'half_bathrooms', 'parking_spots', 'm2_construction', 
-        'm2_land', 'address', 'neighborhood', 'type', 'status', 'contract_type'
+        'm2_land', 'address', 'neighborhood', 'type', 'status', 'contract_type', 'active'
     ];
 
     // Relación con las fotos (similar a como lo hicimos con los autos)
