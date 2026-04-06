@@ -118,7 +118,8 @@
                                                 <div>
                                                     <div class="vehicle-name">{{ $property->title }}</div>
                                                     <div class="vehicle-brand">
-                                                        {{ $property->contract_type == 'sale' ? 'Venta' : 'Renta' }}</div>
+                                                        {{ $property->contract_type == 'sale' ? 'Venta' : 'Renta' }}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>
@@ -208,8 +209,8 @@
     </div>
 
     <!-- 
-             MODAL — NUEVO VEHÍCULO
-        -->
+                         MODAL — NUEVO VEHÍCULO
+                    -->
     <div class="modal fade" id="modalNuevoVehiculo" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl ">
             <div class="modal-content">
@@ -304,21 +305,30 @@
                                             <div class="field-group">
                                                 <label class="field-label">Habitaciones</label>
                                                 <input type="number" class="field-input" name="bedrooms" id="bedrooms"
-                                                    min="0" value="0">
+                                                    min="0" value="{{ old('bedrooms', 0) }}"
+                                                    onfocus="if(this.value=='0')this.value=''"
+                                                    onblur="if(this.value=='')this.value='0'">
                                             </div>
                                         </div>
+
                                         <div class="col-4">
                                             <div class="field-group">
                                                 <label class="field-label">Baños</label>
+                                                {{-- CORREGIDO: name="bathrooms" e id="bathrooms" --}}
                                                 <input type="number" class="field-input" name="bathrooms" id="bathrooms"
-                                                    min="0" value="0">
+                                                    min="0" value="{{ old('bathrooms', 0) }}"
+                                                    onfocus="if(this.value=='0')this.value=''"
+                                                    onblur="if(this.value=='')this.value='0'">
                                             </div>
                                         </div>
+
                                         <div class="col-4">
                                             <div class="field-group">
                                                 <label class="field-label">Cochera</label>
                                                 <input type="number" class="field-input" name="parking_spots"
-                                                    id="parking_spots" min="0" value="0">
+                                                    id="parking_spots" min="0" value="{{ old('parking_spots', 0) }}"
+                                                    onfocus="if(this.value=='0')this.value=''"
+                                                    onblur="if(this.value=='')this.value='0'">
                                             </div>
                                         </div>
                                     </div>

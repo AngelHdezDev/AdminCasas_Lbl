@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Modo creación
                 modalTitle.textContent = 'Nueva Propiedad';
-                btnText.textContent = 'Registrar Vehículo';
+                btnText.textContent = 'Registrar Propiedad';
                 btnIcon.className = 'bi bi-plus-lg';
                 methodField.value = 'POST';
                 formVehiculo.action = "/autos";
