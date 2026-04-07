@@ -11,16 +11,9 @@ class ClientService
     /**
      * Lógica para registrar un nuevo dueño (Cliente)
      */
-    public function storeClient(array $data)
+    public function createClient(array $data)
     {
-        return DB::transaction(function () use ($data) {
-            return Client::create([
-                'name' => $data['name'],
-                'email' => $data['email'] ?? null,
-                'phone' => $data['phone'],
-                'address' => $data['address'] ?? null,
-            ]);
-        });
+        return Client::create($data);
     }
 
     /**

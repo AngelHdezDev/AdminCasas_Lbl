@@ -7,6 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class Client extends Model
 {
     //
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'notes',
+    ];
     public function sellers()
     {
         return $this->belongsToMany(Seller::class);
@@ -14,7 +20,7 @@ class Client extends Model
 
     public function properties()
     {
-        // Un cliente puede estar interesado en muchas propiedades
+        
         return $this->hasMany(Property::class);
     }
 }

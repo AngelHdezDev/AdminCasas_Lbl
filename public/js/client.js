@@ -1,10 +1,10 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const modalPropiedad = document.getElementById('modalPropiedad');
-    const formPropiedad = document.getElementById('formPropiedad');
+document.addEventListener('DOMContentLoaded', function () {
+    const modalCliente = document.getElementById('modalNuevoCliente');
+    const formCliente = document.getElementById('formCliente');
 
-    if (modalPropiedad) {
-        modalPropiedad.addEventListener('show.bs.modal', function(event) {
-            const button = event.relatedTarget;
+    if (modalCliente) {
+        modalCliente.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget; // Botón que activó el modal
             const id = button.getAttribute('data-id');
 
             const modalTitle = document.getElementById('modalTitle');
@@ -14,71 +14,70 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (id) {
                 // MODO EDICIÓN
-                modalTitle.textContent = 'Editar Propiedad';
+                modalTitle.textContent = 'Editar Cliente';
                 btnText.textContent = 'Guardar Cambios';
                 btnIcon.className = 'bi bi-check-lg';
                 methodField.value = 'PUT';
-                formPropiedad.action = `/propiedades/${id}`;
+                formCliente.action = `/clientes/${id}`;
 
-                // Campos de texto y números
-                const fields = [
-                    'title', 'neighborhood', 'address', 'm2_land',
-                    'm2_construction', 'bedrooms', 'bathrooms',
-                    'parking_spots', 'price', 'description',
-                    'city', 'state' // NUEVOS
-                ];
+                // Campos que coinciden con tu DB: id, name, email, phone, notes
+                const fields = ['name', 'email', 'phone', 'notes'];
 
                 fields.forEach(field => {
                     const input = document.getElementById(field);
                     if (input) {
+                        // Extraemos el valor del atributo data- del botón
                         input.value = button.getAttribute(`data-${field}`) || '';
                     }
                 });
 
-                // Selects
-                const selects = ['type', 'contract_type', 'seller_id', 'client_id']; // NUEVOS
-                selects.forEach(field => {
-                    const select = document.getElementById(field);
-                    if (select) {
-                        select.value = button.getAttribute(`data-${field}`) || '';
-                    }
-                });
-
-                // Checkboxes
-                document.getElementById('is_featured').checked = button.getAttribute('data-is_featured') == '1';
-                document.getElementById('show_address').checked = button.getAttribute('data-show_public_address') == '1'; // CORREGIDO
-
             } else {
                 // MODO CREACIÓN
-                modalTitle.textContent = 'Nueva Propiedad';
-                btnText.textContent = 'Registrar Propiedad';
-                btnIcon.className = 'bi bi-plus-lg';
-                formPropiedad.reset();
-
-                // Valores por defecto para creación
-                document.getElementById('show_address').checked = true;
-                document.getElementById('is_featured').checked = false;
+                modalTitle.textContent = 'Nuevo Cliente';
+                btnText.textContent = 'Guardar Cliente';
+                btnIcon.className = 'bi bi-person-plus-fill';
+                formCliente.action = "/clientes";
+                document.getElementById('methodField').value = 'POST';
+                formCliente.reset();
+                const fields = ['name', 'email', 'phone', 'notes'];
+                fields.forEach(field => {
+                    const input = document.getElementById(field);
+                    if (input) {
+                        input.value = "";
+                        input.classList.remove('is-invalid'); 
+                    }
+                });
+                const errorMessages = formCliente.querySelectorAll('.invalid-feedback');
+                errorMessages.forEach(msg => msg.remove());
             }
         });
     }
 
-    // SweetAlert para eliminar
-    document.addEventListener('submit', function(e) {
-        if (e.target && e.target.classList.contains('form-eliminar')) {
-            e.preventDefault();
-            const form = e.target;
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "La propiedad se eliminará permanentemente.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) form.submit();
-            });
-        }
-    });
+    // SweetAlert para eliminar clientes
+    window.confirmDelete = function (id) {
+        Swal.fire({
+            title: '¿Eliminar cliente?',
+            text: "Se perderá el historial de contacto y notas de este propietario.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Crear un form dinámico para enviar el DELETE
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/clients/${id}`;
+                form.innerHTML = `
+                    @csrf
+                    @method('DELETE')
+                `;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
+    };
 });

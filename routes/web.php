@@ -54,3 +54,4 @@ Route::post('/galeria/asignar/{id}', [GaleriaController::class, 'asignar'])->nam
 Route::delete('/galeria/{id}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
 
 Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')->name('clientes.index');
+Route::post('/clientes', [ClientController::class, 'store'])->middleware('auth')->name('clientes.store');

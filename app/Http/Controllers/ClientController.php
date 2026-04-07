@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Services\ClientService;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreClientRequest;
 
 class ClientController extends Controller
 {
@@ -20,20 +21,18 @@ class ClientController extends Controller
         $clients = $this->clientService->getAllPaginated();
         return view('clientes.clientes', compact('clients'));
     }
-    public function store(Request $request)
+    public function store(StoreClientRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:clients,email',
-            'phone' => 'required|string|max:20',
-            'address' => 'nullable|string',
-        ]);
-
         try {
-            $this->clientService->storeClient($validated);
-            return redirect()->back()->with('success', 'Cliente registrado con éxito.');
+            $this->clientService->createClient($request->validated());
+
+            return redirect()->route('clientes.index')
+                ->with('success', '¡Cliente guardado con éxito!');
+
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al registrar cliente.');
+            return redirect()->back()
+                ->with('error', 'Error al procesar el registro.')
+                ->withInput();
         }
     }
 
