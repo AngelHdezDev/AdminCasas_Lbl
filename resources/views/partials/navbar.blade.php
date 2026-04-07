@@ -22,6 +22,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link-vms {{ request()->routeIs('clientes.*') ? 'active' : '' }}"
+                        href="{{ route('clientes.index') }}">
+                        <i class="bi bi-person-plus "> </i>  Clientes
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link-vms {{ request()->routeIs('vendedores.*') ? 'active' : '' }}"
+                        href="{{ route('marcas.index') }}">
+                        <i class="bi bi-tag me-1"></i> Vendedores
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('marcas.*') ? 'active' : '' }}"
                         href="{{ route('marcas.index') }}">
                         <i class="bi bi-tag me-1"></i> Marcas

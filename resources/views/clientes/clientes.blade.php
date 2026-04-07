@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 
-@section('title', 'Propiedades')
+@section('title', 'Clientes')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/autos.css') }}">
@@ -13,23 +13,21 @@
         <div class="container-fluid px-4">
             <div class="page-header-inner">
                 <div>
-                    <p class="page-eyebrow">Inventario</p>
-                    <h1 class="page-title">Propiedades</h1>
+                    <p class="page-eyebrow">Administración</p>
+                    <h1 class="page-title">Clientes</h1>
                     <p class="page-subtitle">
-                        {{ $properties->total() }} propiedades registradas
-                        @if(isset($totalConsignacion) && $totalConsignacion > 0)
-                            &mdash; {{ $totalConsignacion }} en consignación
-                        @endif
+                        <span class="fw-bold">{{ $clients->total() }}</span> clientes registrados
+                       
                     </p>
                 </div>
+                
                 <button class="btn-new-vehicle" data-bs-toggle="modal" data-bs-target="#modalPropiedad">
-                    <i class="bi bi-plus-lg"></i>
-                    Agregar Propiedad
+                    <i class="bi bi-person-plus"></i>
+                    Nuevo Cliente
                 </button>
             </div>
         </div>
     </div>
-
     <!-- ── FILTERS BAR ── -->
     <div class="filters-bar">
         <div class="container-fluid px-4">
@@ -67,7 +65,7 @@
                 </select>
 
                 <span class="filters-count">
-                    Mostrando <span>{{ $properties->total() }}</span> propiedades
+                    Mostrando <span>{{ $clients->total() }}</span> propiedades
                 </span>
 
                 @if(request()->anyFilled(['search', 'type', 'neighborhood', 'contract_type']))
@@ -213,10 +211,10 @@
                         <div class="empty-icon">
                             <i class="bi bi-house-door"></i>
                         </div>
-                        <div class="empty-title">Sin propiedades registradas</div>
-                        <p class="empty-text">Agrega la primera propiedad al inventario para comenzar.</p>
-                        <button class="btn-new-vehicle mx-auto" data-bs-toggle="modal" data-bs-target="#modalNuevaPropiedad">
-                            <i class="bi bi-plus-lg"></i> Agregar Propiedad
+                        <div class="empty-title">Sin clientes registrados</div>
+                        <p class="empty-text">Agrega el primer cliente para comenzar.</p>
+                        <button class="btn-new-vehicle mx-auto" data-bs-toggle="modal" data-bs-target="#modalPropiedad">
+                            <i class="bi bi-person-plus"></i> Nuevo Cliente
                         </button>
                     </div>
                 @endif
@@ -485,7 +483,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('js/autos.js') }}"></script>
+    <script src="{{ asset('js/client.js') }}"></script>
 
     @if(session('success'))
         <script>

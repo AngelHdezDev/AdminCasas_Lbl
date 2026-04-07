@@ -9,6 +9,7 @@ use App\Http\Controllers\AutoController;
 use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\GaleriaController;
+use App\Http\Controllers\ClientController;
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -51,3 +52,5 @@ Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index
 Route::post('/galeria', [GaleriaController::class, 'store'])->name('galeria.store');
 Route::post('/galeria/asignar/{id}', [GaleriaController::class, 'asignar'])->name('galeria.asignar');
 Route::delete('/galeria/{id}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
+
+Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')->name('clientes.index');
