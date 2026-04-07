@@ -33,6 +33,12 @@ class StorePropertyRequest extends FormRequest
             'description' => 'nullable|string',
             'neighborhood' => 'nullable|string',
             'parking_spots' => 'required|integer|min:0',
+            'state' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'is_featured' => 'sometimes|boolean',
+            'show_public_address' => 'sometimes|boolean',
+            'seller_id' => 'nullable|exists:users,id',
+            'client_id' => 'nullable|exists:clients,id',
         ];
     }
 }

@@ -167,9 +167,12 @@
                                                     data-parking_spots="{{ $property->parking_spots }}"
                                                     data-contract_type="{{ $property->contract_type }}"
                                                     data-price="{{ $property->price }}"
-                                                    data-is_featured="{{ $property->is_featured }}"
-                                                    data-show_address="{{ $property->show_address }}"
-                                                    data-description="{{ $property->description }}" style="cursor: pointer;">
+                                                    data-is_featured="{{ $property->is_featured ? '1' : '0' }}"
+                                                    data-show_public_address="{{ $property->show_public_address ? '1' : '0' }}"
+                                                    data-description="{{ $property->description }}"
+                                                    data-city="{{ $property->city }}" data-state="{{ $property->state }}"
+                                                    data-seller_id="{{ $property->seller_id }}"
+                                                    data-client_id="{{ $property->client_id }}" style="cursor: pointer;">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
@@ -222,10 +225,10 @@
     </div>
 
     <!-- 
-                                 MODAL — NUEVO VEHÍCULO
-                            -->
+                                             MODAL — NUEVO VEHÍCULO
+                                        -->
     <div class="modal fade" id="modalPropiedad" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-xl ">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
 
                 <div class="modal-header">
@@ -245,7 +248,7 @@
                     </div>
                 </div>
 
-                <form action="{{route('propiedades.store')}}" method="POST" id="formPropiedad">
+                <form action="{{ route('propiedades.store') }}" method="POST" id="formPropiedad">
                     @csrf
                     <input type="hidden" name="_method" id="methodField" value="POST">
 
@@ -282,6 +285,20 @@
                                                     <option value="land">Terreno</option>
                                                     <option value="commercial">Local Comercial</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="field-group">
+                                                <label class="field-label">Ciudad <span class="required">*</span></label>
+                                                <input type="text" class="field-input" name="city" id="city"
+                                                    placeholder="Ej: Guadalajara, Zapopan..." required>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="field-group">
+                                                <label class="field-label">Estado <span class="required">*</span></label>
+                                                <input type="text" class="field-input" name="state" id="state"
+                                                    placeholder="Ej: Jalisco, CDMX..." required>
                                             </div>
                                         </div>
                                         <div class="col-12">
@@ -323,18 +340,15 @@
                                                     onblur="if(this.value=='')this.value='0'">
                                             </div>
                                         </div>
-
                                         <div class="col-4">
                                             <div class="field-group">
                                                 <label class="field-label">Baños</label>
-                                                {{-- CORREGIDO: name="bathrooms" e id="bathrooms" --}}
                                                 <input type="number" class="field-input" name="bathrooms" id="bathrooms"
                                                     min="0" value="{{ old('bathrooms', 0) }}"
                                                     onfocus="if(this.value=='0')this.value=''"
                                                     onblur="if(this.value=='')this.value='0'">
                                             </div>
                                         </div>
-
                                         <div class="col-4">
                                             <div class="field-group">
                                                 <label class="field-label">Cochera</label>
@@ -396,8 +410,36 @@
                                                 </div>
                                             </div>
                                             <div class="form-switch-custom form-check">
-                                                <input class="form-check-input" type="checkbox" name="show_address"
+                                                <input class="form-check-input" type="checkbox" name="show_public_address"
                                                     id="show_address" value="1" checked>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <div class="form-section-title">Asignación</div>
+                                    <div class="row g-3">
+                                        <div class="col-6">
+                                            <div class="field-group">
+                                                <label class="field-label">Vendedor</label>
+                                                <select class="field-input" name="seller_id" id="seller_id">
+                                                    <option value="">Sin asignar</option>
+                                                    {{-- @foreach($sellers as $seller) --}}
+                                                    {{-- <option value="{{ $seller->id }}">{{ $seller->name }}</option> --}}
+                                                    {{-- @endforeach --}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="field-group">
+                                                <label class="field-label">Cliente</label>
+                                                <select class="field-input" name="client_id" id="client_id">
+                                                    <option value="">Sin asignar</option>
+                                                    {{-- @foreach($clients as $client) --}}
+                                                    {{-- <option value="{{ $client->id }}">{{ $client->name }}</option> --}}
+                                                    {{-- @endforeach --}}
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
@@ -413,6 +455,7 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
                     </div>
 

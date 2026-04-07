@@ -22,9 +22,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Campos de texto y números
                 const fields = [
-                    'title', 'neighborhood', 'address', 'm2_land', 
-                    'm2_construction', 'bedrooms', 'bathrooms', 
-                    'parking_spots', 'price', 'description'
+                    'title', 'neighborhood', 'address', 'm2_land',
+                    'm2_construction', 'bedrooms', 'bathrooms',
+                    'parking_spots', 'price', 'description',
+                    'city', 'state' // NUEVOS
                 ];
 
                 fields.forEach(field => {
@@ -35,17 +36,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 // Selects
-                const selects = ['type', 'contract_type'];
+                const selects = ['type', 'contract_type', 'seller_id', 'client_id']; // NUEVOS
                 selects.forEach(field => {
                     const select = document.getElementById(field);
                     if (select) {
-                        select.value = button.getAttribute(`data-${field}`);
+                        select.value = button.getAttribute(`data-${field}`) || '';
                     }
                 });
 
-                // Checkboxes (Booleans)
+                // Checkboxes
                 document.getElementById('is_featured').checked = button.getAttribute('data-is_featured') == '1';
-                document.getElementById('show_address').checked = button.getAttribute('data-show_address') == '1';
+                document.getElementById('show_address').checked = button.getAttribute('data-show_public_address') == '1'; // CORREGIDO
 
             } else {
                 // MODO CREACIÓN
@@ -53,7 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 btnText.textContent = 'Registrar Propiedad';
                 btnIcon.className = 'bi bi-plus-lg';
                 formPropiedad.reset();
-                
+
                 // Valores por defecto para creación
                 document.getElementById('show_address').checked = true;
                 document.getElementById('is_featured').checked = false;
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Lógica de SweetAlert para eliminar (si usas SweetAlert2)
+    // SweetAlert para eliminar
     document.addEventListener('submit', function(e) {
         if (e.target && e.target.classList.contains('form-eliminar')) {
             e.preventDefault();
