@@ -21,10 +21,7 @@ class ClientService
      */
     public function updateClient(Client $client, array $data)
     {
-        return DB::transaction(function () use ($client, $data) {
-            $client->update($data);
-            return $client;
-        });
+        return $client->update($data);
     }
 
     /**

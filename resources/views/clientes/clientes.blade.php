@@ -185,8 +185,8 @@
     </div>
 
     <!-- 
-                                                                 MODAL — NUEVO VEHÍCULO
-                                                            -->
+                                                                                 MODAL — NUEVO VEHÍCULO
+                                                                            -->
     <div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -215,7 +215,6 @@
 
                     <div class="modal-body">
                         <div class="row g-4">
-
                             <div class="col-lg-6">
                                 <div class="form-section">
                                     <div class="form-section-title">Información Personal</div>
@@ -224,26 +223,38 @@
                                             <div class="field-group">
                                                 <label class="field-label">Nombre Completo <span
                                                         class="required">*</span></label>
-                                                <input type="text" class="field-input" name="name" id="name"
-                                                    placeholder="Ej: Juan Pérez López" required>
+                                                <input type="text" class="field-input @error('name') is-invalid @enderror"
+                                                    name="name" id="name" placeholder="Ej: Juan Pérez López"
+                                                    value="{{ old('name') }}" required>
+                                                @error('name')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
+
                                         <div class="col-12">
                                             <div class="field-group">
                                                 <label class="field-label">Teléfono / WhatsApp <span
                                                         class="required">*</span></label>
-                                                <input type="text" class="field-input" name="phone" id="phone"
-                                                    placeholder="Ej: 33 1234 5678" required>
+                                                <input type="text" class="field-input @error('phone') is-invalid @enderror"
+                                                    name="phone" id="phone" placeholder="Ej: 33 1234 5678"
+                                                    value="{{ old('phone') }}" required>
+                                                @error('phone')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
                                         </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label for="email" class="form-label">Correo Electrónico</label>
-                                            <input type="email" name="email" id="email"
-                                                class="form-control @error('email') is-invalid @enderror"
-                                                value="{{ old('email') }}">
-                                            @error('email')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
+
+                                        <div class="col-12">
+                                            <div class="field-group">
+                                                <label for="email" class="field-label">Correo Electrónico</label>
+                                                <input type="email" name="email" id="email"
+                                                    class="field-input @error('email') is-invalid @enderror"
+                                                    placeholder="ejemplo@correo.com" value="{{ old('email') }}">
+                                                @error('email')
+                                                    <div class="invalid-feedback" style="display: block;">{{ $message }}</div>
+                                                @enderror
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -255,12 +266,15 @@
                                     <div class="field-group" style="margin-bottom: 0;">
                                         <label class="field-label">Notas Internas <span
                                                 style="color:var(--gray-300); font-weight:400;">(Opcional)</span></label>
-                                        <textarea class="field-input" name="notes" id="notes" rows="8"
-                                            placeholder="Información relevante: mejores horarios de contacto, preferencias de zona en Guadalajara, etc."></textarea>
+                                        <textarea class="field-input @error('notes') is-invalid @enderror" name="notes"
+                                            id="notes" rows="8"
+                                            placeholder="Información relevante: mejores horarios de contacto, preferencias de zona en Guadalajara, etc.">{{ old('notes') }}</textarea>
+                                        @error('notes')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
 
@@ -306,8 +320,27 @@
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Reabre el modal automáticamente si hay errores
-                const modal = new bootstrap.Modal(document.getElementById('modalNuevoCliente'));
+                const modalElement = document.getElementById('modalNuevoCliente');
+                const modal = new bootstrap.Modal(modalElement);
+
+                @if(session('edit_client_id'))
+                    const id = "{{ session('edit_client_id') }}";
+                    const form = document.getElementById('formCliente');
+
+                    // UI modo edición
+                    document.getElementById('modalTitle').textContent = 'Editar Cliente';
+                    document.getElementById('btnSubmitText').textContent = 'Guardar Cambios';
+                    document.getElementById('btnSubmitIcon').className = 'bi bi-check-lg';
+                    document.getElementById('methodField').value = 'PUT';
+                    form.action = `/clientes/${id}`;
+
+                    // Repoblar campos con old() desde PHP
+                    document.getElementById('name').value = @json(old('name', ''));
+                    document.getElementById('phone').value = @json(old('phone', ''));
+                    document.getElementById('email').value = @json(old('email', ''));
+                    document.getElementById('notes').value = @json(old('notes', ''));
+                @endif
+
                 modal.show();
             });
         </script>

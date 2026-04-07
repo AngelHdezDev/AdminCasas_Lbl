@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Services\ClientService;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreClientRequest;
+use App\Http\Requests\UpdateClientRequest;
 
 class ClientController extends Controller
 {
@@ -32,6 +33,34 @@ class ClientController extends Controller
         } catch (\Exception $e) {
             return redirect()->back()
                 ->with('error', 'Error al procesar el registro.')
+                ->withInput();
+        }
+    }
+
+    // El $client (o $id) viene de la definición de tu ruta
+    public function update(UpdateClientRequest $request, $client)
+    {
+        try {
+            // 1. Buscamos al cliente
+            $clientModel = Client::findOrFail($client);
+
+            // 2. Procesamos la actualización
+            $this->clientService->updateClient($clientModel, $request->validated());
+
+            return redirect()->route('clientes.index')
+                ->with('success', 'Cliente actualizado correctamente.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Este catch atrapa los errores de validación (como el correo duplicado)
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput()
+                ->with('edit_client_id', $client); // <--- Aquí pasas el ID que recibiste arriba
+
+        } catch (\Exception $e) {
+            // Este catch atrapa errores generales del sistema
+            return redirect()->back()
+                ->with('error', 'Ocurrió un error inesperado.')
                 ->withInput();
         }
     }
