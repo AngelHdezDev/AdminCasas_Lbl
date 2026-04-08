@@ -74,4 +74,14 @@ class ClientController extends Controller
             return redirect()->back()->with('error', $e->getMessage());
         }
     }
+
+    public function deleteFile($id)
+    {
+        $client = Client::findOrFail($id);
+
+        // El servicio se encarga de todo el proceso
+        $this->clientService->deleteClientFile($client);
+
+        return redirect()->back()->with('success', 'Identificación eliminada del registro.');
+    }
 }

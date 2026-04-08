@@ -59,4 +59,17 @@ class ClientService
     {
         return $this->repository->getAllPaginated($perPage);
     }
+
+    public function deleteClientFile($client)
+    {
+        // 1. Borrar el archivo físico si existe
+        if ($client->identification_path && Storage::disk('local')->exists($client->identification_path)) {
+            Storage::disk('local')->delete($client->identification_path);
+        }
+
+        // 2. Actualizar la base de datos poniendo el campo en null
+        return $this->repository->update($client, [
+            'identification_path' => null
+        ]);
+    }
 }
