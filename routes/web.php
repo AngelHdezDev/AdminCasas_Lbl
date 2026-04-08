@@ -10,6 +10,8 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\ClientController;
+use Illuminate\Support\Facades\Storage;
+
 
 Route::get('/', function () {
     return redirect()->route('dashboard');
@@ -59,3 +61,13 @@ Route::put('/clientes/{client}', [ClientController::class, 'update'])->middlewar
 Route::delete('/clientes/{client}', [ClientController::class, 'destroy'])->middleware('auth')->name('clientes.destroy');
 
 Route::get('/api/consulta-cp/{cp}', [App\Http\Controllers\PostalCodeController::class, 'consultaCP']);
+
+Route::get('/clientes/archivo/{id}', function ($id) {
+    $cliente = \App\Models\Client::findOrFail($id);
+
+    if ($cliente->identification_path && Storage::disk('local')->exists($cliente->identification_path)) {
+        return Storage::disk('local')->response($cliente->identification_path);
+    }
+
+    abort(404, "Archivo no encontrado");
+})->middleware('auth')->name('clientes.archivo');

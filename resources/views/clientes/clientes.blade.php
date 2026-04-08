@@ -132,6 +132,7 @@
                                                     data-bs-target="#modalEditarCliente" data-id="{{ $client->id }}"
                                                     data-name="{{ $client->name }}" data-email="{{ $client->email }}"
                                                     data-phone="{{ $client->phone }}" data-notes="{{ $client->notes }}"
+                                                    data-identification="{{ $client->identification_path }}"
                                                     style="cursor: pointer;">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
