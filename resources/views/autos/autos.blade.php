@@ -225,8 +225,8 @@
     </div>
 
     <!-- 
-                                             MODAL — NUEVO VEHÍCULO
-                                        -->
+                                                         MODAL — NUEVO VEHÍCULO
+                                                    -->
     <div class="modal fade" id="modalPropiedad" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
@@ -267,17 +267,11 @@
                                                     placeholder="Ej: Casa moderna con alberca en Zapopan" required>
                                             </div>
                                         </div>
-                                        <div class="col-8">
+
+                                        <div class="col-md-6">
                                             <div class="field-group">
-                                                <label class="field-label">Colonia / Zona <span
+                                                <label class="field-label">Tipo de Propiedad <span
                                                         class="required">*</span></label>
-                                                <input type="text" class="field-input" name="neighborhood" id="neighborhood"
-                                                    placeholder="Ej: Puerta de Hierro, Americana..." required>
-                                            </div>
-                                        </div>
-                                        <div class="col-4">
-                                            <div class="field-group">
-                                                <label class="field-label">Tipo <span class="required">*</span></label>
                                                 <select class="field-input" name="type" id="type" required>
                                                     <option value="">Seleccionar</option>
                                                     <option value="house">Casa</option>
@@ -287,26 +281,49 @@
                                                 </select>
                                             </div>
                                         </div>
-                                        <div class="col-6">
+
+                                        <div class="col-md-6">
                                             <div class="field-group">
-                                                <label class="field-label">Ciudad <span class="required">*</span></label>
-                                                <input type="text" class="field-input" name="city" id="city"
-                                                    placeholder="Ej: Guadalajara, Zapopan..." required>
+                                                <label class="field-label">Código Postal <span
+                                                        class="required">*</span></label>
+                                                <input type="text" class="field-input" name="cp" id="cp" placeholder="44100"
+                                                    maxlength="5" required>
                                             </div>
                                         </div>
-                                        <div class="col-6">
+
+                                        <div class="col-md-6">
                                             <div class="field-group">
                                                 <label class="field-label">Estado <span class="required">*</span></label>
                                                 <input type="text" class="field-input" name="state" id="state"
-                                                    placeholder="Ej: Jalisco, CDMX..." required>
+                                                    placeholder="Estado" readonly required>
                                             </div>
                                         </div>
+
+                                        <div class="col-md-6">
+                                            <div class="field-group">
+                                                <label class="field-label">Ciudad / Municipio <span
+                                                        class="required">*</span></label>
+                                                <input type="text" class="field-input" name="city" id="city"
+                                                    placeholder="Ciudad" readonly required>
+                                            </div>
+                                        </div>
+
                                         <div class="col-12">
                                             <div class="field-group">
-                                                <label class="field-label">Dirección Completa <span
+                                                <label class="field-label">Colonia / Zona <span
+                                                        class="required">*</span></label>
+                                                <select class="field-input" name="neighborhood" id="neighborhood" required>
+                                                    <option value="">Ingrese un CP para cargar colonias...</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="field-group">
+                                                <label class="field-label">Dirección (Calle y Número) <span
                                                         class="required">*</span></label>
                                                 <input type="text" class="field-input" name="address" id="address"
-                                                    placeholder="Calle, número exterior, interior..." required>
+                                                    placeholder="Ej: Av. Vallarta 1234..." required>
                                             </div>
                                         </div>
                                     </div>
@@ -335,27 +352,21 @@
                                             <div class="field-group">
                                                 <label class="field-label">Habitaciones</label>
                                                 <input type="number" class="field-input" name="bedrooms" id="bedrooms"
-                                                    min="0" value="{{ old('bedrooms', 0) }}"
-                                                    onfocus="if(this.value=='0')this.value=''"
-                                                    onblur="if(this.value=='')this.value='0'">
+                                                    min="0" value="0">
                                             </div>
                                         </div>
                                         <div class="col-4">
                                             <div class="field-group">
                                                 <label class="field-label">Baños</label>
                                                 <input type="number" class="field-input" name="bathrooms" id="bathrooms"
-                                                    min="0" value="{{ old('bathrooms', 0) }}"
-                                                    onfocus="if(this.value=='0')this.value=''"
-                                                    onblur="if(this.value=='')this.value='0'">
+                                                    min="0" value="0">
                                             </div>
                                         </div>
                                         <div class="col-4">
                                             <div class="field-group">
                                                 <label class="field-label">Cochera</label>
                                                 <input type="number" class="field-input" name="parking_spots"
-                                                    id="parking_spots" min="0" value="{{ old('parking_spots', 0) }}"
-                                                    onfocus="if(this.value=='0')this.value=''"
-                                                    onblur="if(this.value=='')this.value='0'">
+                                                    id="parking_spots" min="0" value="0">
                                             </div>
                                         </div>
                                     </div>

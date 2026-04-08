@@ -57,3 +57,5 @@ Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')-
 Route::post('/clientes', [ClientController::class, 'store'])->middleware('auth')->name('clientes.store');
 Route::put('/clientes/{client}', [ClientController::class, 'update'])->middleware('auth')->name('clientes.update');
 Route::delete('/clientes/{client}', [ClientController::class, 'destroy'])->middleware('auth')->name('clientes.destroy');
+
+Route::get('/api/consulta-cp/{cp}', [App\Http\Controllers\PostalCodeController::class, 'getPostalCode']);
