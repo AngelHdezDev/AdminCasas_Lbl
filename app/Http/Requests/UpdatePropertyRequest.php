@@ -32,6 +32,7 @@ class UpdatePropertyRequest extends FormRequest
             'city' => 'required|string|max:255', // NUEVO
             'seller_id' => 'nullable|exists:users,id',    // NUEVO
             'client_id' => 'nullable|exists:clients,id',  // NUEVO
+            'cp' => 'required|string|size:5|regex:/^[0-9]+$/', // NUEVO
         ];
     }
 }

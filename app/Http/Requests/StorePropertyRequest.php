@@ -39,6 +39,7 @@ class StorePropertyRequest extends FormRequest
             'show_public_address' => 'sometimes|boolean',
             'seller_id' => 'nullable|exists:users,id',
             'client_id' => 'nullable|exists:clients,id',
+            'cp' => 'required|string|size:5|regex:/^[0-9]+$/',
         ];
     }
 }

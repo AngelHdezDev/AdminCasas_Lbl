@@ -158,6 +158,7 @@
                                                 <a class="btn-action btn-edit" title="Editar" data-bs-toggle="modal"
                                                     data-bs-target="#modalPropiedad" data-id="{{ $property->id }}"
                                                     data-title="{{ $property->title }}"
+                                                    data-cp="{{ $property->cp }}"
                                                     data-neighborhood="{{ $property->neighborhood }}"
                                                     data-type="{{ $property->type }}" data-address="{{ $property->address }}"
                                                     data-m2_land="{{ $property->m2_land }}"
