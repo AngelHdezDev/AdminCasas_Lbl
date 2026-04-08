@@ -29,6 +29,7 @@ class Property extends Model
         'is_featured',
         'seller_id', 
         'client_id',
+        'cp'
     ];
 
     // Relación con las fotos (similar a como lo hicimos con los autos)
