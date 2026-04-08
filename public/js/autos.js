@@ -66,12 +66,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // --- LÓGICA DE BÚSQUEDA DE CP (PETICIÓN AL SERVIDOR) ---
+  
+    const neighborhood = document.getElementById('neighborhood');
+    const stateInput = document.getElementById('state');
+    const cityInput = document.getElementById('city');
+ 
+
     if (cpInput) {
         cpInput.addEventListener('input', function (e) {
-            const cp = e.target.value;
+            const cp = e.target.value.trim();
 
-            if (cp.length === 5) {
-                // Mostramos un estado de carga (opcional)
+            if (cp.length === 5 && /^\d+$/.test(cp)) {
                 cpInput.classList.add('is-loading');
 
                 fetch(`/api/consulta-cp/${cp}`)
@@ -80,33 +85,43 @@ document.addEventListener('DOMContentLoaded', function () {
                         return response.json();
                     })
                     .then(result => {
-                        if (result.data && result.data.length > 0) {
-                            const info = result.data[0]; 
+                        if (result.colonias && result.colonias.length > 0) {
+                            const first = result.colonias[0];
 
-                            const stateInput = document.getElementById('state');
-                            const cityInput = document.getElementById('city');
-                            const neighborhoodSelect = document.getElementById('neighborhood');
+                            if (stateInput) stateInput.value = first.estado || '';
+                            if (cityInput) cityInput.value = first.municipio || '';
 
-                            if (stateInput) stateInput.value = info.d_estado || '';
-                            if (cityInput) cityInput.value = info.D_mnpio || ''; 
-
-                            if (neighborhoodSelect) {
-                                neighborhoodSelect.innerHTML = '<option value="">Seleccione colonia</option>';
-
-                                result.data.forEach(item => {
+                            // Llenar select de colonias
+                            if (neighborhood) {
+                                neighborhood.innerHTML = '<option value="">-- Selecciona una colonia --</option>';
+                                result.colonias.forEach(item => {
                                     const option = document.createElement('option');
-                                    option.value = item.d_asenta || item.neighborhood || 'Colonia';
-                                    option.textContent = item.d_asenta || item.neighborhood || 'Colonia';
-                                    neighborhoodSelect.appendChild(option);
+                                    option.value = item.colonia;
+                                    option.textContent = `${item.colonia} (${item.tipoAsentamiento})`;
+                                    neighborhood.appendChild(option);
                                 });
+                                neighborhood.style.display = 'block'; // mostrar
                             }
 
-                            document.getElementById('cp').classList.remove('is-invalid');
+                            cpInput.classList.remove('is-invalid');
                         } else {
-                            console.error("No se encontraron datos para este CP");
+                            cpInput.classList.add('is-invalid');
+                            if (neighborhood) neighborhood.style.display = 'none';
                         }
                     })
-                    .catch(error => console.error('Error en la petición:', error));
+                    .catch(error => {
+                        console.error('Error en la petición:', error);
+                        cpInput.classList.add('is-invalid');
+                    })
+                    .finally(() => cpInput.classList.remove('is-loading'));
+            } else if (cp.length === 0) {
+                // Limpiar campos si borran el CP
+                if (stateInput) stateInput.value = '';
+                if (cityInput) cityInput.value = '';
+                if (colonySelect) {
+                    colonySelect.innerHTML = '<option value="">-- Selecciona una colonia --</option>';
+                    colonySelect.style.display = 'none';
+                }
             }
         });
     }
