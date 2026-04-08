@@ -36,7 +36,8 @@
                                                 class="field-input @error('name') is-invalid @enderror"
                                                 value="{{ old('name', $clientError->name ?? '') }}" required>
                                             @error('name') <div class="invalid-feedback" style="display:block">
-                                            {{ $message }}</div> @enderror
+                                                {{ $message }}
+                                            </div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -47,7 +48,8 @@
                                                 class="field-input @error('phone') is-invalid @enderror"
                                                 value="{{ old('phone', $clientError->phone ?? '') }}" required>
                                             @error('phone') <div class="invalid-feedback" style="display:block">
-                                            {{ $message }}</div> @enderror
+                                                {{ $message }}
+                                            </div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -57,7 +59,8 @@
                                                 class="field-input @error('email') is-invalid @enderror"
                                                 value="{{ old('email', $clientError->email ?? '') }}">
                                             @error('email') <div class="invalid-feedback" style="display:block">
-                                            {{ $message }}</div> @enderror
+                                                {{ $message }}
+                                            </div> @enderror
                                         </div>
                                     </div>
                                     <div class="col-12">
@@ -80,10 +83,18 @@
 
                                 <div class="field-group">
                                     <label class="field-label">Identificación Actual</label>
+
                                     <div id="preview-container-edit"
-                                        class="d-flex align-items-center justify-content-center border rounded bg-light"
+                                        class="d-flex align-items-center justify-content-center border rounded bg-light position-relative"
                                         style="min-height: 200px; overflow: hidden;">
+
                                         @if($clientError && $clientError->identification_path)
+                                            <button type="button" class="btn btn-danger btn-sm position-absolute"
+                                                style="top: 10px; right: 10px; z-index: 10;"
+                                                onclick="confirmDeleteFile({{ $clientError->id }})">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+
                                             <img src="{{ route('clientes.archivo', $clientError->id) }}"
                                                 class="img-fluid rounded" style="max-height: 180px; object-fit: contain;">
                                         @else

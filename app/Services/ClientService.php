@@ -27,12 +27,14 @@ class ClientService
 
     public function updateClient($client, array $data)
     {
-        // Lógica de Storage: Reemplazar archivo si viene uno nuevo
-        if (isset($data['identification_path'])) {
-            if ($client->identification_path) {
+        if (isset($data['identification_path']) && $data['identification_path'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($client->identification_path && Storage::disk('local')->exists($client->identification_path)) {
                 Storage::disk('local')->delete($client->identification_path);
             }
             $data['identification_path'] = $data['identification_path']->store('identification_client', 'local');
+
+        } else {
+            unset($data['identification_path']);
         }
 
         return $this->repository->update($client, $data);
