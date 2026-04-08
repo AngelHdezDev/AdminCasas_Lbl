@@ -184,208 +184,8 @@
         </div>
     </div>
 
-    <!-- 
-                                                                                                     MODAL — NUEVO VEHÍCULO
-                                                                                                -->
-    <!-- MODAL — NUEVO CLIENTE -->
-    <div class="modal fade" id="modalNuevoCliente" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-header-inner">
-                        <div class="modal-title-group">
-                            <div class="modal-icon"><i class="bi bi-person-badge-fill"></i></div>
-                            <div>
-                                <div class="modal-title-text">Nuevo Cliente</div>
-                                <div class="modal-subtitle-text">Registra la información del propietario o cliente potencial
-                                </div>
-                            </div>
-                        </div>
-                        <button class="btn-close-custom" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-                    </div>
-                </div>
-
-                <form action="{{ route('clientes.store') }}" method="POST" id="formCliente">
-                    @csrf
-                    <div class="modal-body">
-                        <div class="row g-4">
-                            <div class="col-lg-6">
-                                <div class="form-section">
-                                    <div class="form-section-title">Información Personal</div>
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <div class="field-group">
-                                                <label class="field-label">Nombre Completo <span
-                                                        class="required">*</span></label>
-                                                <input type="text" name="name" id="name" placeholder="Ej: Juan Pérez López"
-                                                    class="field-input @if(!session('edit_client_id')) @error('name') is-invalid @enderror @endif"
-                                                    value="@if(!session('edit_client_id')){{ old('name') }}@endif" required>
-                                                @if(!session('edit_client_id'))
-                                                    @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="field-group">
-                                                <label class="field-label">Teléfono / WhatsApp <span
-                                                        class="required">*</span></label>
-                                                <input type="text" name="phone" id="phone" placeholder="Ej: 33 1234 5678"
-                                                    class="field-input @if(!session('edit_client_id')) @error('phone') is-invalid @enderror @endif"
-                                                    value="@if(!session('edit_client_id')){{ old('phone') }}@endif"
-                                                    required>
-                                                @if(!session('edit_client_id'))
-                                                    @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="field-group">
-                                                <label class="field-label">Correo Electrónico</label>
-                                                <input type="email" name="email" id="email" placeholder="ejemplo@correo.com"
-                                                    class="field-input @if(!session('edit_client_id')) @error('email') is-invalid @enderror @endif"
-                                                    value="@if(!session('edit_client_id')){{ old('email') }}@endif">
-                                                @if(!session('edit_client_id'))
-                                                    @error('email')<div class="invalid-feedback" style="display:block;">
-                                                    {{ $message }}</div>@enderror
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-section">
-                                    <div class="form-section-title">Detalles y Seguimiento</div>
-                                    <div class="field-group" style="margin-bottom:0;">
-                                        <label class="field-label">Notas Internas <span
-                                                style="color:var(--gray-300);font-weight:400;">(Opcional)</span></label>
-                                        <textarea name="notes" id="notes" rows="8"
-                                            class="field-input @if(!session('edit_client_id')) @error('notes') is-invalid @enderror @endif"
-                                            placeholder="Información relevante...">@if(!session('edit_client_id')){{ old('notes') }}@endif</textarea>
-                                        @if(!session('edit_client_id'))
-                                            @error('notes')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer-custom">
-                        <span class="footer-note"><i class="bi bi-shield-check"></i> Los datos están protegidos por tu
-                            política de privacidad</span>
-                        <div class="footer-actions">
-                            <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-person-plus-fill"></i>
-                                <span>Guardar Cliente</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL — EDITAR CLIENTE -->
-    <div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <div class="modal-header-inner">
-                        <div class="modal-title-group">
-                            <div class="modal-icon"><i class="bi bi-person-badge-fill"></i></div>
-                            <div>
-                                <div class="modal-title-text">Editar Cliente</div>
-                                <div class="modal-subtitle-text">Actualiza la información del cliente</div>
-                            </div>
-                        </div>
-                        <button class="btn-close-custom" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-                    </div>
-                </div>
-
-                <form action="" method="POST" id="formEditarCliente">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-body">
-                        <div class="row g-4">
-                            <div class="col-lg-6">
-                                <div class="form-section">
-                                    <div class="form-section-title">Información Personal</div>
-                                    <div class="row g-3">
-                                        <div class="col-12">
-                                            <div class="field-group">
-                                                <label class="field-label">Nombre Completo <span
-                                                        class="required">*</span></label>
-                                                <input type="text" name="name" id="edit_name"
-                                                    placeholder="Ej: Juan Pérez López"
-                                                    class="field-input @if(session('edit_client_id')) @error('name') is-invalid @enderror @endif"
-                                                    value="@if(session('edit_client_id')){{ old('name') }}@endif" required>
-                                                @if(session('edit_client_id'))
-                                                    @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="field-group">
-                                                <label class="field-label">Teléfono / WhatsApp <span
-                                                        class="required">*</span></label>
-                                                <input type="text" name="phone" id="edit_phone"
-                                                    placeholder="Ej: 33 1234 5678"
-                                                    class="field-input @if(session('edit_client_id')) @error('phone') is-invalid @enderror @endif"
-                                                    value="@if(session('edit_client_id')){{ old('phone') }}@endif" required>
-                                                @if(session('edit_client_id'))
-                                                    @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                                @endif
-                                            </div>
-                                        </div>
-                                        <div class="col-12">
-                                            <div class="field-group">
-                                                <label class="field-label">Correo Electrónico</label>
-                                                <input type="email" name="email" id="edit_email"
-                                                    placeholder="ejemplo@correo.com"
-                                                    class="field-input @if(session('edit_client_id')) @error('email') is-invalid @enderror @endif"
-                                                    value="@if(session('edit_client_id')){{ old('email') }}@endif">
-                                                @if(session('edit_client_id'))
-                                                    @error('email')<div class="invalid-feedback" style="display:block;">
-                                                    {{ $message }}</div>@enderror
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6">
-                                <div class="form-section">
-                                    <div class="form-section-title">Detalles y Seguimiento</div>
-                                    <div class="field-group" style="margin-bottom:0;">
-                                        <label class="field-label">Notas Internas <span
-                                                style="color:var(--gray-300);font-weight:400;">(Opcional)</span></label>
-                                        <textarea name="notes" id="edit_notes" rows="8"
-                                            class="field-input @if(session('edit_client_id')) @error('notes') is-invalid @enderror @endif"
-                                            placeholder="Información relevante...">@if(session('edit_client_id')){{ old('notes') }}@endif</textarea>
-                                        @if(session('edit_client_id'))
-                                            @error('notes')<div class="invalid-feedback">{{ $message }}</div>@enderror
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer-custom">
-                        <span class="footer-note"><i class="bi bi-shield-check"></i> Los datos están protegidos por tu
-                            política de privacidad</span>
-                        <div class="footer-actions">
-                            <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="submit" class="btn-submit">
-                                <i class="bi bi-check-lg"></i>
-                                <span>Guardar Cambios</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    @include('clientes.modals.modal-create')
+    @include('clientes.modals.modal-edit')
 
     <!-- DATA PARA JS -->
     <div id="laravel-data" data-has-errors="{{ $errors->any() ? 'true' : 'false' }}" data-success="{{ session('success') }}"
@@ -411,7 +211,6 @@
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                // Buscamos si existe el ID de edición en la sesión de Laravel
                 const editClientId = "{{ session('edit_client_id') }}";
 
                 if (editClientId) {
@@ -419,21 +218,13 @@
 
                     const modalEditElement = document.getElementById('modalEditarCliente');
                     if (modalEditElement) {
-                        // 1. Instanciar modal de edición
                         const modalEdit = new bootstrap.Modal(modalEditElement);
-
-                        // 2. IMPORTANTE: Re-asignar el action al form de edición
-                        // Sin esto, el form de edición queda con action vacía tras el error
                         const formEdit = document.getElementById('formEditarCliente');
                         formEdit.action = `/clientes/${editClientId}`;
-
-                        // 3. Mostrar el de edición
                         modalEdit.show();
                     }
                 } else {
                     console.log("Error en creación de nuevo cliente");
-
-                    // Si no hay ID, abrimos el de creación
                     const modalCreateElement = document.getElementById('modalNuevoCliente');
                     if (modalCreateElement) {
                         const modalCreate = new bootstrap.Modal(modalCreateElement);

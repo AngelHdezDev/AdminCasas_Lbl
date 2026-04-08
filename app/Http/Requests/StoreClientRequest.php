@@ -26,6 +26,7 @@ class StoreClientRequest extends FormRequest
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255|unique:clients,email',
             'notes' => 'nullable|string',
+            'identification_path' => 'nullable|file|mimes:jpg,jpeg,png|max:1048',
         ];
     }
 
@@ -36,6 +37,9 @@ class StoreClientRequest extends FormRequest
             'phone.required' => 'El teléfono es necesario para el seguimiento.',
             'email.email'    => 'El formato del correo electrónico no es válido.',
             'email.unique'   => 'Este correo ya pertenece a un cliente registrado.',
+            'identification_path.file' => 'El archivo de identificación debe ser un archivo válido.',
+            'identification_path.mimes' => 'El archivo de identificación debe ser una imagen (jpg, jpeg, png).',
+            'identification_path.max' => 'El archivo de identificación no debe superar los 1MB de tamaño.',
         ];
     }
 }

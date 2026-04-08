@@ -23,6 +23,7 @@ class UpdateClientRequest extends FormRequest
             'phone' => 'required|string|max:20',
             'email' => 'nullable|email|max:255|unique:clients,email,' . $clientId,
             'notes' => 'nullable|string',
+            'identification_path' => 'nullable|file|mimes:jpg,jpeg,png|max:1048',
         ];
     }
 
@@ -32,6 +33,10 @@ class UpdateClientRequest extends FormRequest
             'name.required'  => 'El nombre es obligatorio.',
             'phone.required' => 'El teléfono es necesario para el seguimiento.',
             'email.unique'   => 'Este correo ya está registrado con otro cliente.',
+            'email.email'    => 'El formato del correo electrónico no es válido.',
+            'identification_path.file' => 'El archivo de identificación debe ser un archivo válido.',
+            'identification_path.mimes' => 'El archivo de identificación debe ser una imagen (jpg, jpeg, png).',
+            'identification_path.max' => 'El archivo de identificación no debe superar los 1MB de tamaño.',
         ];
     }
 

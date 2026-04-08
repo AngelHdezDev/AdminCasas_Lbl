@@ -12,6 +12,7 @@ class Client extends Model
         'email',
         'phone',
         'notes',
+        'identification_path'
     ];
     public function sellers()
     {

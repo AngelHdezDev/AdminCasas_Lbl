@@ -2,46 +2,59 @@
 
 namespace App\Services;
 
-use App\Models\Client;
-use Illuminate\Support\Facades\DB;
+use App\Repositories\ClientRepository;
+use Illuminate\Support\Facades\Storage;
 use Exception;
 
 class ClientService
 {
-    /**
-     * Lógica para registrar un nuevo dueño (Cliente)
-     */
+    protected $repository;
+
+    public function __construct(ClientRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     public function createClient(array $data)
     {
-        return Client::create($data);
+        // Lógica de Storage: Guardar la identificación
+        if (isset($data['identification_path'])) {
+            $data['identification_path'] = $data['identification_path']->store('identification_client', 'local');
+        }
+
+        return $this->repository->create($data);
     }
 
-    /**
-     * Actualizar datos del cliente
-     */
-    public function updateClient(Client $client, array $data)
+    public function updateClient($client, array $data)
     {
-        return $client->update($data);
+        // Lógica de Storage: Reemplazar archivo si viene uno nuevo
+        if (isset($data['identification_path'])) {
+            if ($client->identification_path) {
+                Storage::disk('local')->delete($client->identification_path);
+            }
+            $data['identification_path'] = $data['identification_path']->store('identification_client', 'local');
+        }
+
+        return $this->repository->update($client, $data);
     }
 
-    /**
-     * Validar si se puede eliminar (Regla de negocio)
-     */
-    public function deleteClient(Client $client)
+    public function deleteClient($client)
     {
-        // Regla: No eliminar si tiene propiedades consignadas
-        if ($client->properties()->count() > 0) {
+        // Regla de negocio: Consultamos al repo si tiene propiedades
+        if ($this->repository->hasProperties($client)) {
             throw new Exception("No se puede eliminar un cliente con propiedades activas.");
         }
 
-        return $client->delete();
+        // Si tenía un archivo de identificación, lo borramos del disco al eliminar al cliente
+        if ($client->identification_path) {
+            Storage::disk('local')->delete($client->identification_path);
+        }
+
+        return $this->repository->delete($client);
     }
 
     public function getAllPaginated($perPage = 10)
     {
-        // Usamos eager loading de properties por si quieres mostrar cuántas casas tiene cada uno
-        return Client::withCount('properties')
-            ->latest()
-            ->paginate($perPage);
+        return $this->repository->getAllPaginated($perPage);
     }
 }
