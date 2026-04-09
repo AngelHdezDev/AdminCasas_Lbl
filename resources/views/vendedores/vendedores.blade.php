@@ -86,7 +86,7 @@
             @endif
 
             <div class="table-card">
-                @if(isset($clients) && count($clients) > 0)
+                @if(isset($sellers) && count($sellers) > 0)
                     <div class="table-responsive">
                         <table class="vms-table" id="clientsTable">
                             <thead>
@@ -100,7 +100,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($clients as $client)
+                                @foreach($sellers as $seller)
                                     <tr>
                                         <td>
                                             <div class="vehicle-cell">
@@ -110,26 +110,26 @@
                                                         style="font-size: 1.5rem; color: var(--primary-color);"></i>
                                                 </div>
                                                 <div>
-                                                    <div class="vehicle-name">{{ $client->name }}</div>
+                                                    <div class="vehicle-name">{{ $seller->name }}</div>
                                                     <div class="vehicle-brand">Registrado el
-                                                        {{ $client->created_at->format('d/m/Y') }}
+                                                        {{ $seller->created_at->format('d/m/Y') }}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td style="font-weight: 500; color: var(--gray-700);">
-                                            <i class="bi bi-telephone text-muted me-1"></i> {{ $client->phone }}
+                                            <i class="bi bi-telephone text-muted me-1"></i> {{ $seller->phone }}
                                         </td>
                                         <td style="color: var(--gray-500);">
-                                            {{ $client->email ?? 'Sin correo' }}
+                                            {{ $seller->email ?? 'Sin correo' }}
                                         </td>
                                         <td style="color: var(--gray-500); max-width: 200px;" class="text-truncate">
-                                            {{ $client->notes }}
+                                            {{ $seller->notes }}
                                         </td>
                                         <td class="align-middle text-center">
-                                            @if($client->identification_path)
+                                            @if($seller->identification_path)
                                                 <div class="position-relative d-inline-block">
-                                                    <img src="{{ route('clientes.archivo', $client->id) }}" alt="ID {{ $client->name }}"
+                                                    <img src="{{ route('clientes.archivo', $seller->id) }}" alt="ID {{ $seller->name }}"
                                                         loading="lazy" class="rounded shadow-sm border"
                                                         style="width: 50px; height: 40px; object-fit: cover; cursor: pointer;"
                                                         onclick="window.open(this.src, '_blank')">
@@ -143,12 +143,11 @@
                                         <td>
                                             <div class="action-buttons" style="justify-content: flex-end;">
                                                 {{-- Botón Editar con todos los data-attributes para el JS --}}
-                                                <a class="btn-action btn-edit" title="Editar Cliente" data-bs-toggle="modal"
-                                                    data-bs-target="#modalEditarCliente" data-id="{{ $client->id }}"
-                                                    data-name="{{ $client->name }}" data-email="{{ $client->email }}"
-                                                    data-phone="{{ $client->phone }}" data-notes="{{ $client->notes }}"
-                                                    data-identification="{{ $client->identification_path }}"
-                                                    style="cursor: pointer;">
+                                                <a class="btn-action btn-edit" title="Editar Vendedor" data-bs-toggle="modal"
+                                                    data-bs-target="#modalEditarVendedor" data-id="{{ $seller->id }}"
+                                                    data-name="{{ $seller->name }}" data-email="{{ $seller->email }}"
+                                                    data-phone="{{ $seller->phone }}" data-notes="{{ $seller->notes }}"
+                                                    data-contract="{{ $seller->contract_path }}" style="cursor: pointer;">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
@@ -169,16 +168,16 @@
                     </div>
 
                     {{-- Paginación --}}
-                    @if($clients->hasPages())
+                    @if($sellers->hasPages())
                         <div class="pagination-wrapper">
                             <div class="w-100">
                                 <div class="pagination-info">
-                                    Mostrando <strong>{{ $clients->firstItem() }}</strong> a
-                                    <strong>{{ $clients->lastItem() }}</strong>
-                                    de <strong>{{ $clients->total() }}</strong> clientes
+                                    Mostrando <strong>{{ $sellers->firstItem() }}</strong> a
+                                    <strong>{{ $sellers->lastItem() }}</strong>
+                                    de <strong>{{ $sellers->total() }}</strong> vendedores
                                 </div>
                                 <div class="d-flex justify-content-center">
-                                    {{ $clients->links('pagination::bootstrap-4') }}
+                                    {{ $sellers->links('pagination::bootstrap-4') }}
                                 </div>
                             </div>
                         </div>
@@ -210,7 +209,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('js/client.js') }}"></script>
+    <script src="{{ asset('js/seller.js') }}"></script>
 
     @if(session('success'))
         <script>
@@ -227,21 +226,20 @@
     @if ($errors->any())
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                const editClientId = "{{ session('edit_client_id') }}";
+                const editSellerId = "{{ session('edit_seller_id') }}"; // Nombre correcto
 
-                if (editClientId) {
-                    console.log("Error en edición para el cliente:", editClientId);
-
-                    const modalEditElement = document.getElementById('modalEditarCliente');
+                if (editSellerId) {
+                    const modalEditElement = document.getElementById('modalEditarVendedor');
                     if (modalEditElement) {
                         const modalEdit = new bootstrap.Modal(modalEditElement);
-                        const formEdit = document.getElementById('formEditarCliente');
-                        formEdit.action = `/clientes/${editClientId}`;
+                        const formEdit = document.getElementById('formEditarVendedor');
+                        // Usamos la variable corregida
+                        formEdit.action = `/vendedores/${editSellerId}`;
                         modalEdit.show();
                     }
                 } else {
-                    console.log("Error en creación de nuevo cliente");
-                    const modalCreateElement = document.getElementById('modalNuevoCliente');
+                    console.log("Error en creación de nuevo vendedor");
+                    const modalCreateElement = document.getElementById('modalNuevoVendedor');
                     if (modalCreateElement) {
                         const modalCreate = new bootstrap.Modal(modalCreateElement);
                         modalCreate.show();

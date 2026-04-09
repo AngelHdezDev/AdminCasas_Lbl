@@ -13,16 +13,18 @@ class SellerRepository
             ->paginate($perPage);
     }
 
-    public function getAll() {
+    public function getAll()
+    {
         return Seller::orderBy('created_at', 'desc')->get();
     }
 
-    public function store(array $data) {
+    public function store(array $data)
+    {
         return Seller::create($data);
     }
 
-    public function update($id, array $data) {
-        $seller = Seller::findOrFail($id);
+    public function update($seller, array $data)
+    {
         $seller->update($data);
         return $seller;
     }

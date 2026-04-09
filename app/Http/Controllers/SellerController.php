@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Services\SellerService;
 use Illuminate\Http\Request;
 use App\Models\Seller;
+use App\Http\Requests\StoreSellerRequest;
+use App\Http\Requests\UpdateSellerRequest;
 
 class SellerController extends Controller
 {
     protected $service;
 
-    public function __construct(SellerService $service) {
+    public function __construct(SellerService $service)
+    {
         $this->service = $service;
     }
 
@@ -20,14 +23,17 @@ class SellerController extends Controller
         return view('vendedores.vendedores', compact('sellers'));
     }
 
-    public function store(Request $request) {
-        $data = $request->validate([
-            'name'  => 'required',
-            'email' => 'required|email|unique:sellers',
-            'phone' => 'nullable'
-        ]);
+    public function store(StoreSellerRequest $request)
+    {
+        $this->service->storeSeller($request->validated());
+        return redirect()->back()->with('success', 'Vendedor guardado correctamente.');
+    }
 
-        $this->service->storeSeller($data);
-        return back()->with('success', 'Vendedor guardado');
+    public function update(UpdateSellerRequest $request, Seller $seller)
+    {
+        // Pasamos el objeto directamente al servicio
+        $this->service->updateSeller($seller, $request->validated());
+
+        return redirect()->back()->with('success', 'Vendedor actualizado con éxito.');
     }
 }

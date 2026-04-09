@@ -2,11 +2,21 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Seller extends Model
 {
-    //
+    use HasFactory;
+    protected $table = 'sellers';
+    protected $fillable = [
+        'name',
+        'email',
+        'phone',
+        'is_active',
+        'notes',
+        'contract_path'
+    ];
     public function clients()
     {
         // Relación muchos a muchos con la tabla pivote

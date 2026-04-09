@@ -1,12 +1,12 @@
 @php
-    $clientError = session('edit_client_id') ? \App\Models\Client::find(session('edit_client_id')) : null;
+    $clientError = session('edit_seller_id') ? \App\Models\Seller::find(session('edit_seller_id')) : null;
 @endphp
 
 <head>
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="modalEditarVendedor" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -14,16 +14,16 @@
                     <div class="modal-title-group">
                         <div class="modal-icon"><i class="bi bi-person-badge-fill"></i></div>
                         <div>
-                            <div class="modal-title-text">Editar Cliente</div>
-                            <div class="modal-subtitle-text">Actualiza la información del cliente</div>
+                            <div class="modal-title-text">Editar Vendedor</div>
+                            <div class="modal-subtitle-text">Actualiza la información del vendedor</div>
                         </div>
                     </div>
                     <button class="btn-close-custom" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
                 </div>
             </div>
 
-            <form action="{{ $clientError ? route('clientes.update', $clientError->id) : '' }}" method="POST"
-                id="formEditarCliente" enctype="multipart/form-data">
+            <form action="{{ $clientError ? route('vendedores.update', $clientError->id) : '' }}" method="POST"
+                id="formEditarVendedor" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="modal-body">

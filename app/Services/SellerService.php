@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\SellerRepository;
+use App\Models\Seller;
 
 class SellerService
 {
@@ -21,14 +22,33 @@ class SellerService
 
     public function storeSeller(array $data)
     {
-        // Si el checkbox no viene, Laravel no manda nada, así que lo forzamos a 0 o 1
         $data['is_active'] = isset($data['is_active']) ? 1 : 0;
-        return $this->repo->store($data);
-    }
 
-    public function updateSeller($id, array $data)
+        if (request()->hasFile('contract_file')) {
+            $path = request()->file('contract_file')->store('contracts', 'local');
+            $data['contract_path'] = $path;
+        }
+
+        return $this->repo->store($data);
+
+    }
+    public function updateSeller(Seller $seller, array $data)
     {
+        // Manejo del checkbox
         $data['is_active'] = isset($data['is_active']) ? 1 : 0;
-        return $this->repo->update($id, $data);
+
+        // Manejo del contrato
+        if (request()->hasFile('contract_file')) {
+            // Borrar el archivo anterior si existe
+            if ($seller->contract_path && \Storage::disk('local')->exists($seller->contract_path)) {
+                \Storage::disk('local')->delete($seller->contract_path);
+            }
+
+            // Guardar el nuevo contrato
+            $data['contract_path'] = request()->file('contract_file')->store('contracts', 'local');
+        }
+
+        // Enviamos al repositorio para guardar los cambios
+        return $this->repo->update($seller, $data);
     }
 }

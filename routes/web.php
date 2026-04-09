@@ -11,6 +11,7 @@ use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\GaleriaController;
 use App\Http\Controllers\ClientController;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\SellerController;
 
 
 Route::get('/', function () {
@@ -62,8 +63,11 @@ Route::delete('/clientes/{client}', [ClientController::class, 'destroy'])->middl
 Route::delete('/clientes/{id}/archivo', [ClientController::class, 'deleteFile'])->middleware('auth')->name('clientes.deleteFile');
 
 
-Route::get('/vendedores', [App\Http\Controllers\SellerController::class, 'index'])->middleware('auth')->name('vendedores.index');
-Route::post('/vendedores', [App\Http\Controllers\SellerController::class, 'store'])->middleware('auth')->name('vendedores.store');
+Route::get('/vendedores', [SellerController::class, 'index'])->middleware('auth')->name('vendedores.index');
+Route::post('/vendedores', [SellerController::class, 'store'])->middleware('auth')->name('vendedores.store');
+Route::put('/vendedores/{seller}', [SellerController::class, 'update'])->middleware('auth')->name('vendedores.update');
+Route::delete('/vendedores/{seller}', [SellerController::class, 'destroy'])->middleware('auth')->name('vendedores.destroy');
+
 
 
 
