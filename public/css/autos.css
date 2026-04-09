@@ -951,3 +951,11 @@ textarea.field-input {
         overflow-y: auto;
     }
 }
+
+/* Añade esto a tu CSS */
+img[loading="lazy"] {
+    background: #f8f9fa;
+    min-width: 50px;
+    min-height: 40px;
+    display: inline-block;
+}

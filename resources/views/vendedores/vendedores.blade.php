@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 
-@section('title', 'Clientes')
+@section('title', 'Vendedores')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/autos.css') }}">
