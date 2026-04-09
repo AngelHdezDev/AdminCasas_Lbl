@@ -14,16 +14,16 @@
             <div class="page-header-inner">
                 <div>
                     <p class="page-eyebrow">Administración</p>
-                    <h1 class="page-title">Clientes</h1>
+                    <h1 class="page-title">Vendedores</h1>
                     <p class="page-subtitle">
-                        <span class="fw-bold">{{ $clients->total() }}</span> clientes registrados
+                        <span class="fw-bold">{{ $sellers->total() }}</span> vendedores registrados
 
                     </p>
                 </div>
 
-                <button class="btn-new-vehicle" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente">
+                <button class="btn-new-vehicle" data-bs-toggle="modal" data-bs-target="#modalNuevoVendedor">
                     <i class="bi bi-person-plus"></i>
-                    Nuevo Cliente
+                    Nuevo Vendedor
                 </button>
             </div>
         </div>
@@ -65,7 +65,7 @@
                 </select>
 
                 <span class="filters-count">
-                    Mostrando <span>{{ $clients->total() }}</span> clientes
+                    Mostrando <span>{{ $sellers->total() }}</span> vendedores
                 </span>
 
                 @if(request()->anyFilled(['search', 'type', 'neighborhood', 'contract_type']))
@@ -189,10 +189,10 @@
                         <div class="empty-icon">
                             <i class="bi bi-person-plus"></i>
                         </div>
-                        <div class="empty-title">Sin clientes registrados</div>
-                        <p class="empty-text">Agrega el primer cliente para comenzar.</p>
-                        <button class="btn-new-vehicle mx-auto" data-bs-toggle="modal" data-bs-target="#modalNuevoCliente">
-                            <i class="bi bi-person-plus"></i> Nuevo Cliente
+                        <div class="empty-title">Sin vendedores registrados</div>
+                        <p class="empty-text">Agrega el primer vendedor para comenzar.</p>
+                        <button class="btn-new-vehicle mx-auto" data-bs-toggle="modal" data-bs-target="#modalNuevoVendedor">
+                            <i class="bi bi-person-plus"></i> Nuevo Vendedor
                         </button>
                     </div>
                 @endif
@@ -200,8 +200,8 @@
         </div>
     </div>
 
-    @include('clientes.modals.modal-create')
-    @include('clientes.modals.modal-edit')
+    @include('vendedores.modals.modal-create')
+    @include('vendedores.modals.modal-edit')
 
     <!-- DATA PARA JS -->
     <div id="laravel-data" data-has-errors="{{ $errors->any() ? 'true' : 'false' }}" data-success="{{ session('success') }}"

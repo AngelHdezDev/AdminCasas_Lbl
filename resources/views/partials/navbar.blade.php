@@ -29,7 +29,7 @@
                 </li>
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('vendedores.*') ? 'active' : '' }}"
-                        href="{{ route('marcas.index') }}">
+                        href="{{ route('vendedores.index') }}">
                         <i class="bi bi-tag me-1"></i> Vendedores
                     </a>
                 </li>

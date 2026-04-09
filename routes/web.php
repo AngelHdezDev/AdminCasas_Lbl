@@ -61,6 +61,12 @@ Route::put('/clientes/{client}', [ClientController::class, 'update'])->middlewar
 Route::delete('/clientes/{client}', [ClientController::class, 'destroy'])->middleware('auth')->name('clientes.destroy');
 Route::delete('/clientes/{id}/archivo', [ClientController::class, 'deleteFile'])->middleware('auth')->name('clientes.deleteFile');
 
+
+Route::get('/vendedores', [App\Http\Controllers\SellerController::class, 'index'])->middleware('auth')->name('vendedores.index');
+Route::post('/vendedores', [App\Http\Controllers\SellerController::class, 'store'])->middleware('auth')->name('vendedores.store');
+
+
+
 Route::get('/api/consulta-cp/{cp}', [App\Http\Controllers\PostalCodeController::class, 'consultaCP']);
 
 Route::get('/clientes/archivo/{id}', function ($id) {
