@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Repositories\SellerRepository;
 use App\Models\Seller;
-
+use Illuminate\Support\Facades\Storage;
 class SellerService
 {
     protected $repo;
@@ -50,5 +50,23 @@ class SellerService
 
         // Enviamos al repositorio para guardar los cambios
         return $this->repo->update($seller, $data);
+    }
+
+    
+    public function deleteSellerFile($id)
+    {
+        $seller = $this->repo->find($id);
+
+        if ($seller && $seller->contract_path) {
+            // 1. Borrar archivo físico del disco 'local'
+            if (Storage::disk('local')->exists($seller->contract_path)) {
+                Storage::disk('local')->delete($seller->contract_path);
+            }
+
+            // 2. Limpiar el path en la base de datos a través del repositorio
+            return $this->repo->update($id, ['contract_path' => null]);
+        }
+
+        return false;
     }
 }

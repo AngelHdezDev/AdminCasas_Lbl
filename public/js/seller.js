@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!event.relatedTarget) return;
 
             const button = event.relatedTarget;
-            
+
             // 1. Extraer información de los atributos data- del botón
             const sellerId = button.getAttribute('data-id');
             const name = button.getAttribute('data-name');
@@ -20,14 +20,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const hasFile = button.getAttribute('data-contract');
 
             // 2. Actualizar la acción del formulario con el ID del vendedor
-            formEditar.action = `/vendedores/${sellerId}`;
+            // Asegúrate de que no haya espacios ni letras extras
+            formEditar.action = `/vendedores/${sellerId.trim()}`;
 
             // 3. Llenar los campos del formulario
             // IMPORTANTE: Los IDs deben coincidir con tu HTML
-            if(document.getElementById('edit_name')) document.getElementById('edit_name').value = name || '';
-            if(document.getElementById('edit_email')) document.getElementById('edit_email').value = email || '';
-            if(document.getElementById('edit_phone')) document.getElementById('edit_phone').value = phone || '';
-            if(document.getElementById('edit_notes')) document.getElementById('edit_notes').value = notes || '';
+            if (document.getElementById('edit_name')) document.getElementById('edit_name').value = name || '';
+            if (document.getElementById('edit_email')) document.getElementById('edit_email').value = email || '';
+            if (document.getElementById('edit_phone')) document.getElementById('edit_phone').value = phone || '';
+            if (document.getElementById('edit_notes')) document.getElementById('edit_notes').value = notes || '';
 
             // 4. Lógica para la Previsualización del Archivo (Contrato)
             const previewContainer = document.getElementById('preview-container-edit');
@@ -117,15 +118,15 @@ function confirmDeleteContract(sellerId) {
             // Creamos formulario dinámico para enviar DELETE a la ruta puente
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = `/vendedores/${sellerId}/archivo`; 
-            
+            form.action = `/vendedores/${sellerId}/archivo`;
+
             const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            
+
             form.innerHTML = `
                 <input type="hidden" name="_token" value="${csrfToken}">
                 <input type="hidden" name="_method" value="DELETE">
             `;
-            
+
             document.body.appendChild(form);
             form.submit();
         }

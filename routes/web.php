@@ -67,6 +67,8 @@ Route::get('/vendedores', [SellerController::class, 'index'])->middleware('auth'
 Route::post('/vendedores', [SellerController::class, 'store'])->middleware('auth')->name('vendedores.store');
 Route::put('/vendedores/{seller}', [SellerController::class, 'update'])->middleware('auth')->name('vendedores.update');
 Route::delete('/vendedores/{seller}', [SellerController::class, 'destroy'])->middleware('auth')->name('vendedores.destroy');
+Route::delete('/vendedores/{id}/archivo', [SellerController::class, 'deleteFile'])->middleware('auth')->name('vendedores.deleteFile');
+
 
 
 

@@ -36,4 +36,15 @@ class SellerController extends Controller
 
         return redirect()->back()->with('success', 'Vendedor actualizado con éxito.');
     }
+
+    public function deleteFile($id)
+    {
+        $success = $this->service->deleteSellerFile($id);
+
+        if ($success) {
+            return redirect()->back()->with('success', 'Archivo eliminado correctamente.');
+        }
+
+        return redirect()->back()->with('error', 'No se pudo eliminar el archivo.');
+    }
 }

@@ -23,9 +23,18 @@ class SellerRepository
         return Seller::create($data);
     }
 
-    public function update($seller, array $data)
+    public function find($id)
+    {
+        // Cambia $this->model por Seller
+        return Seller::find($id);
+    }
+
+    public function update(Seller $seller, array $data)
     {
         $seller->update($data);
         return $seller;
+       
     }
+
+    
 }

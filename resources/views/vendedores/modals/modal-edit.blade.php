@@ -3,6 +3,10 @@
     $sellerError = session('edit_seller_id') ? \App\Models\Seller::find(session('edit_seller_id')) : null;
 @endphp
 
+<head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+</head>
+
 <div class="modal fade" id="modalEditarVendedor" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content">
