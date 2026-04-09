@@ -15,6 +15,8 @@ use App\Http\Requests\Marca\UpdateMarcaRequest;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
+use App\Models\Seller;
+use App\Models\Client;
 
 
 class PropertyController extends Controller
@@ -38,7 +40,10 @@ class PropertyController extends Controller
     public function index(Request $request)
     {
         $properties = $this->service->getAllPaginated(10, $request->all());
-        return view('autos.autos', compact('properties'));
+        $vendedores = Seller::orderBy('name', 'asc')->get();
+        $clientes = Client::orderBy('name', 'asc')->get();
+
+        return view('autos.autos', compact('properties', 'vendedores', 'clientes'));
     }
     public function update(UpdatePropertyRequest $request, $id): RedirectResponse
     {

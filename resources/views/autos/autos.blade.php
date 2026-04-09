@@ -157,8 +157,7 @@
 
                                                 <a class="btn-action btn-edit" title="Editar" data-bs-toggle="modal"
                                                     data-bs-target="#modalPropiedad" data-id="{{ $property->id }}"
-                                                    data-title="{{ $property->title }}"
-                                                    data-cp="{{ $property->cp }}"
+                                                    data-title="{{ $property->title }}" data-cp="{{ $property->cp }}"
                                                     data-neighborhood="{{ $property->neighborhood }}"
                                                     data-type="{{ $property->type }}" data-address="{{ $property->address }}"
                                                     data-m2_land="{{ $property->m2_land }}"
@@ -226,8 +225,8 @@
     </div>
 
     <!-- 
-                                                         MODAL — NUEVO VEHÍCULO
-                                                    -->
+                                                                 MODAL — NUEVO VEHÍCULO
+                                                            -->
     <div class="modal fade" id="modalPropiedad" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content">
@@ -437,9 +436,9 @@
                                                 <label class="field-label">Vendedor</label>
                                                 <select class="field-input" name="seller_id" id="seller_id">
                                                     <option value="">Sin asignar</option>
-                                                    {{-- @foreach($sellers as $seller) --}}
-                                                    {{-- <option value="{{ $seller->id }}">{{ $seller->name }}</option> --}}
-                                                    {{-- @endforeach --}}
+                                                    @foreach($vendedores as $vendedor)
+                                                        <option value="{{ $vendedor->id }}">{{ $vendedor->name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>
@@ -448,9 +447,9 @@
                                                 <label class="field-label">Cliente</label>
                                                 <select class="field-input" name="client_id" id="client_id">
                                                     <option value="">Sin asignar</option>
-                                                    {{-- @foreach($clients as $client) --}}
-                                                    {{-- <option value="{{ $client->id }}">{{ $client->name }}</option> --}}
-                                                    {{-- @endforeach --}}
+                                                    @foreach($clientes as $cliente)
+                                                        <option value="{{ $cliente->id }}">{{ $cliente->name }}</option>
+                                                    @endforeach
                                                 </select>
                                             </div>
                                         </div>

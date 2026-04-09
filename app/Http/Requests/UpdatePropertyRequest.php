@@ -30,7 +30,7 @@ class UpdatePropertyRequest extends FormRequest
             'show_public_address' => 'sometimes|boolean',      // CORREGIDO + RENOMBRADO
             'state' => 'required|string|max:255', // NUEVO
             'city' => 'required|string|max:255', // NUEVO
-            'seller_id' => 'nullable|exists:users,id',    // NUEVO
+            'seller_id' => 'nullable|exists:sellers,id',    // NUEVO
             'client_id' => 'nullable|exists:clients,id',  // NUEVO
             'cp' => 'required|string|size:5|regex:/^[0-9]+$/', // NUEVO
         ];
