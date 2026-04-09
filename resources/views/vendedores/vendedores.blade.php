@@ -127,9 +127,9 @@
                                             {{ $seller->notes }}
                                         </td>
                                         <td class="align-middle text-center">
-                                            @if($seller->identification_path)
+                                            @if($seller->contract_path)
                                                 <div class="position-relative d-inline-block">
-                                                    <img src="{{ route('clientes.archivo', $seller->id) }}" alt="ID {{ $seller->name }}"
+                                                    <img src="{{ route('vendedores.archivo', $seller->id) }}" alt="ID {{ $seller->name }}"
                                                         loading="lazy" class="rounded shadow-sm border"
                                                         style="width: 50px; height: 40px; object-fit: cover; cursor: pointer;"
                                                         onclick="window.open(this.src, '_blank')">

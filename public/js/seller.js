@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const email = button.getAttribute('data-email');
             const phone = button.getAttribute('data-phone');
             const notes = button.getAttribute('data-notes');
-            const hasFile = button.getAttribute('data-identification');
+            const hasFile = button.getAttribute('data-contract');
 
             // 2. Actualizar la acción del formulario con el ID del vendedor
             formEditar.action = `/vendedores/${sellerId}`;
@@ -41,13 +41,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                 onclick="confirmDeleteContract(${sellerId})">
                             <i class="bi bi-trash"></i>
                         </button>
-                        <div class="text-center">
-                            <i class="bi bi-file-earmark-pdf text-primary" style="font-size: 3rem;"></i>
-                            <p class="small mb-0 text-muted">Contrato / ID cargado</p>
-                            <a href="/vendedores/archivo/${sellerId}" target="_blank" class="btn btn-link btn-sm mt-1">
-                                <i class="bi bi-eye"></i> Ver documento actual
-                            </a>
-                        </div>`;
+                        
+                        <img src="/vendedores/archivo/${sellerId}" 
+                             class="img-fluid rounded" 
+                             style="max-height: 180px; object-fit: contain;">`;
                 } else {
                     // Estado vacío
                     previewContainer.innerHTML = `

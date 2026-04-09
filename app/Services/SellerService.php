@@ -22,10 +22,10 @@ class SellerService
 
     public function storeSeller(array $data)
     {
-        $data['is_active'] = isset($data['is_active']) ? 1 : 0;
+        $data['is_active'] = 1;
 
-        if (request()->hasFile('contract_file')) {
-            $path = request()->file('contract_file')->store('contracts', 'local');
+        if (request()->hasFile('contract_path')) {
+            $path = request()->file('contract_path')->store('contracts', 'local');
             $data['contract_path'] = $path;
         }
 

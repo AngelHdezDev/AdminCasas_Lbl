@@ -82,3 +82,14 @@ Route::get('/clientes/archivo/{id}', function ($id) {
 
     abort(404, "Archivo no encontrado");
 })->middleware('auth')->name('clientes.archivo');
+
+
+Route::get('/vendedores/archivo/{id}', function ($id) {
+    $vendedor = \App\Models\Seller::findOrFail($id);
+
+    if ($vendedor->contract_path && Storage::disk('local')->exists($vendedor->contract_path)) {
+        return Storage::disk('local')->response($vendedor->contract_path);
+    }
+
+    abort(404, "Archivo no encontrado");
+})->middleware('auth')->name('vendedores.archivo');

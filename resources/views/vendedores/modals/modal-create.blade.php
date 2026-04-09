@@ -71,7 +71,7 @@
                                     <div class="col-12">
                                         <div class="field-group">
                                             <label class="field-label">Contrato Oficial</label>
-                                            <input type="file" name="identification_path" class="field-input">
+                                            <input type="file" name="contract_path" class="field-input" id="contract_path">
                                         </div>
                                     </div>
                                 </div>
@@ -84,8 +84,8 @@
                                     <label class="field-label">Notas Internas <span
                                             style="color:var(--gray-300);font-weight:400;">(Opcional)</span></label>
                                     <textarea name="notes" id="notes" rows="8"
-                                        class="field-input @if(!session('edit_client_id')) @error('notes') is-invalid @enderror @endif"
-                                        placeholder="Información relevante...">@if(!session('edit_client_id')){{ old('notes') }}@endif</textarea>
+                                        class="field-input @if(!session('edit_seller_id')) @error('notes') is-invalid @enderror @endif"
+                                        placeholder="Información relevante...">@if(!session('edit_seller_id')){{ old('notes') }}@endif</textarea>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +96,7 @@
                     <div class="footer-actions">
                         <button type="button" class="btn-cancel" data-bs-dismiss="modal">Cancelar</button>
                         <button type="submit" class="btn-submit">
-                            <i class="bi bi-person-plus-fill"></i> Guardar Cliente
+                            <i class="bi bi-person-plus-fill"></i> Guardar Vendedor
                         </button>
                     </div>
                 </div>
