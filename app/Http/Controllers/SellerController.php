@@ -17,9 +17,10 @@ class SellerController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $sellers = $this->service->getAllPaginated();
+        $sellers = $this->service->getAllPaginated(10, $request->all());
+
         return view('vendedores.vendedores', compact('sellers'));
     }
 

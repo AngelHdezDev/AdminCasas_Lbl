@@ -31,16 +31,16 @@
     <!-- ── FILTERS BAR ── -->
     <div class="filters-bar">
         <div class="container-fluid px-4">
-            <form action="{{ route('propiedades.index') }}" method="GET" class="filters-inner" id="filterForm">
+            <form action="{{ route('vendedores.index') }}" method="GET" class="filters-inner" id="filterForm">
 
                 <div class="search-box">
                     <i class="bi bi-search"></i>
                     <input type="text" name="search" class="search-input"
-                        placeholder="Buscar por título, descripción o calle..." value="{{ request('search') }}"
+                        placeholder="Buscar por nombre, teléfono o correo..." value="{{ request('search') }}"
                         id="searchInput">
                 </div>
 
-                <select class="filter-select" name="type" onchange="this.form.submit()">
+                <!-- <select class="filter-select" name="type" onchange="this.form.submit()">
                     <option value="">Todos los tipos</option>
                     <option value="house" {{ request('type') == 'house' ? 'selected' : '' }}>Casas</option>
                     <option value="apartment" {{ request('type') == 'apartment' ? 'selected' : '' }}>Departamentos
@@ -62,14 +62,14 @@
                     <option value="">Cualquier operación</option>
                     <option value="sale" {{ request('contract_type') == 'sale' ? 'selected' : '' }}>En Venta</option>
                     <option value="rent" {{ request('contract_type') == 'rent' ? 'selected' : '' }}>En Renta</option>
-                </select>
+                </select> -->
 
                 <span class="filters-count">
                     Mostrando <span>{{ $sellers->total() }}</span> vendedores
                 </span>
 
                 @if(request()->anyFilled(['search', 'type', 'neighborhood', 'contract_type']))
-                    <a href="{{ route('propiedades.index') }}" class="btn btn-sm btn-outline-secondary">
+                    <a href="{{ route('vendedores.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-x-circle"></i> Limpiar
                     </a>
                 @endif

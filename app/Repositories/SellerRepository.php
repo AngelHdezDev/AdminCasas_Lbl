@@ -6,11 +6,20 @@ use App\Models\Seller;
 
 class SellerRepository
 {
-    public function getAllPaginated($perPage)
+    public function getAllPaginated($perPage, array $filters = [])
     {
         return Seller::withCount('properties')
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%")
+                        ->orWhere('phone', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            })
             ->latest()
-            ->paginate($perPage);
+            ->paginate($perPage)
+            ->appends($filters); 
     }
 
     public function getAll()
@@ -33,8 +42,8 @@ class SellerRepository
     {
         $seller->update($data);
         return $seller;
-       
+
     }
 
-    
+
 }

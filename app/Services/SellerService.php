@@ -14,11 +14,10 @@ class SellerService
         $this->repo = $repo;
     }
 
-    public function getAllPaginated($perPage = 10)
+    public function getAllPaginated($perPage = 10, array $filters = [])
     {
-        return $this->repo->getAllPaginated($perPage);
+        return $this->repo->getAllPaginated($perPage, $filters);
     }
-
 
     public function storeSeller(array $data)
     {
@@ -52,7 +51,7 @@ class SellerService
         return $this->repo->update($seller, $data);
     }
 
-    
+
     public function deleteSellerFile($id)
     {
         $seller = $this->repo->find($id);
