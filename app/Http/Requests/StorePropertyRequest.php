@@ -37,7 +37,7 @@ class StorePropertyRequest extends FormRequest
             'city' => 'required|string|max:255',
             'is_featured' => 'sometimes|boolean',
             'show_public_address' => 'sometimes|boolean',
-            'seller_id' => 'nullable|exists:users,id',
+            'seller_id' => 'nullable|exists:sellers,id',
             'client_id' => 'nullable|exists:clients,id',
             'cp' => 'required|string|size:5|regex:/^[0-9]+$/',
         ];
