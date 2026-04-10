@@ -55,9 +55,9 @@ class ClientService
         return $this->repository->delete($client);
     }
 
-    public function getAllPaginated($perPage = 10)
+    public function getClientsForIndex($perPage = 10, array $filters = [])
     {
-        return $this->repository->getAllPaginated($perPage);
+        return $this->repository->getAllPaginated($perPage, $filters);
     }
 
     public function deleteClientFile($client)

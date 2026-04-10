@@ -17,9 +17,11 @@ class ClientController extends Controller
         $this->clientService = $clientService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $clients = $this->clientService->getAllPaginated();
+        // Pasamos todos los inputs ($request->all()) como filtros
+        $clients = $this->clientService->getClientsForIndex(10, $request->all());
+
         return view('clientes.clientes', compact('clients'));
     }
     public function store(StoreClientRequest $request)

@@ -6,11 +6,20 @@ use App\Models\Client;
 
 class ClientRepository
 {
-    public function getAllPaginated($perPage)
+    public function getAllPaginated($perPage = 10, array $filters = [])
     {
-        return Client::withCount('properties')
-            ->latest()
-            ->paginate($perPage);
+        return Client::query()
+            ->when($filters['search'] ?? null, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%")
+                      ->orWhere('phone', 'LIKE', "%{$search}%")
+                      ->orWhere('email', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('name', 'asc')
+            ->paginate($perPage)
+            ->appends($filters);
     }
 
     public function create(array $data)
