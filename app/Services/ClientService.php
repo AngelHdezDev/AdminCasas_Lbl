@@ -40,19 +40,9 @@ class ClientService
         return $this->repository->update($client, $data);
     }
 
-    public function deleteClient($client)
+    public function deleteClient($id)
     {
-        // Regla de negocio: Consultamos al repo si tiene propiedades
-        if ($this->repository->hasProperties($client)) {
-            throw new Exception("No se puede eliminar un cliente con propiedades activas.");
-        }
-
-        // Si tenía un archivo de identificación, lo borramos del disco al eliminar al cliente
-        if ($client->identification_path) {
-            Storage::disk('local')->delete($client->identification_path);
-        }
-
-        return $this->repository->delete($client);
+        return $this->repository->deactivate($id);
     }
 
     public function getClientsForIndex($perPage = 10, array $filters = [])

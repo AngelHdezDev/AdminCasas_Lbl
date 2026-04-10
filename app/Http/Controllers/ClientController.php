@@ -67,14 +67,15 @@ class ClientController extends Controller
         }
     }
 
-    public function destroy(Client $client)
+    public function destroy($id)
     {
-        try {
-            $this->clientService->deleteClient($client);
-            return redirect()->route('clients.index')->with('success', 'Cliente eliminado.');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', $e->getMessage());
+        $result = $this->clientService->deleteClient($id);
+
+        if ($result) {
+            return redirect()->back()->with('success', 'Cliente eliminado correctamente.');
         }
+
+        return redirect()->back()->with('error', 'No se pudo eliminar el cliente.');
     }
 
     public function deleteFile($id)

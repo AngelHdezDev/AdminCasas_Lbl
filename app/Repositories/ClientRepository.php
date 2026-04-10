@@ -9,12 +9,13 @@ class ClientRepository
     public function getAllPaginated($perPage = 10, array $filters = [])
     {
         return Client::query()
+            ->where('is_active', 1)
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
-                      ->orWhere('email', 'LIKE', "%{$search}%")
-                      ->orWhere('phone', 'LIKE', "%{$search}%")
-                      ->orWhere('email', 'LIKE', "%{$search}%");
+                        ->orWhere('email', 'LIKE', "%{$search}%")
+                        ->orWhere('phone', 'LIKE', "%{$search}%")
+                        ->orWhere('email', 'LIKE', "%{$search}%");
                 });
             })
             ->orderBy('name', 'asc')
@@ -33,11 +34,16 @@ class ClientRepository
         return $client;
     }
 
-    public function delete(Client $client)
+    public function deactivate($id)
     {
-        return $client->delete();
+        $client = Client::find($id);
+        if ($client) {
+            $client->is_active = 0;
+            return $client->save();
+        }
+        return false;
     }
-    
+
     public function hasProperties(Client $client)
     {
         return $client->properties()->count() > 0;
