@@ -42,8 +42,12 @@ class PropertyController extends Controller
         $properties = $this->service->getAllPaginated(10, $request->all());
         $vendedores = Seller::orderBy('name', 'asc')->get();
         $clientes = Client::orderBy('name', 'asc')->get();
+        $states = Property::whereNotNull('state')
+            ->distinct()
+            ->orderBy('state', 'asc')
+            ->pluck('state');
 
-        return view('autos.autos', compact('properties', 'vendedores', 'clientes'));
+        return view('autos.autos', compact('properties', 'vendedores', 'clientes', 'states'));
     }
     public function update(UpdatePropertyRequest $request, $id): RedirectResponse
     {

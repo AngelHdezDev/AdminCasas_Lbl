@@ -51,11 +51,11 @@
                     <option value="local" {{ request('type') == 'local' ? 'selected' : '' }}>Locales</option>
                 </select>
 
-                <select class="filter-select" name="neighborhood" onchange="this.form.submit()">
-                    <option value="">Todas las zonas</option>
-                    @foreach($neighborhoods ?? [] as $neighborhood)
-                        <option value="{{ $neighborhood }}" {{ request('neighborhood') == $neighborhood ? 'selected' : '' }}>
-                            {{ $neighborhood }}
+                <select class="filter-select" name="state" onchange="this.form.submit()">
+                    <option value="">Todos los estados</option>
+                    @foreach($states ?? [] as $state)
+                        <option value="{{ $state }}" {{ request('state') == $state ? 'selected' : '' }}>
+                            {{ $state }}
                         </option>
                     @endforeach
                 </select>
@@ -70,7 +70,7 @@
                     Mostrando <span>{{ $properties->total() }}</span> propiedades
                 </span>
 
-                @if(request()->anyFilled(['search', 'type', 'neighborhood', 'contract_type']))
+                @if(request()->anyFilled(['search', 'type', 'state', 'contract_type']))
                     <a href="{{ route('propiedades.index') }}" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-x-circle"></i> Limpiar
                     </a>

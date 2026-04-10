@@ -12,33 +12,33 @@
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('dashboard') ? 'active' : '' }}"
                         href="{{ route('dashboard') }}">
-                        <i class="bi bi-speedometer2 me-1"></i>Dashboard
+                        <i class="bi bi-bar-chart-fill me-1"></i>Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('propiedades.*') ? 'active' : '' }}"
                         href="{{ route('propiedades.index') }}">
-                        <i class="bi bi-car-front me-1"></i>Propiedades
+                        <i class="bi bi-house-door-fill me-1"></i>Propiedades
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('clientes.*') ? 'active' : '' }}"
                         href="{{ route('clientes.index') }}">
-                        <i class="bi bi-person-plus "> </i>  Clientes
+                        <i class="bi bi-person-plus me-1"> </i>  Clientes
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('vendedores.*') ? 'active' : '' }}"
                         href="{{ route('vendedores.index') }}">
-                        <i class="bi bi-tag me-1"></i> Vendedores
+                        <i class="bi bi-currency-dollar me-1"></i> Vendedores
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('marcas.*') ? 'active' : '' }}"
                         href="{{ route('marcas.index') }}">
                         <i class="bi bi-tag me-1"></i> Marcas
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('galeria.*') ? 'active' : '' }}"
                         href="{{ route('galeria.index') }}">

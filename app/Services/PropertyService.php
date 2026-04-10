@@ -35,14 +35,14 @@ class PropertyService
         }
 
         // 3. Filtro por Colonia (Neighborhood)
-        if (!empty($filters['neighborhood'])) {
-            $query->where('neighborhood', $filters['neighborhood']);
+        if (!empty($filters['state'])) {
+            $query->where('state', $filters['state']);
         }
 
-        // // 4. Filtro por Operación (Venta o Renta)
-        // if (!empty($filters['contract_type'])) {
-        //     $query->where('contract_type', $filters['contract_type']);
-        // }
+        // 4. Filtro por Operación (Venta o Renta)
+        if (!empty($filters['contract_type'])) {
+            $query->where('contract_type', $filters['contract_type']);
+        }
 
         return $query->orderBy('created_at', 'desc')
             ->paginate($perPage);
