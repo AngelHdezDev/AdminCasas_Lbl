@@ -18,7 +18,7 @@ class ClientRepository
                         ->orWhere('email', 'LIKE', "%{$search}%");
                 });
             })
-            ->orderBy('name', 'asc')
+            ->latest()
             ->paginate($perPage)
             ->appends($filters);
     }
