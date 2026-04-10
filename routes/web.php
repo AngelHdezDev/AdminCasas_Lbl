@@ -51,10 +51,10 @@ Route::put('/marcas/{id}', [MarcaController::class, 'update'])->middleware('auth
 Route::delete('/marcas/{id}', [MarcaController::class, 'changeStatus'])->middleware('auth')->name('marcas.changeStatus');
 
 
-Route::get('/galeria', [GaleriaController::class, 'index'])->name('galeria.index');
-Route::post('/galeria', [GaleriaController::class, 'store'])->name('galeria.store');
-Route::post('/galeria/asignar/{id}', [GaleriaController::class, 'asignar'])->name('galeria.asignar');
-Route::delete('/galeria/{id}', [GaleriaController::class, 'destroy'])->name('galeria.destroy');
+Route::get('/galeria', [GalleryController::class, 'index'])->name('galeria.index');
+Route::post('/galeria', [GalleryController::class, 'store'])->name('galeria.store');
+Route::post('/galeria/asignar/{id}', [GalleryController::class, 'asignar'])->name('galeria.asignar');
+Route::delete('/galeria/{id}', [GalleryController::class, 'destroy'])->name('galeria.destroy');
 
 Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')->name('clientes.index');
 Route::post('/clientes', [ClientController::class, 'store'])->middleware('auth')->name('clientes.store');

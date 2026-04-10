@@ -59,7 +59,7 @@
                         <div class="gallery-item" data-vehiculo="{{ $imagen->id_auto ?? 'sin-asignar' }}">
                             <div class="image-container">
 
-                                <img src="{{ asset('storage/' . $imagen->path) }}" alt="{{ $imagen->nombre_original }}">
+                                <img src="{{ asset('storage/'.$imagen->ruta_archivo) }}" alt="{{ $imagen->nombre_original }}">
                                 <div class="image-overlay"></div>
 
                                 @if($imagen->id_auto)
