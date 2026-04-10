@@ -9,4 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
     
 
-Schedule::command('app:extraer-fotos')->everyMinute()->withoutOverlapping();
+Schedule::command('app:extraer-fotos')->everyMinute();

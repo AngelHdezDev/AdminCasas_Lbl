@@ -11,7 +11,7 @@ use App\Jobs\SendInvalidFormatEmail;
 class ExtraerFotosCorreo extends Command
 {
     protected $signature = 'app:extraer-fotos';
-    protected $description = 'Descarga imágenes de autos desde el correo ';
+    protected $description = 'Descarga imágenes de las propiedades desde el correo ';
 
     public function handle()
     {

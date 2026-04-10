@@ -27,7 +27,7 @@ class Property extends Model
         'city',
         'show_public_address',
         'is_featured',
-        'seller_id', 
+        'seller_id',
         'client_id',
         'cp'
     ];
@@ -38,8 +38,8 @@ class Property extends Model
         return $this->hasMany(PropertyImage::class);
     }
 
-     public function thumbnail()
+    public function thumbnail()
     {
-        return $this->hasOne(PropertyImage::class, 'property_id')->where('thumbnail', 1);
+        return $this->hasOne(PropertyImage::class, 'property_id')->where('is_main', 1);
     }
 }
