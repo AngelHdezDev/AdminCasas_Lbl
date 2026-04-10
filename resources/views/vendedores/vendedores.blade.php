@@ -152,7 +152,7 @@
                                                 </a>
 
                                                 {{-- Formulario de eliminación --}}
-                                                <form method="POST" class="form-eliminar" style="display:inline;">
+                                                <form action="{{ route('vendedores.destroy', $seller->id) }}" method="POST" class="form-eliminar" style="display:inline;">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn-action delete btn-delete" title="Eliminar">

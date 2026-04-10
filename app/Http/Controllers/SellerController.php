@@ -48,4 +48,15 @@ class SellerController extends Controller
 
         return redirect()->back()->with('error', 'No se pudo eliminar el archivo.');
     }
+
+    public function destroy($id)
+    {
+        $result = $this->service->deleteSeller($id);
+
+        if ($result) {
+            return redirect()->back()->with('success', 'Vendedor desactivado con éxito.');
+        }
+
+        return redirect()->back()->with('error', 'No se pudo procesar la solicitud.');
+    }
 }

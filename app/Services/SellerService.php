@@ -34,7 +34,7 @@ class SellerService
     public function updateSeller(Seller $seller, array $data)
     {
         // Manejo del checkbox
-        $data['is_active'] = isset($data['is_active']) ? 1 : 0;
+        $data['is_active'] = 1;
 
         // Manejo del contrato
         if (request()->hasFile('contract_file')) {
@@ -67,5 +67,10 @@ class SellerService
         }
 
         return false;
+    }
+
+    public function deleteSeller($id)
+    {
+        return $this->repo->deactivate($id);
     }
 }

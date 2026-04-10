@@ -9,6 +9,7 @@ class SellerRepository
     public function getAllPaginated($perPage, array $filters = [])
     {
         return Seller::withCount('properties')
+            ->where('is_active', 1)
             ->when($filters['search'] ?? null, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('name', 'LIKE', "%{$search}%")
@@ -19,7 +20,7 @@ class SellerRepository
             })
             ->latest()
             ->paginate($perPage)
-            ->appends($filters); 
+            ->appends($filters);
     }
 
     public function getAll()
@@ -43,6 +44,16 @@ class SellerRepository
         $seller->update($data);
         return $seller;
 
+    }
+
+    public function deactivate($id)
+    {
+        $seller = Seller::find($id);
+        if ($seller) {
+            $seller->is_active = 0;
+            return $seller->save();
+        }
+        return false;
     }
 
 
