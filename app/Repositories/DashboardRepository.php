@@ -13,8 +13,8 @@ class DashboardRepository
     {
         return [
             'total_properties' => Property::count(),
-            'sale_value' => Property::where('contract_type', 'venta')->sum('price'),
-            'rent_count' => Property::where('contract_type', 'renta')->count(),
+            'sale_value' => Property::where('contract_type', 'sale')->sum('price'),
+            'rent_count' => Property::where('contract_type', 'rent')->count(),
             'featured_count' => Property::where('is_featured', true)->count(),
         ];
     }
@@ -24,7 +24,7 @@ class DashboardRepository
         return [
             'total_sellers' => Seller::count(),
             'total_clients' => Client::count(),
-            'active_properties' => Property::where('status', 'activa')->count(),
+            'active_properties' => Property::where('active', 1)->count(),
         ];
     }
 
