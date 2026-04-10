@@ -3,11 +3,10 @@
 @section('title', 'Dashboard')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard2.css') }}">
 @endpush
 
 @section('content')
-
 
     <!-- ── PAGE HEADER ── -->
     <div class="page-header">
@@ -15,7 +14,7 @@
             <p class="page-eyebrow">Sistema de Gestión</p>
             <h1 class="page-title">Dashboard</h1>
             <p class="page-subtitle">
-                Resumen general del inventario y operaciones
+                Resumen general de propiedades y operaciones
             </p>
         </div>
     </div>
@@ -29,14 +28,14 @@
                 <div class="stat-card">
                     <div class="stat-header">
                         <div class="stat-icon">
-                            <i class="bi bi-car-front-fill"></i>
+                            <i class="bi bi-house-fill"></i>
                         </div>
                     </div>
-                    <div class="stat-label">Total Vehículos</div>
-                    <div class="stat-value">{{ $totalVehiculos ?? 0 }}</div>
-                    <div class="stat-change {{ $diffVehiculos >= 0 ? 'positive' : 'negative' }}">
-                        <i class="bi {{ $diffVehiculos >= 0 ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i>
-                        {{ $diffVehiculos >= 0 ? '+' : '' }}{{ number_format($diffVehiculos, 1) }}% este mes
+                    <div class="stat-label">Total Propiedades</div>
+                    <div class="stat-value">{{ $totalPropiedades ?? 0 }}</div>
+                    <div class="stat-change {{ ($diffPropiedades ?? 0) >= 0 ? 'positive' : 'negative' }}">
+                        <i class="bi {{ ($diffPropiedades ?? 0) >= 0 ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i>
+                        {{ ($diffPropiedades ?? 0) >= 0 ? '+' : '' }}{{ number_format($diffPropiedades ?? 0, 1) }}% este mes
                     </div>
                 </div>
 
@@ -46,11 +45,25 @@
                             <i class="bi bi-cash-stack"></i>
                         </div>
                     </div>
-                    <div class="stat-label">Valor Inventario</div>
-                    <div class="stat-value">${{ number_format($valorInventario ?? 0, 0) }}</div>
-                    <div class="stat-change {{ $diffInventario >= 0 ? 'positive' : 'negative' }}">
-                        <i class="bi {{ $diffInventario >= 0 ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i>
-                        {{ $diffInventario >= 0 ? '+' : '' }}{{ number_format($diffInventario, 1) }}% trimestre
+                    <div class="stat-label">Valor en Venta</div>
+                    <div class="stat-value">${{ number_format($valorVenta ?? 0, 0) }}</div>
+                    <div class="stat-change {{ ($diffValor ?? 0) >= 0 ? 'positive' : 'negative' }}">
+                        <i class="bi {{ ($diffValor ?? 0) >= 0 ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i>
+                        {{ ($diffValor ?? 0) >= 0 ? '+' : '' }}{{ number_format($diffValor ?? 0, 1) }}% trimestre
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon">
+                            <i class="bi bi-key-fill"></i>
+                        </div>
+                    </div>
+                    <div class="stat-label">En Renta</div>
+                    <div class="stat-value">{{ $totalRenta ?? 0 }}</div>
+                    <div class="stat-change positive">
+                        <i class="bi bi-arrow-up"></i>
+                        +{{ $rentaNuevas ?? 0 }} nuevas
                     </div>
                 </div>
 
@@ -60,25 +73,44 @@
                             <i class="bi bi-bookmark-star-fill"></i>
                         </div>
                     </div>
-                    <div class="stat-label">En Consignación</div>
-                    <div class="stat-value">{{ $totalConsignacion ?? 0 }}</div>
-                    <div class="stat-change positive">
-                        <i class="bi bi-arrow-up"></i>
-                        +{{ $consignacionNuevos ?? 0 }} nuevos
+                    <div class="stat-label">Destacadas</div>
+                    <div class="stat-value">{{ $totalDestacadas ?? 0 }}</div>
+                    <div class="stat-change {{ ($destacadasVencidas ?? 0) > 0 ? 'negative' : 'positive' }}">
+                        <i class="bi {{ ($destacadasVencidas ?? 0) > 0 ? 'bi-arrow-down' : 'bi-check-circle' }}"></i>
+                        {{ ($destacadasVencidas ?? 0) > 0 ? '-' . $destacadasVencidas . ' vencidas' : 'Al día' }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- KPI Row -->
+            <div class="kpi-row">
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-gold">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Agentes Activos</div>
+                        <div class="kpi-value">{{ $totalSellers ?? 0 }}</div>
                     </div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-header">
-                        <div class="stat-icon">
-                            <i class="bi bi-tags-fill"></i>
-                        </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-blue">
+                        <i class="bi bi-person-check-fill"></i>
                     </div>
-                    <div class="stat-label">Marcas Activas</div>
-                    <div class="stat-value">{{ $totalMarcas ?? 0 }}</div>
-                    <div class="stat-change {{ $marcasDescontinuadas > 0 ? 'negative' : 'positive' }}">
-                        <i class="bi {{ $marcasDescontinuadas > 0 ? 'bi-arrow-down' : 'bi-check-circle' }}"></i>
-                        {{ $marcasDescontinuadas > 0 ? '-' : '' }}{{ $marcasDescontinuadas ?? 0 }} descontinuadas
+                    <div>
+                        <div class="kpi-label">Clientes Registrados</div>
+                        <div class="kpi-value">{{ $totalClients ?? 0 }}</div>
+                    </div>
+                </div>
+
+                <div class="kpi-card">
+                    <div class="kpi-icon kpi-green">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                    <div>
+                        <div class="kpi-label">Propiedades Activas</div>
+                        <div class="kpi-value">{{ $propiedadesActivas ?? 0 }}</div>
                     </div>
                 </div>
             </div>
@@ -86,88 +118,95 @@
             <!-- Content Grid -->
             <div class="content-grid">
 
-                <!-- Recent Vehicles -->
+                <!-- Recent Properties -->
                 <div class="content-card">
                     <div class="card-header">
                         <h2 class="card-title">
                             <i class="bi bi-clock-history"></i>
-                            Vehículos Recientes
+                            Propiedades Recientes
                         </h2>
                         <a href="{{ route('propiedades.index') }}" class="card-link">
-                            Ver todos →
+                            Ver todas →
                         </a>
                     </div>
                     <div class="card-body">
-                        @if(isset($vehiculosRecientes) && count($vehiculosRecientes) > 0)
-                            @foreach($vehiculosRecientes as $vehiculo)
-                                <div class="vehicle-list-item">
-                                    <div class="vehicle-thumb">
-                                        <div class="vehicle-thumb">
-                                            {{-- Preguntamos por la relación que acabas de crear --}}
-                                            @if($vehiculo->thumbnail)
-                                                <img src="{{ asset('storage/' . $vehiculo->thumbnail->imagen) }}" alt="">
-                                            @else
-                                                {{-- Si el auto no tiene ninguna imagen con thumbnail = 1 --}}
-                                                <i class="bi bi-car-front"></i>
+                        @if(isset($propiedadesRecientes) && count($propiedadesRecientes) > 0)
+                            @foreach($propiedadesRecientes as $propiedad)
+                                <div class="prop-list-item">                                 
+                                    <div class="prop-thumb">
+                                        {{--
+                                        Cambiamos la lógica temporalmente:
+                                        Como no hay relación, siempre mostrará el icono de la casa
+                                        --}}
+                                        <i class="bi bi-house"></i>
+                                    </div>
+                                    <div class="prop-info">
+                                        <div class="prop-name">{{ $propiedad->title }}</div>
+                                        <div class="prop-meta">
+                                            @if($propiedad->bedrooms)
+                                                <span><i class="bi bi-door-closed"></i> {{ $propiedad->bedrooms }} rec</span>
+                                            @endif
+                                            @if($propiedad->bathrooms)
+                                                <span><i class="bi bi-droplet"></i> {{ $propiedad->bathrooms }} baños</span>
+                                            @endif
+                                            @if($propiedad->m2_construction)
+                                                <span><i class="bi bi-rulers"></i> {{ $propiedad->m2_construction }} m²</span>
+                                            @endif
+                                            @if($propiedad->neighborhood)
+                                                <span>· {{ $propiedad->neighborhood }}</span>
                                             @endif
                                         </div>
                                     </div>
-                                    <div class="vehicle-info">
-                                        <div class="vehicle-name">{{ $vehiculo->marca->nombre ?? '' }} {{ $vehiculo->modelo }}
-                                        </div>
-                                        <div class="vehicle-meta">{{ $vehiculo->year }} · {{ $vehiculo->color }} ·
-                                            {{ $vehiculo->tipo }}
-                                        </div>
+                                    <div class="prop-right">
+                                        <div class="prop-price">${{ number_format($propiedad->price, 0) }}</div>
+                                        <span class="prop-badge badge-{{ $propiedad->contract_type }}">
+                                            {{ ucfirst($propiedad->contract_type) }}
+                                        </span>
                                     </div>
-                                    <div class="vehicle-price">${{ number_format($vehiculo->precio, 0) }}</div>
                                 </div>
                             @endforeach
                         @else
                             <div class="empty-state">
                                 <div class="empty-icon">
-                                    <i class="bi bi-car-front"></i>
+                                    <i class="bi bi-house"></i>
                                 </div>
-                                <p class="empty-text">No hay vehículos registrados</p>
+                                <p class="empty-text">No hay propiedades registradas</p>
                             </div>
                         @endif
                     </div>
                 </div>
 
-                <!-- Top Brands -->
+                <!-- Top Sellers -->
                 <div class="content-card">
                     <div class="card-header">
                         <h2 class="card-title">
                             <i class="bi bi-trophy"></i>
-                            Top Marcas por su valor
+                            Top Agentes
                         </h2>
-                        <a href="{{ route('marcas.index') }}" class="card-link">
-                            Ver todas →
+                        <a href="{{ route('vendedores.index') }}" class="card-link">
+                            Ver todos →
                         </a>
                     </div>
                     <div class="card-body">
-                        @if(isset($marcasTop) && count($marcasTop) > 0)
-                            @foreach($marcasTop as $marca)
-                                <div class="brand-list-item">
-                                    <div class="brand-logo-small">
-                                        @if($marca->imagen)
-                                            <img src="{{ asset('storage/' . $marca->imagen) }}" width="50">
-                                        @else
-                                            {{ strtoupper(substr($marca->nombre, 0, 1)) }}
-                                        @endif
+                        @if(isset($agentesTop) && count($agentesTop) > 0)
+                            @foreach($agentesTop as $agente)
+                                <div class="agent-list-item">
+                                    <div class="agent-avatar">
+                                        {{ strtoupper(substr($agente->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $agente->name)[1] ?? '', 0, 1)) }}
                                     </div>
-                                    <div class="brand-info">
-                                        <div class="brand-name">{{ $marca->nombre }}</div>
-                                        <div class="brand-count">{{ $marca->autos_count ?? 0}} vehículos</div>
+                                    <div class="agent-info">
+                                        <div class="agent-name">{{ $agente->name }}</div>
+                                        <div class="agent-count">{{ $agente->properties_count ?? 0 }} propiedades</div>
                                     </div>
-                                    <div class="brand-value">${{ number_format($marca->autos_sum_precio ?? 0, 0) }}</div>
+                                    <div class="agent-value">${{ number_format($agente->properties_sum_price ?? 0, 0) }}</div>
                                 </div>
                             @endforeach
                         @else
                             <div class="empty-state">
                                 <div class="empty-icon">
-                                    <i class="bi bi-tag"></i>
+                                    <i class="bi bi-people"></i>
                                 </div>
-                                <p class="empty-text">No hay marcas registradas</p>
+                                <p class="empty-text">No hay agentes registrados</p>
                             </div>
                         @endif
                     </div>
@@ -176,7 +215,7 @@
             </div>
 
             <!-- Activity Timeline -->
-            <div class="content-card">
+            <!-- <div class="content-card">
                 <div class="card-header">
                     <h2 class="card-title">
                         <i class="bi bi-activity"></i>
@@ -188,7 +227,7 @@
                         @foreach($actividades as $actividad)
                             <div class="activity-item">
                                 <div class="activity-icon-wrapper">
-                                    <i class="{{ $actividad->icono}}"></i>
+                                    <i class="{{ $actividad->icono }}"></i>
                                 </div>
                                 <div class="activity-content">
                                     <div class="activity-title">{{ $actividad->titulo }}</div>
@@ -200,13 +239,14 @@
                     @else
                         <div class="empty-state">
                             <div class="empty-icon">
-                                <i class="bi bi-tag"></i>
+                                <i class="bi bi-clock-history"></i>
                             </div>
                             <p class="empty-text">No hay actividades registradas</p>
                         </div>
                     @endif
                 </div>
-            </div>
+            </div> -->
+
         </div>
     </div>
 @endsection

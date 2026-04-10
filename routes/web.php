@@ -26,7 +26,7 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.authentica
 
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/dashboard', [DashboardController::class, 'getMarcas'])
+Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware('auth')
     ->name('dashboard');
 
