@@ -18,7 +18,7 @@ class UpdatePropertyRequest extends FormRequest
             'neighborhood' => 'nullable|string|max:255',
             'address' => 'required|string|max:500',
             'type' => 'required|string|in:house,apartment,land,commercial',
-            'contract_type' => 'required|string|in:sale,rent',
+            'contract_type' => 'required|string|in:sale,rent,consignment',
             'price' => 'required|numeric|min:0',
             'm2_land' => 'required|numeric|min:0',
             'm2_construction' => 'required|numeric|min:0',

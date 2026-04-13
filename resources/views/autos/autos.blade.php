@@ -385,6 +385,7 @@
                                                     required>
                                                     <option value="sale">Venta</option>
                                                     <option value="rent">Renta</option>
+                                                    <option value="consignment">Consignación</option>
                                                 </select>
                                             </div>
                                         </div>
