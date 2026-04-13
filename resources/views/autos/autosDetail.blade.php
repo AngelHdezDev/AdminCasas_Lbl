@@ -76,7 +76,7 @@
                                                         </form>
                                                     @endif
                                                     @if(!$image->is_hero)
-                                                        <form 
+                                                        <form action="{{ route('propiedades.imagen.hero', $image->id) }}"
                                                             method="POST" class="d-inline">
                                                             @csrf @method('PATCH')
                                                             <button type="submit" class="btn-hero-thumbnail"

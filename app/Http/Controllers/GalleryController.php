@@ -17,7 +17,7 @@ class GalleryController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
-        $properties = Property::where('active', 1)->orderBy('title', 'asc')->get(); 
+        $properties = Property::where('active', 1)->orderBy('title', 'asc')->get();
 
         return view('galeria.galeria', compact('imagenes', 'properties'));
     }
@@ -39,10 +39,10 @@ class GalleryController extends Controller
 
                 PropertyImage::create([
                     'property_id' => $request->property_id,
-                    'path'        => $temp->ruta_archivo, // Usamos 'path' como en tu DBeaver
-                    'is_main'     => $tienePrincipal ? 0 : 1, // Si es la primera, es la principal
-                    'is_hero'     => 0,
-                    'created_at'  => now()
+                    'path' => $temp->ruta_archivo, // Usamos 'path' como en tu DBeaver
+                    'is_main' => $tienePrincipal ? 0 : 1, // Si es la primera, es la principal
+                    'is_hero' => 0,
+                    'created_at' => now()
                 ]);
 
                 // Marcamos la temporal como procesada
@@ -93,6 +93,29 @@ class GalleryController extends Controller
             return back()->with('success', 'Portada de la propiedad actualizada.');
         } catch (\Exception $e) {
             return back()->with('error', 'No se pudo actualizar la portada.');
+        }
+    }
+
+    public function setHero($id)
+    {
+        try {
+            $imagen = PropertyImage::findOrFail($id);
+
+            $yaEraHero = $imagen->is_hero;
+
+            DB::transaction(function () use ($imagen, $yaEraHero) {
+                PropertyImage::where('is_hero', 1)->update(['is_hero' => 0]);
+
+                if (!$yaEraHero) {
+                    $imagen->update(['is_hero' => 1]);
+                }
+            });
+
+            $msg = !$yaEraHero ? 'Nueva imagen destacada global establecida.' : 'Se ha quitado la imagen destacada.';
+            return back()->with('success', $msg);
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al procesar el Hero: ' . $e->getMessage());
         }
     }
 }
