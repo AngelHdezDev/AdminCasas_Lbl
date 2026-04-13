@@ -53,15 +53,34 @@
                                                 data-imagen-id="{{ $image->id }}">
                                                 <img src="{{ asset('storage/' . $image->path) }}" alt="Imagen {{ $index + 1 }}"
                                                     onclick="changeImage('{{ asset('storage/' . $image->path) }}', this.parentElement)">
-                                                @if($image->is_featured) <span class="badge-portada"><i class="bi bi-star-fill"></i>
-                                                Portada</span> @endif
+                                                @if($image->is_main)
+                                                    <span class="badge-portada">
+                                                        <i class="bi bi-star-fill"></i>
+                                                        <span>Portada</span>
+                                                    </span>
+                                                @endif
+
+                                                @if($image->is_hero)
+                                                    <span class="badge-hero">
+                                                        <i class="bi bi-image-fill"></i>
+                                                        <span>Hero</span>
+                                                    </span>
+                                                @endif
                                                 <div class="thumbnail-actions">
-                                                    @if(!$image->is_featured)
+                                                    @if(!$image->is_main)
                                                         <form action="{{ route('propiedades.imagen.portada', $image->id) }}"
                                                             method="POST" class="d-inline">
                                                             @csrf @method('PATCH')
                                                             <button type="submit" class="btn-portada-thumbnail"
                                                                 title="Marcar como portada"><i class="bi bi-star"></i></button>
+                                                        </form>
+                                                    @endif
+                                                    @if(!$image->is_hero)
+                                                        <form 
+                                                            method="POST" class="d-inline">
+                                                            @csrf @method('PATCH')
+                                                            <button type="submit" class="btn-hero-thumbnail"
+                                                                title="Marcar como Hero"><i class="bi bi-image-fill"></i></button>
                                                         </form>
                                                     @endif
                                                     <form action="{{ route('propiedades.imagen.delete', $image->id) }}"

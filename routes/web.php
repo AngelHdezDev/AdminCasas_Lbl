@@ -41,7 +41,9 @@ Route::delete('/propiedades/{id}', [PropertyController::class, 'destroy'])->midd
 Route::put('/propiedades/{id}', [PropertyController::class, 'update'])->middleware('auth')->name('propiedades.update');
 Route::get('/propiedades/details/{id_property}', [PropertyController::class, 'showDetail'])->middleware('auth')->name('propiedades.show');
 Route::delete('/propiedades/imagen/{id}', [PropertyController::class, 'eliminarImagen'])->middleware('auth')->name('propiedades.imagen.delete');
-Route::patch('/propiedades/imagen/{id}/portada', [GalleryController::class, 'setPortada'])->name('propiedades.imagen.portada');
+Route::patch('/propiedades/imagen/{id}/portada', [GalleryController::class, 'setPortada'])->middleware('auth')->name('propiedades.imagen.portada');
+Route::patch('/propiedades/imagen/{id}/hero', [GalleryController::class, 'setHero'])->middleware('auth')->name('propiedades.imagen.hero');
+
 
 
 // Ruta para marcas
