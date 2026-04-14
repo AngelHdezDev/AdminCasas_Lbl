@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\PropertyImage;
+use Illuminate\Support\Str;
 
 class Property extends Model
 {
@@ -29,10 +30,50 @@ class Property extends Model
         'is_featured',
         'seller_id',
         'client_id',
-        'cp'
+        'cp',
+        'slug',
     ];
 
-    // Relación con las fotos (similar a como lo hicimos con los autos)
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($property) {
+            if (empty($property->slug)) {
+                $property->slug = static::generateUniqueSlug($property->title);
+            }
+        });
+
+        static::updating(function ($property) {
+            if ($property->isDirty('title')) {
+                $property->slug = static::generateUniqueSlug($property->title, $property->id);
+            }
+        });
+    }
+
+    /**
+     * Lógica para garantizar que el slug sea único
+     */
+    private static function generateUniqueSlug(string $title, $currentId = null): string
+    {
+        $slug = Str::slug($title);
+        $originalSlug = $slug;
+        $count = 1;
+
+        while (
+            static::where('slug', $slug)
+                ->when($currentId, function ($query, $currentId) {
+                    return $query->where('id', '!=', $currentId);
+                })
+                ->exists()
+        ) {
+            $slug = $originalSlug . '-' . $count;
+            $count++;
+        }
+
+        return $slug;
+    }
+
     public function images()
     {
         return $this->hasMany(PropertyImage::class);
