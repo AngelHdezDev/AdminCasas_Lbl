@@ -32,6 +32,8 @@ class Property extends Model
         'client_id',
         'cp',
         'slug',
+        'latitude',
+        'longitude',
     ];
 
     protected static function boot()
