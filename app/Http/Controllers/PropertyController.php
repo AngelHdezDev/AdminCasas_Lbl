@@ -102,4 +102,12 @@ class PropertyController extends Controller
 
         return response()->json($response->json());
     }
+
+    public function edit($id)
+    {
+        $property = Property::findOrFail($id);
+        $vendedores = Seller::orderBy('name', 'asc')->get();
+        $clientes = Client::orderBy('name', 'asc')->get();
+        return view('autos.editPropiedad', compact('property', 'vendedores', 'clientes'));
+    }
 }

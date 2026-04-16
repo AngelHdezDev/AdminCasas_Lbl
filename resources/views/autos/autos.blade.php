@@ -155,7 +155,7 @@
                                                     <i class="bi bi-eye"></i>
                                                 </a>
 
-                                                <a class="btn-action btn-edit" title="Editar" data-bs-toggle="modal"
+                                                <a class="btn-action btn-edit" title="Editar" href="{{ route('propiedades.edit', $property->id) }}"
                                                     data-bs-target="#modalPropiedad" data-id="{{ $property->id }}"
                                                     data-title="{{ $property->title }}" data-cp="{{ $property->cp }}"
                                                     data-neighborhood="{{ $property->neighborhood }}"

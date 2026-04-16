@@ -45,6 +45,7 @@ Route::patch('/propiedades/imagen/{id}/portada', [GalleryController::class, 'set
 Route::patch('/propiedades/imagen/{id}/hero', [GalleryController::class, 'setHero'])->middleware('auth')->name('propiedades.imagen.hero');
 Route::get('/propiedades/crear', [PropertyController::class, 'create'])->name('propiedades.create');
 Route::get('/propiedades/autocomplete', [PropertyController::class, 'autocomplete'])->name('propiedades.autocomplete');
+Route::get('/propiedades/editar/{id}', [PropertyController::class, 'edit'])->name('propiedades.edit');
 
 
 // Ruta para marcas
