@@ -387,6 +387,65 @@
             .btn-submit:hover {
                 opacity: .88;
             }
+            
+            /* Estilos para el Grid de Amenidades */
+            .amenities-grid-form {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                gap: 10px;
+                margin-top: 5px;
+            }
+
+            .amenity-checkbox {
+                position: relative;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 10px;
+                background: #f9fafb;
+                border: 0.5px solid rgba(0, 0, 0, .1);
+                border-radius: var(--radius-md);
+                cursor: pointer;
+                transition: all 0.2s ease;
+                user-select: none;
+            }
+
+            .amenity-checkbox:hover {
+                background: #f3f4f6;
+            }
+
+            .amenity-checkbox i {
+                font-size: 16px;
+                color: #6b7280;
+                transition: color 0.2s;
+            }
+
+            .amenity-checkbox span {
+                font-size: 13px;
+                font-weight: 500;
+                color: #4b5563;
+            }
+
+            /* Escondemos el checkbox real pero mantenemos la funcionalidad */
+            .amenity-checkbox input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            /* Estado cuando está seleccionado */
+            .amenity-checkbox:has(input:checked) {
+                background: var(--purple-light);
+                border-color: var(--purple);
+            }
+
+            .amenity-checkbox:has(input:checked) i {
+                color: var(--purple);
+            }
+
+            .amenity-checkbox:has(input:checked) span {
+                color: var(--purple);
+            }
         </style>
     @endpush
 
@@ -630,6 +689,28 @@
                 </div>
             </div>
         </div>
+
+                    <div class="prop-card">
+    <div class="prop-section-title">Amenidades Disponibles</div>
+    <div class="amenities-grid-form">
+        @foreach($amenities as $amenity)
+            <label class="amenity-checkbox">
+                <input type="checkbox" 
+                       name="amenities[]" 
+                       value="{{ $amenity->id }}"
+                       {{-- Comparamos los IDs actuales con los de la propiedad --}}
+                       @checked(in_array($amenity->id, old('amenities', $property->amenities->pluck('id')->toArray())))
+                >
+                <i class="{{ $amenity->icon }}"></i>
+                <span>{{ $amenity->name }}</span>
+            </label>
+        @endforeach
+    </div>
+    <p style="font-size:12px;color:#9ca3af;margin-top:12px;margin-bottom:0">
+        <i class="bi bi-info-circle me-1"></i>
+        Selecciona todas las características que incluye la propiedad.
+    </p>
+</div>
 
                     <div class="prop-card">
                         <div class="prop-section-title">Detalles adicionales</div>

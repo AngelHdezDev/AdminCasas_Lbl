@@ -112,6 +112,7 @@ class PropertyController extends Controller
         $property = Property::findOrFail($id);
         $vendedores = Seller::orderBy('name', 'asc')->get();
         $clientes = Client::orderBy('name', 'asc')->get();
-        return view('autos.editPropiedad', compact('property', 'vendedores', 'clientes'));
+        $amenities = Amenity::all();
+        return view('autos.editPropiedad', compact('property', 'vendedores', 'clientes', 'amenities'));
     }
 }
