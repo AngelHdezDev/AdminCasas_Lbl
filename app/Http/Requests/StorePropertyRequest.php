@@ -42,6 +42,8 @@ class StorePropertyRequest extends FormRequest
             'cp' => 'required|string|size:5|regex:/^[0-9]+$/',
             'latitude' => 'nullable|numeric|min:-90|max:90',
             'longitude' => 'nullable|numeric|min:-180|max:180',
+            'amenities' => 'nullable|array',
+            'amenities.*' => 'exists:amenities,id',
 
         ];
     }

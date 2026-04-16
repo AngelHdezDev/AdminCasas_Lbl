@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Seller;
 use App\Models\Client;
+use App\Models\Amenity;
 use Illuminate\Support\Facades\Http;
 
 
@@ -33,6 +34,10 @@ class PropertyController extends Controller
     public function store(StorePropertyRequest $request): RedirectResponse
     {
         $property = $this->service->createProperty($request->validated());
+
+        if ($request->has('amenities')) {
+            $property->amenities()->sync($request->amenities);
+        }
 
         return redirect()->route('propiedades.index')
             ->with('success', 'Propiedad registrada con éxito');
@@ -52,11 +57,9 @@ class PropertyController extends Controller
     }
     public function update(UpdatePropertyRequest $request, $id): RedirectResponse
     {
-        // Buscamos la propiedad manualmente por el ID de la ruta
         $property = Property::findOrFail($id);
-
-        // Pasamos el modelo encontrado al servicio
         $this->service->updateProperty($property, $request->validated());
+        $property->amenities()->sync($request->input('amenities', []));
 
         return redirect()->route('propiedades.index')
             ->with('success', 'Propiedad actualizada con éxito');
@@ -85,7 +88,8 @@ class PropertyController extends Controller
     {
         $vendedores = Seller::orderBy('name', 'asc')->get();
         $clientes = Client::orderBy('name', 'asc')->get();
-        return view('autos.addPropiedad', compact('vendedores', 'clientes'));
+        $amenities = Amenity::all();
+        return view('autos.addPropiedad', compact('vendedores', 'clientes', 'amenities'));
     }
 
     public function autocomplete(Request $request)

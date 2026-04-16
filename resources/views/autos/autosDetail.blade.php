@@ -5,6 +5,19 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/detalle-vehiculo.css') }}">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map-detail {
+            height: 400px;
+            width: 100%;
+            border-radius: 12px;
+            z-index: 1;
+        }
+
+        .map-card {
+            overflow: hidden;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -38,6 +51,8 @@
 
                 <div class="col-12 col-lg-8">
                     <div class="content-card">
+                        <input type="hidden" name="latitude" id="lat" value="{{ old('latitude', $property->latitude) }}">
+                        <input type="hidden" name="longitude" id="lng" value="{{ old('longitude', $property->longitude) }}">
                         <div class="card-body-custom p-0">
                             @if($property->images->count() > 0)
                                 <div class="gallery-main">
@@ -76,11 +91,11 @@
                                                         </form>
                                                     @endif
                                                     @if(!$image->is_hero)
-                                                        <form action="{{ route('propiedades.imagen.hero', $image->id) }}"
-                                                            method="POST" class="d-inline">
+                                                        <form action="{{ route('propiedades.imagen.hero', $image->id) }}" method="POST"
+                                                            class="d-inline">
                                                             @csrf @method('PATCH')
-                                                            <button type="submit" class="btn-hero-thumbnail"
-                                                                title="Marcar como Hero"><i class="bi bi-image-fill"></i></button>
+                                                            <button type="submit" class="btn-hero-thumbnail" title="Marcar como Hero"><i
+                                                                    class="bi bi-image-fill"></i></button>
                                                         </form>
                                                     @endif
                                                     <form action="{{ route('propiedades.imagen.delete', $image->id) }}"
@@ -154,6 +169,13 @@
                                     </div>
                                 </div>
                             </div>
+
+
+                            <div class="map-card mt-4">
+                                <div class="spec-label mb-2"><i class="bi bi-map"></i> Ubicación en el Mapa</div>
+                                <div id="map-detail"></div>
+                            </div>
+
 
                             <div class="address-box mt-4 p-3 bg-light rounded">
                                 <div class="spec-label mb-2"><i class="bi bi-geo"></i> Dirección Exacta</div>
@@ -235,8 +257,32 @@
         </div>
     </div>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/detalle-vehiculo.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Coordenadas desde el modelo
+            const lat = {{ $property->latitude ?? 20.6596 }};
+            const lng = {{ $property->longitude ?? -103.3496 }};
+
+            // Inicializar mapa (estático)
+            const map = L.map('map-detail', {
+                dragging: !L.Browser.mobile, // Deshabilitar arrastre en móvil para permitir scroll
+                scrollWheelZoom: false,      // Evitar zoom accidental al hacer scroll
+                touchZoom: true
+            }).setView([lat, lng], 16);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap'
+            }).addTo(map);
+
+            // Marcador personalizado o estándar (no arrastrable)
+            L.marker([lat, lng]).addTo(map)
+                .bindPopup('<b>{{ $property->title }}</b><br>{{ $property->neighborhood }}')
+                .openPopup();
+        });
+    </script>
     @if(session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {

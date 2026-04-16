@@ -85,4 +85,9 @@ class Property extends Model
     {
         return $this->hasOne(PropertyImage::class, 'property_id')->where('is_main', 1);
     }
+
+    public function amenities()
+    {
+        return $this->belongsToMany(Amenity::class);
+    }
 }
