@@ -402,7 +402,7 @@
             </div>
         </div>
 
-        <form action="{{ route('propiedades.update', $property->id) }}" method="PUT" id="formPropiedad">
+        <form action="{{ route('propiedades.update', $property->id) }}" method="POST" id="formPropiedad">
             @csrf
             @method('PUT')
                 <div class="layout-top">
