@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Seller;
 use App\Models\Client;
+use Illuminate\Support\Facades\Http;
 
 
 class PropertyController extends Controller
@@ -78,5 +79,27 @@ class PropertyController extends Controller
 
         return redirect()->route('propiedades.index')
             ->with('success', 'La propiedad ha sido dada de baja correctamente.');
+    }
+
+    public function create()
+    {
+        $vendedores = Seller::orderBy('name', 'asc')->get();
+        $clientes = Client::orderBy('name', 'asc')->get();
+        return view('autos.addPropiedad', compact('vendedores', 'clientes'));
+    }
+
+    public function autocomplete(Request $request)
+    {
+        $query = $request->get('q');
+        $response = Http::withHeaders([
+            'User-Agent' => 'AdminCasas/1.0'
+        ])->get("https://nominatim.openstreetmap.org/search", [
+                    'q' => $query,
+                    'format' => 'json',
+                    'addressdetails' => 1,
+                    'limit' => 5
+                ]);
+
+        return response()->json($response->json());
     }
 }

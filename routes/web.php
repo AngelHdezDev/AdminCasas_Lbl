@@ -43,7 +43,8 @@ Route::get('/propiedades/details/{id_property}', [PropertyController::class, 'sh
 Route::delete('/propiedades/imagen/{id}', [PropertyController::class, 'eliminarImagen'])->middleware('auth')->name('propiedades.imagen.delete');
 Route::patch('/propiedades/imagen/{id}/portada', [GalleryController::class, 'setPortada'])->middleware('auth')->name('propiedades.imagen.portada');
 Route::patch('/propiedades/imagen/{id}/hero', [GalleryController::class, 'setHero'])->middleware('auth')->name('propiedades.imagen.hero');
-
+Route::get('/propiedades/crear', [PropertyController::class, 'create'])->name('propiedades.create');
+Route::get('/propiedades/autocomplete', [PropertyController::class, 'autocomplete'])->name('propiedades.autocomplete');
 
 
 // Ruta para marcas

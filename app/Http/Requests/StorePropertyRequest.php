@@ -40,6 +40,9 @@ class StorePropertyRequest extends FormRequest
             'seller_id' => 'nullable|exists:sellers,id',
             'client_id' => 'nullable|exists:clients,id',
             'cp' => 'required|string|size:5|regex:/^[0-9]+$/',
+            'latitude' => 'nullable|numeric|min:-90|max:90',
+            'longitude' => 'nullable|numeric|min:-180|max:180',
+
         ];
     }
 }
