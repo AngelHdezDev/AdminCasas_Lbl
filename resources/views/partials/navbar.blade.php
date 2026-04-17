@@ -1,8 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-vms">
     <div class="container-fluid px-4">
         <a class="navbar-brand-vms" href="{{ route('dashboard') }}">
-            <div class="brand-icon"><i class="bi bi-car-front-fill"></i></div>
-            VMS
+            <div class="brand-icon">
+                <img src="{{ asset('Logos.png') }}" alt="Logo AdminCasas" style="width: 40px; height: auto;">
+            </div>
+            CTP
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -24,7 +26,7 @@
                 <li class="nav-item">
                     <a class="nav-link-vms {{ request()->routeIs('clientes.*') ? 'active' : '' }}"
                         href="{{ route('clientes.index') }}">
-                        <i class="bi bi-person-plus me-1"> </i>  Clientes
+                        <i class="bi bi-person-plus me-1"> </i> Clientes
                     </a>
                 </li>
                 <li class="nav-item">

@@ -838,7 +838,7 @@
                                 }
                             })
                             .catch(err => console.error('Autocomplete error:', err));
-                    }, 400);
+                    }, 270);
                 });
 
                 document.addEventListener('click', e => {

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login - VMS')
+@section('title', 'Login - CTP')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
@@ -12,10 +12,10 @@
             <!-- Header -->
             <div class="login-header">
                 <div class="brand-icon">
-                    <i class="bi bi-car-front-fill"></i>
+                    <img src="{{ asset('Logos.png') }}" alt="Logo AdminCasas" style="width: 80px; height: auto;">
                 </div>
                 <h1>Panel de Administración</h1>
-                <p>Inventario de Autos</p>
+                <p>Inventario de Propiedades</p>
             </div>
 
             <!-- Body -->
@@ -79,13 +79,13 @@
             <div class="login-footer">
                 <small>
                     <i class="bi bi-shield-check"></i>
-                    Sistema Seguro de Gestión de Inventario
+                    Sistema Seguro de Gestión de Propiedades - CTP
                 </small>
             </div>
         </div>
 
         <div class="copyright">
-            <small>© 2026 Sistema de Inventario de Autos · VMS</small>
+            <small>© 2026 Sistema de Propiedades · CTP</small>
         </div>
     </div>
 
