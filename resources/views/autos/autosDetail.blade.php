@@ -250,6 +250,31 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="content-card mt-4">
+                            <div class="card-header-custom">
+                                <h2 class="card-title-custom"><i class="bi bi-stars"></i> Amenidades y Servicios</h2>
+                            </div>
+                            <div class="card-body-custom">
+                                <div class="amenities-display-grid">
+                                    @forelse($property->amenities as $amenity)
+                                        <div class="amenity-display-item">
+                                            <div class="amenity-display-icon">
+                                                {{-- Lógica para detectar si es clase de icono o emoji --}}
+                                                @if(str_contains($amenity->icon, 'bi-'))
+                                                    <i class="{{ $amenity->icon }}"></i>
+                                                @else
+                                                    <span class="emoji-font">{{ $amenity->icon }}</span>
+                                                @endif
+                                            </div>
+                                            <span class="amenity-display-name">{{ $amenity->name }}</span>
+                                        </div>
+                                    @empty
+                                        <div class="text-muted small">No hay amenidades registradas para esta propiedad.
+                                        </div>
+                                    @endforelse
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                 </div>

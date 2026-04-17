@@ -314,7 +314,8 @@ body {
 .badge-hero {
     background: rgba(52, 152, 219, 0.95);
     color: white;
-    bottom: 32px; /* apilado arriba del de portada */
+    bottom: 32px;
+    /* apilado arriba del de portada */
 }
 
 .badge-portada span,
@@ -336,6 +337,7 @@ body {
 .thumbnail-item:hover .badge-hero span {
     display: inline;
 }
+
 .gallery-empty-large {
     height: 400px;
     display: flex;
@@ -599,6 +601,7 @@ body {
         grid-template-columns: repeat(4, 1fr);
     }
 }
+
 /* Contenedor de acciones en thumbnails */
 .thumbnail-item {
     position: relative;
@@ -685,4 +688,52 @@ body {
 
 .badge-portada i {
     font-size: 0.75rem;
+}
+
+/* ── AMENITIES DISPLAY ── */
+.amenities-display-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 1rem;
+}
+
+.amenity-display-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.8rem;
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-100);
+}
+
+.amenity-display-icon {
+    width: 32px;
+    height: 32px;
+    background: var(--white);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1rem;
+    flex-shrink: 0;
+    box-shadow: var(--shadow-sm);
+}
+
+.amenity-display-name {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+    font-weight: 500;
+}
+
+.emoji-font {
+    font-size: 1.2rem;
+    line-height: 1;
+}
+
+@media (max-width: 576px) {
+    .amenities-display-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
