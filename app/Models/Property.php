@@ -90,4 +90,14 @@ class Property extends Model
     {
         return $this->belongsToMany(Amenity::class);
     }
+
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
+    }
+
+    public function seller()
+    {
+        return $this->belongsTo(Seller::class, 'seller_id');
+    }
 }

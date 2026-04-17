@@ -67,7 +67,7 @@ class PropertyController extends Controller
 
     public function showDetail($id_property)
     {
-        $property = Property::findOrFail($id_property);
+        $property = Property::with(['client', 'seller', 'amenities'])->findOrFail($id_property);
 
         return view('autos.autosDetail', compact('property'));
     }
