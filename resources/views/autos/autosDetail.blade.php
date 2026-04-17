@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 
-@section('title', 'Detalle del Vehículo')
+@section('title', 'Detalle de la Propiedad')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/detalle-vehiculo.css') }}">
