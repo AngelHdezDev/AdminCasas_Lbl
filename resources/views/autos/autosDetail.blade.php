@@ -263,8 +263,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Coordenadas desde el modelo
-            const lat = {{ $property->latitude ?? 20.6596 }};
-            const lng = {{ $property->longitude ?? -103.3496 }};
+            const lat = {{ $property->latitude  }};
+            const lng = {{ $property->longitude  }};
 
             // Inicializar mapa (estático)
             const map = L.map('map-detail', {

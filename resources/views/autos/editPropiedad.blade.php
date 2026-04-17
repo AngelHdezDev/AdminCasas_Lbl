@@ -701,7 +701,7 @@
                        {{-- Comparamos los IDs actuales con los de la propiedad --}}
                        @checked(in_array($amenity->id, old('amenities', $property->amenities->pluck('id')->toArray())))
                 >
-                <i class="{{ $amenity->icon }}"></i>
+                <span class="emoji-icon">{{ $amenity->icon }}</span>
                 <span>{{ $amenity->name }}</span>
             </label>
         @endforeach
