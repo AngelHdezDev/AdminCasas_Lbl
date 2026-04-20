@@ -43,9 +43,9 @@ Route::get('/propiedades/details/{id_property}', [PropertyController::class, 'sh
 Route::delete('/propiedades/imagen/{id}', [PropertyController::class, 'eliminarImagen'])->middleware('auth')->name('propiedades.imagen.delete');
 Route::patch('/propiedades/imagen/{id}/portada', [GalleryController::class, 'setPortada'])->middleware('auth')->name('propiedades.imagen.portada');
 Route::patch('/propiedades/imagen/{id}/hero', [GalleryController::class, 'setHero'])->middleware('auth')->name('propiedades.imagen.hero');
-Route::get('/propiedades/crear', [PropertyController::class, 'create'])->name('propiedades.create');
-Route::get('/propiedades/autocomplete', [PropertyController::class, 'autocomplete'])->name('propiedades.autocomplete');
-Route::get('/propiedades/editar/{id}', [PropertyController::class, 'edit'])->name('propiedades.edit');
+Route::get('/propiedades/crear', [PropertyController::class, 'create'])->middleware('auth')->name('propiedades.create');
+Route::get('/propiedades/autocomplete', [PropertyController::class, 'autocomplete'])->middleware('auth')->name('propiedades.autocomplete');
+Route::get('/propiedades/editar/{id}', [PropertyController::class, 'edit'])->middleware('auth')->name('propiedades.edit');
 
 
 // Ruta para marcas
@@ -55,10 +55,10 @@ Route::put('/marcas/{id}', [MarcaController::class, 'update'])->middleware('auth
 Route::delete('/marcas/{id}', [MarcaController::class, 'changeStatus'])->middleware('auth')->name('marcas.changeStatus');
 
 
-Route::get('/galeria', [GalleryController::class, 'index'])->name('galeria.index');
-Route::post('/galeria', [GalleryController::class, 'store'])->name('galeria.store');
-Route::post('/galeria/asignar/{id}', [GalleryController::class, 'asignar'])->name('galeria.asignar');
-Route::delete('/galeria/{id}', [GalleryController::class, 'destroy'])->name('galeria.destroy');
+Route::get('/galeria', [GalleryController::class, 'index'])->middleware('auth')->name('galeria.index');
+Route::post('/galeria', [GalleryController::class, 'store'])->middleware('auth')->name('galeria.store');
+Route::post('/galeria/asignar/{id}', [GalleryController::class, 'asignar'])->middleware('auth')->name('galeria.asignar');
+Route::delete('/galeria/{id}', [GalleryController::class, 'destroy'])->middleware('auth')->name('galeria.destroy');
 
 Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')->name('clientes.index');
 Route::post('/clientes', [ClientController::class, 'store'])->middleware('auth')->name('clientes.store');
