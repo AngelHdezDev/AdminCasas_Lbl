@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Galería de Imágenes - VMS')
+@section('title', 'Galería de Imágenes - CTP')
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/galeria.css') }}">
