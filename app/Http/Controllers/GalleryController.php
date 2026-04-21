@@ -118,4 +118,6 @@ class GalleryController extends Controller
             return back()->with('error', 'Error al procesar el Hero: ' . $e->getMessage());
         }
     }
+
+    
 }

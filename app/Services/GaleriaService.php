@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\PropertyImage;
 use App\Models\Property;
+use App\Models\ImagenTemporal;
 use Illuminate\Support\Facades\Storage;
 
 class GaleriaService
@@ -24,20 +25,22 @@ class GaleriaService
     public function uploadMultiple(array $files)
     {
         $uploadedImages = [];
-
         foreach ($files as $file) {
             // Guardamos en storage/app/public/properties con nombre único
-            $path = $file->store('properties', 'public');
-
+            $path = $file->store('inbox_fotos', 'public');
             // Creamos el registro en la base de datos
-            $uploadedImages[] = PropertyImage::create([
-                'property_id' => null, // Nacen sin dueño
-                'path' => $path,
-                'is_main' => false,
-                'is_hero' => false
+            $uploadedImages[] = ImagenTemporal::create([
+                // 'property_id' => null, // Nacen sin dueño
+                'ruta_archivo' => $path,
+                'nombre_original' => $file->getClientOriginalName(),
+                'correo_origen' => auth()->user()->correo,
+                'asunto' => 'Subida desde galería',
+                'fecha_correo' => now(),
+                'status' => 0
+                // 'is_main' => false,
+                // 'is_hero' => false
             ]);
         }
-
         return $uploadedImages;
     }
 
