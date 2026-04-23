@@ -10,3 +10,4 @@ Artisan::command('inspire', function () {
     
 
 Schedule::command('app:extraer-fotos')->everyMinute();
+Schedule::command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();
