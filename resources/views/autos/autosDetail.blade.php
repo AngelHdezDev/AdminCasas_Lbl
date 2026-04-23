@@ -173,7 +173,7 @@
 
                             <div class="map-card mt-4">
                                 <div class="spec-label mb-2"><i class="bi bi-map"></i> Ubicación en el Mapa</div>
-                                <div id="map-detail"></div>
+                                <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
                             </div>
 
 
@@ -285,29 +285,6 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/detalle-vehiculo.js') }}"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Coordenadas desde el modelo
-            const lat = {{ $property->latitude  }};
-            const lng = {{ $property->longitude  }};
-
-            // Inicializar mapa (estático)
-            const map = L.map('map-detail', {
-                dragging: !L.Browser.mobile, // Deshabilitar arrastre en móvil para permitir scroll
-                scrollWheelZoom: false,      // Evitar zoom accidental al hacer scroll
-                touchZoom: true
-            }).setView([lat, lng], 16);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
-
-            // Marcador personalizado o estándar (no arrastrable)
-            L.marker([lat, lng]).addTo(map)
-                .bindPopup('<b>{{ $property->title }}</b><br>{{ $property->neighborhood }}')
-                .openPopup();
-        });
-    </script>
     @if(session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -334,3 +311,34 @@
     @endif
 
 @endsection
+
+@push('scripts')
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}"></script>
+
+    <script>
+        function initMap() {
+            // Coordenadas desde tu modelo
+            const pos = { 
+                lat: {{ $property->latitude }}, 
+                lng: {{ $property->longitude }} 
+            };
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: pos,
+                zoom: 17,
+                mapTypeControl: false,
+                streetViewControl: false, // Opcional: quita el monito de Street View
+                fullscreenControl: true
+            });
+
+            // Marcador Estático
+            new google.maps.Marker({
+                position: pos,
+                map: map,
+                draggable: false // Aseguramos que no se pueda mover
+            });
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+@endpush
