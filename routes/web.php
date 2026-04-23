@@ -100,7 +100,3 @@ Route::get('/vendedores/archivo/{id}', function ($id) {
     abort(404, "Archivo no encontrado");
 })->middleware('auth')->name('vendedores.archivo');
 
-
-Route::get('/maps', function () {
-    return view('maps');
-})->name('maps');

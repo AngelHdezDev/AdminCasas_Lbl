@@ -19,6 +19,9 @@ use App\Models\Seller;
 use App\Models\Client;
 use App\Models\Amenity;
 use Illuminate\Support\Facades\Http;
+use App\Models\PropertyImage;
+use Illuminate\Support\Facades\Storage;
+;
 
 
 class PropertyController extends Controller
@@ -114,5 +117,22 @@ class PropertyController extends Controller
         $clientes = Client::orderBy('name', 'asc')->get();
         $amenities = Amenity::all();
         return view('autos.editPropiedad', compact('property', 'vendedores', 'clientes', 'amenities'));
+    }
+
+    public function eliminarImagen($id)
+    {
+        $imagen = PropertyImage::findOrFail($id);
+
+        // Eliminar archivo y registro...
+        if (Storage::exists($imagen->path)) {
+            Storage::delete($imagen->path);
+        }
+        $imagen->delete();
+
+        // ESTO ES LO QUE EL JS NECESITA LEER:
+        return response()->json([
+            'success' => true,
+            'message' => 'Imagen eliminada correctamente.'
+        ], 200);
     }
 }

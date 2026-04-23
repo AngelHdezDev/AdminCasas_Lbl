@@ -65,6 +65,8 @@ document.addEventListener('DOMContentLoaded', function () {
             e.stopPropagation();
 
             const form = deleteBtn.closest('.delete-image-form');
+            const url = form.getAttribute('action');
+            const token = form.querySelector('input[name="_token"]').value;
 
             Swal.fire({
                 title: '¿Eliminar imagen?',
@@ -74,12 +76,42 @@ document.addEventListener('DOMContentLoaded', function () {
                 confirmButtonColor: '#c0392b',
                 confirmButtonText: 'Sí, eliminar',
                 cancelButtonText: 'Cancelar',
-                reverseButtons: true
+                reverseButtons: true,
+                allowOutsideClick: false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Al usar submit(), el navegador recargará la página 
-                    // con la respuesta del controlador (el redirect back)
-                    form.submit();
+                    // Mostramos un indicador de carga mientras el servidor responde
+                    Swal.fire({
+                        title: 'Eliminando...',
+                        didOpen: () => {
+                            Swal.showLoading();
+                        },
+                        allowOutsideClick: false,
+                        showConfirmButton: false
+                    });
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: new FormData(form)
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // ÉXITO: Recargamos la página completa
+                                window.location.reload();
+                            } else {
+                                Swal.fire('Error', data.message || 'No se pudo eliminar.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Hubo un problema de comunicación con el servidor.', 'error');
+                        });
                 }
             });
         }
