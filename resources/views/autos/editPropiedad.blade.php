@@ -25,8 +25,8 @@
                     <div class="left-column">
                         <!-- Publicación -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Publicación</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Datos de Publicación</h4>
                             </div>
                             <div class="field">
                                 <label class="field-label">
@@ -53,8 +53,8 @@
 
                         <!-- Ubicación -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Ubicación en mapa</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Ubicación en mapa</h4>
                             </div>
                             <div class="map-search">
                                 <i class="bi bi-search"></i>
@@ -72,6 +72,9 @@
 
                         <!-- Dimensiones -->
                         <div class="card">
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Datos de publicación</h4>
+                            </div>
                             <div class="card-header">
                                 <span class="card-title">Dimensiones y distribución</span>
                             </div>
@@ -113,8 +116,8 @@
 
                         <!-- Amenidades -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Amenidades disponibles</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Amenidades disponibles</h4>
                             </div>
                             <div class="amenities-grid">
                                 @foreach($amenities as $amenity)
@@ -135,8 +138,8 @@
 
                         <!-- Descripción -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Detalles adicionales</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Detalles adicionales</h4>
                             </div>
                             <div class="field" style="margin-bottom:0">
                                 <label class="field-label">
@@ -154,12 +157,13 @@
 
                         <!-- Datos de Ubicación -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Datos de ubicación</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Datos de ubicación</h4>
                                 <span class="card-badge">
                                     <i class="bi bi-magic"></i> Auto
                                 </span>
                             </div>
+
                             <div class="field">
                                 <label class="field-label">
                                     Código postal <span class="required">*</span>
@@ -203,8 +207,8 @@
 
                         <!-- Comercialización -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Comercialización</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Comercialización</h4>
                             </div>
                             <div class="grid-2">
                                 <div class="field">
@@ -264,8 +268,8 @@
 
                         <!-- Asignación -->
                         <div class="card">
-                            <div class="card-header">
-                                <span class="card-title">Asignación</span>
+                            <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Asignación</h4>
                             </div>
                             <div class="field">
                                 <label class="field-label">Vendedor</label>
@@ -317,7 +321,8 @@
 
 
 @push('scripts')
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
 
     <script>
         let map, marker, autocomplete, geocoder;
@@ -434,5 +439,3 @@
         google.maps.event.addDomListener(window, 'load', initMap);
     </script>
 @endpush
-
-
