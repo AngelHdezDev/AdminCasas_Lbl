@@ -313,8 +313,7 @@
 @endsection
 
 @push('scripts')
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBFEdmq9JH19Llzt3Wy8-XkTjqb4hV35lo&libraries=places"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
 
     <script>
         let map, marker, autocomplete, geocoder;

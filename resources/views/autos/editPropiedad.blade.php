@@ -1,6 +1,12 @@
 @extends('layouts.app')
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/createPropiedad.css') }}">
+    <style>
+        /* Aseguramos que el contenedor de resultados de Google no choque con tu estilo */
+        .pac-container {
+            z-index: 10000 !important;
+        }
+    </style>
 @endpush
 
 @section('content')
@@ -8,6 +14,7 @@
     <body>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
         </main>
         <main class="main-content">
             <form action="{{ route('propiedades.update', $property->id) }}" method="POST" id="formPropiedad">
@@ -51,11 +58,10 @@
                             </div>
                             <div class="map-search">
                                 <i class="bi bi-search"></i>
-                                <input type="text" id="address-input" class="field-input"
+                                <input type="text" id="address-search" class="field-input"
                                     placeholder="Busca una calle o colonia..." autocomplete="off">
-                                <div id="results-list" class="autocomplete-results"></div>
                             </div>
-                            <div id="map"></div>
+                            <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
                             <p class="map-hint">
                                 <i class="bi bi-info-circle"></i>
                                 También puedes hacer clic en el mapa o arrastrar el marcador.
@@ -310,135 +316,123 @@
 @endsection
 
 
-
 @push('scripts')
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
 
+    <script>
+        let map, marker, autocomplete, geocoder;
+
+        function initMap() {
             const initialLat = {{ old('latitude', $property->latitude) ?? 20.6596 }};
             const initialLng = {{ old('longitude', $property->longitude) ?? -103.3496 }};
 
-            const map = L.map('map').setView([initialLat, initialLng], 13);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap'
-            }).addTo(map);
+            const initialPos = { lat: initialLat, lng: initialLng }; // GDL
 
-            let marker = L.marker([initialLat, initialLng], { draggable: true }).addTo(map);
-
-            // Referencias DOM
-            const addressInput = document.getElementById('address-input');
-            const resultsList = document.getElementById('results-list');
-            const latInput = document.getElementById('lat');
-            const lngInput = document.getElementById('lng');
-            const stateInput = document.getElementById('state');
-            const cityInput = document.getElementById('city');
-            const cpInput = document.getElementById('cp');
-            const neighborhoodEl = document.getElementById('neighborhood');
-            const addressEl = document.getElementById('address');
-
-            // Rellena el formulario con datos de Nominatim
-            function fillForm(data) {
-
-                if (!data) return;
-
-                latInput.value = data.lat;
-                lngInput.value = data.lon;
-
-                if (data.display_name) {
-                    addressInput.value = data.display_name;
-                }
-
-                if (data.address) {
-                    const a = data.address;
-
-                    stateInput.value = a.state || '';
-                    cityInput.value = a.city || a.village || a.municipality || a.county || '';
-                    cpInput.value = a.postcode || '';
-
-                    // Dirección: calle + número
-                    const street = [a.road || a.pedestrian || '', a.house_number || ''].filter(Boolean).join(' ');
-                    if (street) addressEl.value = street;
-
-                    // Colonia: Extraer el nombre de la zona
-                    const colonia = a.suburb || a.neighbourhood || a.quarter || a.city_district || a.town || a.amenity || '';
-                    populateNeighborhood(colonia);
-                }
-            }
-
-            // AHORA FUNCIONA COMO INPUT
-            function populateNeighborhood(colonia) {
-                if (neighborhoodEl) {
-                    // Simplemente asignamos el valor al input
-                    neighborhoodEl.value = colonia;
-                }
-            }
-
-            // Reverse geocoding al mover marcador o hacer clic en mapa
-            function reverseGeocode(lat, lng) {
-                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`)
-                    .then(r => r.json())
-                    .then(data => fillForm(data))
-                    .catch(err => console.error('Reverse geocoding error:', err));
-            }
-
-            marker.on('dragend', function () {
-                const pos = marker.getLatLng();
-                reverseGeocode(pos.lat, pos.lng);
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: initialPos,
+                zoom: 18,
+                mapTypeControl: false
             });
 
-            map.on('click', function (e) {
-                marker.setLatLng(e.latlng);
-                reverseGeocode(e.latlng.lat, e.latlng.lng);
+            marker = new google.maps.Marker({
+                position: initialPos,
+                map: map,
+                draggable: true
             });
 
-            // Autocomplete de dirección
-            let timer;
-            addressInput.addEventListener('input', function () {
-                clearTimeout(timer);
-                const query = this.value.trim();
-                if (query.length < 3) { resultsList.style.display = 'none'; return; }
+            geocoder = new google.maps.Geocoder();
 
-                timer = setTimeout(() => {
-                    fetch(`{{ route('propiedades.autocomplete') }}?q=${encodeURIComponent(query)}`)
-                        .then(r => r.json())
-                        .then(data => {
-                            resultsList.innerHTML = '';
-                            if (data && data.length > 0) {
-                                resultsList.style.display = 'block';
-                                data.forEach(item => {
-                                    const btn = document.createElement('button');
-                                    btn.type = 'button';
-                                    btn.className = 'list-group-item list-group-item-action text-start';
-                                    btn.innerHTML = `<i class="bi bi-geo-alt-fill me-2" style="color:var(--purple);font-size:12px"></i>${item.display_name}`;
+            // Autocomplete
+            const searchInput = document.getElementById("address-search");
+            autocomplete = new google.maps.places.Autocomplete(searchInput);
+            autocomplete.bindTo("bounds", map);
 
-                                    btn.onclick = () => {
-                                        const lat = item.lat;
-                                        const lon = item.lon;
+            autocomplete.addListener("place_changed", () => {
+                const place = autocomplete.getPlace();
+                if (!place.geometry) return;
 
-                                        map.setView([lat, lon], 17);
-                                        marker.setLatLng([lat, lon]);
-
-                                        // Pedimos el reverseGeocode para obtener el JSON completo rico en detalles
-                                        reverseGeocode(lat, lon);
-
-                                        resultsList.style.display = 'none';
-                                    };
-                                    resultsList.appendChild(btn);
-                                });
-                            } else {
-                                resultsList.style.display = 'none';
-                            }
-                        })
-                        .catch(err => console.error('Autocomplete error:', err));
-                }, 400);
+                map.setCenter(place.geometry.location);
+                map.setZoom(17);
+                marker.setPosition(place.geometry.location);
+                fillAddressFields(place);
             });
 
-            document.addEventListener('click', e => {
-                if (!addressInput.contains(e.target) && !resultsList.contains(e.target)) {
-                    resultsList.style.display = 'none';
+            // Al arrastrar el pin
+            marker.addListener("dragend", () => {
+                const pos = marker.getPosition();
+                geocoder.geocode({ location: pos }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        fillAddressFields(results[0]);
+                        searchInput.value = results[0].formatted_address;
+                    }
+                });
+            });
+
+            // Al hacer clic en el mapa
+            map.addListener("click", (e) => {
+                marker.setPosition(e.latLng);
+                geocoder.geocode({ location: e.latLng }, (results, status) => {
+                    if (status === "OK" && results[0]) {
+                        fillAddressFields(results[0]);
+                        searchInput.value = results[0].formatted_address;
+                    }
+                });
+            });
+        }
+
+        function fillAddressFields(place) {
+            // Lat/Lng
+            document.getElementById("lat").value = place.geometry.location.lat();
+            document.getElementById("lng").value = place.geometry.location.lng();
+
+            // Resetear campos
+            document.getElementById("cp").value = "";
+            document.getElementById("state").value = "";
+            document.getElementById("city").value = "";
+            document.getElementById("neighborhood").value = "";
+            document.getElementById("address").value = "";
+
+            let streetName = "";
+            let streetNumber = "";
+
+            place.address_components.forEach(component => {
+                const types = component.types; // Usamos el array completo de tipos
+
+                // Código Postal
+                if (types.includes("postal_code")) {
+                    document.getElementById("cp").value = component.long_name;
                 }
+                // Estado
+                if (types.includes("administrative_area_level_1")) {
+                    document.getElementById("state").value = component.long_name;
+                }
+                // Ciudad (Municipio)
+                if (types.includes("locality")) {
+                    document.getElementById("city").value = component.long_name;
+                }
+
+                // --- OBTENER COLONIA ---
+                // Google suele enviar la colonia en una de estas 3 etiquetas:
+                // 1. sublocality_level_1 (La más común en ciudades grandes como GDL)
+                // 2. neighborhood (Colonias específicas o barrios)
+                // 3. sublocality (Genérico)
+                if (types.includes("sublocality_level_1") ||
+                    types.includes("neighborhood") ||
+                    types.includes("sublocality")) {
+
+                    document.getElementById("neighborhood").value = component.long_name;
+                }
+
+                // Dirección (Calle y Número)
+                if (types.includes("route")) streetName = component.long_name;
+                if (types.includes("street_number")) streetNumber = component.long_name;
             });
-        });
+
+            document.getElementById("address").value = `${streetName} ${streetNumber}`.trim();
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
     </script>
 @endpush
+
+
