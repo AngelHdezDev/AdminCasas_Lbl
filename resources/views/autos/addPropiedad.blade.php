@@ -168,6 +168,22 @@
                                 </span>
                             </div>
 
+                            <div class="field" style="margin-bottom:0">
+                                <label class="field-label">
+                                    Dirección <span class="required">*</span>
+                                </label>
+                                <input type="text" class="field-input" name="address" id="address"
+                                    placeholder="Se detecta del mapa" required>
+                            </div>
+
+                            <div class="field">
+                                <label class="field-label">
+                                    Colonia <span class="required">*</span>
+                                </label>
+                                <input type="text" class="field-input" name="neighborhood" id="neighborhood"
+                                    placeholder="Se detecta del mapa" required>
+                            </div>
+
                             <div class="field">
                                 <label class="field-label">
                                     Código postal <span class="required">*</span>
@@ -178,32 +194,19 @@
                             <div class="grid-2">
                                 <div class="field">
                                     <label class="field-label">
-                                        Estado <span class="required">*</span>
-                                    </label>
-                                    <input type="text" class="field-input" name="state" id="state" placeholder="—" readonly
-                                        required>
-                                </div>
-                                <div class="field">
-                                    <label class="field-label">
                                         Ciudad <span class="required">*</span>
                                     </label>
                                     <input type="text" class="field-input" name="city" id="city" placeholder="—" readonly
                                         required>
                                 </div>
-                            </div>
-                            <div class="field">
-                                <label class="field-label">
-                                    Colonia <span class="required">*</span>
-                                </label>
-                                <input type="text" class="field-input" name="neighborhood" id="neighborhood"
-                                    placeholder="Se detecta del mapa" required>
-                            </div>
-                            <div class="field" style="margin-bottom:0">
-                                <label class="field-label">
-                                    Dirección <span class="required">*</span>
-                                </label>
-                                <input type="text" class="field-input" name="address" id="address"
-                                    placeholder="Se detecta del mapa" required>
+                                <div class="field">
+                                    <label class="field-label">
+                                        Estado <span class="required">*</span>
+                                    </label>
+                                    <input type="text" class="field-input" name="state" id="state" placeholder="—" readonly
+                                        required>
+                                </div>
+
                             </div>
                         </div>
 
