@@ -153,7 +153,7 @@
                                                 <span><i class="bi bi-droplet"></i> {{ $propiedad->bathrooms }} baños</span>
                                             @endif
                                             @if($propiedad->m2_construction)
-                                                <span><i class="bi bi-rulers"></i> {{ $propiedad->m2_construction }} m²</span>
+                                                <span><i class="bi bi-rulers"></i> {{ number_format($propiedad->m2_construction, 0, '.', ',') }} m²</span>
                                             @endif
                                             @if($propiedad->neighborhood)
                                                 <span>· {{ $propiedad->neighborhood }}</span>

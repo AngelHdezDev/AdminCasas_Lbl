@@ -132,7 +132,7 @@
                                         <td>
                                             <span class="badge-tipo">{{ $property->type }}</span>
                                         </td>
-                                        <td style="font-weight: 500; color: var(--gray-700);">{{ $property->m2_construction }} m²
+                                        <td style="font-weight: 500; color: var(--gray-700);">{{ number_format($property->m2_construction, 0, '.', ',') }} m²
                                         </td>
                                         <td style="color: var(--gray-500);">{{ $property->bedrooms }}</td>
                                         <td style="color: var(--gray-500);">{{ $property->bathrooms }}</td>

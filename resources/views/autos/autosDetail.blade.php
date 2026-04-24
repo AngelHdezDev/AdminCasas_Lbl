@@ -143,14 +143,18 @@
                                     <div class="spec-icon"><i class="bi bi-rulers"></i></div>
                                     <div class="spec-content">
                                         <div class="spec-label">Terreno</div>
-                                        <div class="spec-value">{{ $property->m2_land }} m²</div>
+                                        {{-- Formato: variable, decimales, separador decimal, separador miles --}}
+                                        <div class="spec-value">{{ number_format($property->m2_land, 0, '.', ',') }} m²
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="spec-item">
                                     <div class="spec-icon"><i class="bi bi-building"></i></div>
                                     <div class="spec-content">
                                         <div class="spec-label">Construcción</div>
-                                        <div class="spec-value">{{ $property->m2_construction }} m²</div>
+                                        <div class="spec-value">{{ number_format($property->m2_construction, 0, '.', ',') }}
+                                            m²</div>
                                     </div>
                                 </div>
 
@@ -318,10 +322,10 @@
     <script>
         function initMap() {
             // Coordenadas desde tu modelo
-            const pos = { 
-                lat: {{ $property->latitude }}, 
+            const pos = {
+                lat: {{ $property->latitude }},
                 lng: {{ $property->longitude }} 
-            };
+                };
 
             const map = new google.maps.Map(document.getElementById("map"), {
                 center: pos,
