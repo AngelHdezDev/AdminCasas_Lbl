@@ -132,13 +132,16 @@
                     <div class="card-body">
                         @if(isset($propiedadesRecientes) && count($propiedadesRecientes) > 0)
                             @foreach($propiedadesRecientes as $propiedad)
-                                <div class="prop-list-item">                                 
+                                <div class="prop-list-item">
                                     <div class="prop-thumb">
-                                        {{--
-                                        Cambiamos la lógica temporalmente:
-                                        Como no hay relación, siempre mostrará el icono de la casa
-                                        --}}
-                                        <i class="bi bi-house"></i>
+                                        @if($propiedad->images && $propiedad->images->count() > 0)
+                                            {{-- Mostramos la primera imagen de la relación --}}
+                                            <img src="{{ asset('storage/' . $propiedad->images->first()->path) }}"
+                                                alt="{{ $propiedad->titulo }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        @else
+                                            {{-- Si no tiene fotos, mostramos el icono que tenías --}}
+                                            <i class="bi bi-house"></i>
+                                        @endif
                                     </div>
                                     <div class="prop-info">
                                         <div class="prop-name">{{ $propiedad->title }}</div>
@@ -216,36 +219,36 @@
 
             <!-- Activity Timeline -->
             <!-- <div class="content-card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="bi bi-activity"></i>
-                        Actividad Reciente
-                    </h2>
-                </div>
-                <div class="card-body">
-                    @if(isset($actividades) && count($actividades) > 0)
-                        @foreach($actividades as $actividad)
-                            <div class="activity-item">
-                                <div class="activity-icon-wrapper">
-                                    <i class="{{ $actividad->icono }}"></i>
+                    <div class="card-header">
+                        <h2 class="card-title">
+                            <i class="bi bi-activity"></i>
+                            Actividad Reciente
+                        </h2>
+                    </div>
+                    <div class="card-body">
+                        @if(isset($actividades) && count($actividades) > 0)
+                            @foreach($actividades as $actividad)
+                                <div class="activity-item">
+                                    <div class="activity-icon-wrapper">
+                                        <i class="{{ $actividad->icono }}"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">{{ $actividad->titulo }}</div>
+                                        <div class="activity-desc">{{ $actividad->descripcion }}</div>
+                                    </div>
+                                    <div class="activity-time">{{ $actividad->tiempo }}</div>
                                 </div>
-                                <div class="activity-content">
-                                    <div class="activity-title">{{ $actividad->titulo }}</div>
-                                    <div class="activity-desc">{{ $actividad->descripcion }}</div>
+                            @endforeach
+                        @else
+                            <div class="empty-state">
+                                <div class="empty-icon">
+                                    <i class="bi bi-clock-history"></i>
                                 </div>
-                                <div class="activity-time">{{ $actividad->tiempo }}</div>
+                                <p class="empty-text">No hay actividades registradas</p>
                             </div>
-                        @endforeach
-                    @else
-                        <div class="empty-state">
-                            <div class="empty-icon">
-                                <i class="bi bi-clock-history"></i>
-                            </div>
-                            <p class="empty-text">No hay actividades registradas</p>
-                        </div>
-                    @endif
-                </div>
-            </div> -->
+                        @endif
+                    </div>
+                </div> -->
 
         </div>
     </div>
