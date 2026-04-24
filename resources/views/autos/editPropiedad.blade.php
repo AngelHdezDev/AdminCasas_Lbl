@@ -164,29 +164,15 @@
                                 </span>
                             </div>
 
-                            <div class="field">
+                            <div class="field" style="margin-bottom:0">
                                 <label class="field-label">
-                                    Código postal <span class="required">*</span>
+                                    Dirección <span class="required">*</span>
                                 </label>
-                                <input type="text" class="field-input" name="cp" id="cp" placeholder="Se detecta del mapa"
-                                    maxlength="5" required value="{{ old('cp', $property->cp) }}">
+                                <input type="text" class="field-input" name="address" id="address"
+                                    placeholder="Se detecta del mapa" required
+                                    value="{{ old('address', $property->address) }}">
                             </div>
-                            <div class="grid-2">
-                                <div class="field">
-                                    <label class="field-label">
-                                        Estado <span class="required">*</span>
-                                    </label>
-                                    <input type="text" class="field-input" name="state" id="state" placeholder="—" readonly
-                                        required value="{{ old('state', $property->state) }}">
-                                </div>
-                                <div class="field">
-                                    <label class="field-label">
-                                        Ciudad <span class="required">*</span>
-                                    </label>
-                                    <input type="text" class="field-input" name="city" id="city" placeholder="—" readonly
-                                        required value="{{ old('city', $property->city) }}">
-                                </div>
-                            </div>
+
                             <div class="field">
                                 <label class="field-label">
                                     Colonia <span class="required">*</span>
@@ -195,13 +181,31 @@
                                     placeholder="Se detecta del mapa" required
                                     value="{{ old('neighborhood', $property->neighborhood) }}">
                             </div>
-                            <div class="field" style="margin-bottom:0">
+
+                            <div class="field">
                                 <label class="field-label">
-                                    Dirección <span class="required">*</span>
+                                    Código postal <span class="required">*</span>
                                 </label>
-                                <input type="text" class="field-input" name="address" id="address"
-                                    placeholder="Se detecta del mapa" required
-                                    value="{{ old('address', $property->address) }}">
+                                <input type="text" class="field-input" name="cp" id="cp" placeholder="Se detecta del mapa"
+                                    maxlength="5" required value="{{ old('cp', $property->cp) }}">
+                            </div>
+                            <div class="grid-2">
+                                
+                                <div class="field">
+                                    <label class="field-label">
+                                        Ciudad <span class="required">*</span>
+                                    </label>
+                                    <input type="text" class="field-input" name="city" id="city" placeholder="—" readonly
+                                        required value="{{ old('city', $property->city) }}">
+                                </div>
+
+                                <div class="field">
+                                    <label class="field-label">
+                                        Estado <span class="required">*</span>
+                                    </label>
+                                    <input type="text" class="field-input" name="state" id="state" placeholder="—" readonly
+                                        required value="{{ old('state', $property->state) }}">
+                                </div>
                             </div>
                         </div>
 
