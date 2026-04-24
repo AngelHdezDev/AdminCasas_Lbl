@@ -85,15 +85,19 @@
                                     <label class="field-label">
                                         Terreno (m²) <span class="required">*</span>
                                     </label>
-                                    <input type="number" class="field-input" name="m2_land" id="m2_land" placeholder="0"
+                                    <input type="text" class="field-input m2-mask" data-target="m2_land" placeholder="0"
                                         required>
+                                    <input type="hidden" name="m2_land" id="m2_land" value="{{ old('m2_land') }}">
                                 </div>
+
                                 <div class="field">
                                     <label class="field-label">
                                         Construcción (m²) <span class="required">*</span>
                                     </label>
-                                    <input type="number" class="field-input" name="m2_construction" id="m2_construction"
+                                    <input type="text" class="field-input m2-mask" data-target="m2_construction"
                                         placeholder="0" required>
+                                    <input type="hidden" name="m2_construction" id="m2_construction"
+                                        value="{{ old('m2_construction') }}">
                                 </div>
                             </div>
                             <div class="grid-3">
@@ -479,6 +483,48 @@
                 if (realInput.value) {
                     e.target.value = realInput.value;
                 }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const m2Inputs = document.querySelectorAll('.m2-mask');
+
+            // Formateador de números (separador de miles, sin decimales para m2)
+            const m2Formatter = new Intl.NumberFormat('es-MX', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+
+            m2Inputs.forEach(maskInput => {
+                const targetId = maskInput.getAttribute('data-target');
+                const realInput = document.getElementById(targetId);
+
+                // Si regresamos por error de validación, formatear el valor que ya estaba
+                if (realInput.value) {
+                    maskInput.value = m2Formatter.format(realInput.value);
+                }
+
+                maskInput.addEventListener('input', function (e) {
+                    // Limpiar todo lo que no sea número o punto
+                    let value = e.target.value.replace(/[^\d.]/g, '');
+
+                    // Guardar valor limpio en el input real
+                    realInput.value = value;
+                });
+
+                maskInput.addEventListener('focus', function (e) {
+                    // Al entrar para editar, mostrar el número limpio
+                    if (realInput.value) {
+                        e.target.value = realInput.value;
+                    }
+                });
+
+                maskInput.addEventListener('blur', function (e) {
+                    // Al salir, poner el formato con comas (ej: 1,500)
+                    const numericValue = parseFloat(realInput.value);
+                    if (!isNaN(numericValue)) {
+                        e.target.value = m2Formatter.format(numericValue);
+                    }
+                });
             });
         });
     </script>

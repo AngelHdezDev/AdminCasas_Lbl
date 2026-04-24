@@ -73,25 +73,23 @@
                         <!-- Dimensiones -->
                         <div class="card">
                             <div class="mb-4 border-l-4 border-blue-500 pl-3 py-1">
-                                <h4 class="text-sm font-bold text-gray-800 uppercase">Datos de publicación</h4>
+                                <h4 class="text-sm font-bold text-gray-800 uppercase">Dimensiones y distribución</h4>
                             </div>
-                            <div class="card-header">
-                                <span class="card-title">Dimensiones y distribución</span>
-                            </div>
+
                             <div class="grid-2">
                                 <div class="field">
-                                    <label class="field-label">
-                                        Terreno (m²) <span class="required">*</span>
-                                    </label>
-                                    <input type="number" class="field-input" name="m2_land" id="m2_land" placeholder="0"
-                                        required value="{{ old('m2_land', $property->m2_land) }}">
+                                    <label class="field-label">Terreno (m²) <span class="required">*</span></label>
+                                    <input type="text" class="field-input m2-mask" id="m2_land_display" placeholder="0"
+                                        required>
+                                    <input type="hidden" name="m2_land" id="m2_land"
+                                        value="{{ old('m2_land', $property->m2_land) }}">
                                 </div>
+
                                 <div class="field">
-                                    <label class="field-label">
-                                        Construcción (m²) <span class="required">*</span>
-                                    </label>
-                                    <input type="number" class="field-input" name="m2_construction" id="m2_construction"
-                                        placeholder="0" required
+                                    <label class="field-label">Construcción (m²) <span class="required">*</span></label>
+                                    <input type="text" class="field-input m2-mask" id="m2_construction_display"
+                                        placeholder="0" required>
+                                    <input type="hidden" name="m2_construction" id="m2_construction"
                                         value="{{ old('m2_construction', $property->m2_construction) }}">
                                 </div>
                             </div>
@@ -487,6 +485,51 @@
                 if (!isNaN(numericValue)) {
                     e.target.value = formatter.format(numericValue);
                 }
+            });
+        });
+        document.addEventListener('DOMContentLoaded', function () {
+            const m2Masks = document.querySelectorAll('.m2-mask');
+
+            // Formateador de números (Estilo mexicano: comas para miles)
+            const m2Formatter = new Intl.NumberFormat('es-MX', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+            });
+
+            m2Masks.forEach(displayInput => {
+                // Obtenemos el ID del input oculto (está justo después en el HTML o por ID)
+                const realInput = displayInput.nextElementSibling;
+
+                // 1. CARGA INICIAL: Si ya hay datos en la DB, formatearlos
+                if (realInput.value) {
+                    displayInput.value = m2Formatter.format(realInput.value);
+                }
+
+                // 2. EVENTO INPUT: Mientras escriben, limpiamos y guardamos el valor real
+                displayInput.addEventListener('input', function (e) {
+                    let value = e.target.value.replace(/[^\d.]/g, '');
+
+                    // Evitar doble punto decimal
+                    const parts = value.split('.');
+                    if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+
+                    realInput.value = value;
+                });
+
+                // 3. EVENTO FOCUS: Al hacer clic para editar, quitar comas para que no estorben
+                displayInput.addEventListener('focus', function (e) {
+                    if (realInput.value) {
+                        e.target.value = realInput.value;
+                    }
+                });
+
+                // 4. EVENTO BLUR: Al salir, volver a poner el formato legible
+                displayInput.addEventListener('blur', function (e) {
+                    const numericValue = parseFloat(realInput.value);
+                    if (!isNaN(numericValue)) {
+                        e.target.value = m2Formatter.format(numericValue);
+                    }
+                });
             });
         });
     </script>
