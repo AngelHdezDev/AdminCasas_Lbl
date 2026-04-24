@@ -190,7 +190,7 @@
                                     maxlength="5" required value="{{ old('cp', $property->cp) }}">
                             </div>
                             <div class="grid-2">
-                                
+
                                 <div class="field">
                                     <label class="field-label">
                                         Ciudad <span class="required">*</span>
@@ -229,8 +229,11 @@
                                     <label class="field-label">
                                         Precio <span class="required">*</span>
                                     </label>
-                                    <input type="number" class="field-input" name="price" id="price" placeholder="0.00"
-                                        min="0" step="0.01" required value="{{ old('price', $property->price) }}">
+
+                                    <input type="text" class="field-input" id="price_display" placeholder="$ 0.00" required>
+
+                                    <input type="hidden" name="price" id="price_hidden"
+                                        value="{{ old('price', $property->price) }}">
                                 </div>
                             </div>
                             <div class="toggle-list">
@@ -441,5 +444,50 @@
         }
 
         google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const displayInput = document.getElementById('price_display');
+            const hiddenInput = document.getElementById('price_hidden');
+
+            // Configuración del formateador de moneda MXN
+            const formatter = new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                minimumFractionDigits: 2
+            });
+
+            // 1. Cargar valor inicial desde la DB
+            if (hiddenInput.value) {
+                displayInput.value = formatter.format(hiddenInput.value);
+            }
+
+            // 2. Al escribir: Limpiar y guardar valor real
+            displayInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/[^\d.]/g, '');
+
+                // Evitar múltiples puntos decimales
+                const parts = value.split('.');
+                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+
+                hiddenInput.value = value;
+            });
+
+            // 3. Al entrar (Focus): Mostrar el número limpio para editar fácil
+            displayInput.addEventListener('focus', function (e) {
+                if (hiddenInput.value) {
+                    e.target.value = hiddenInput.value;
+                }
+            });
+
+            // 4. Al salir (Blur): Poner el formato bonito $ 0,000.00
+            displayInput.addEventListener('blur', function (e) {
+                const numericValue = parseFloat(hiddenInput.value);
+                if (!isNaN(numericValue)) {
+                    e.target.value = formatter.format(numericValue);
+                }
+            });
+        });
     </script>
 @endpush

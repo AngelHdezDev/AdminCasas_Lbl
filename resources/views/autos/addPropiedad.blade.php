@@ -230,8 +230,12 @@
                                     <label class="field-label">
                                         Precio <span class="required">*</span>
                                     </label>
-                                    <input type="number" class="field-input" name="price" id="price" placeholder="0.00"
-                                        min="0" step="0.01" required>
+                                    {{-- Input visual con formato --}}
+                                    <input type="text" class="field-input" id="price_mask" placeholder="$ 0.00" required>
+
+                                    {{-- Input real que se envía al servidor (mantiene el name="price") --}}
+                                    <input type="hidden" name="price" id="price"
+                                        value="{{ old('price', $propiedad->price ?? '') }}">
                                 </div>
                             </div>
                             <div class="toggle-list">
@@ -318,6 +322,7 @@
 @endsection
 
 @push('scripts')
+
     <script
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
 
@@ -431,5 +436,50 @@
         }
 
         google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const maskInput = document.getElementById('price_mask');
+            const realInput = document.getElementById('price');
+
+            // Función para dar formato de moneda (MXN)
+            const formatter = new Intl.NumberFormat('es-MX', {
+                style: 'currency',
+                currency: 'MXN',
+                minimumFractionDigits: 2
+            });
+
+            // Si ya hay un valor (edición), formatearlo al cargar
+            if (realInput.value) {
+                maskInput.value = formatter.format(realInput.value);
+            }
+
+            maskInput.addEventListener('input', function (e) {
+                // 1. Limpiar el valor de todo lo que no sea número
+                let value = e.target.value.replace(/[^\d.]/g, '');
+
+                // 2. Evitar múltiples puntos decimales
+                const parts = value.split('.');
+                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+
+                // 3. Guardar el valor limpio en el input oculto para Laravel
+                realInput.value = value;
+            });
+
+            maskInput.addEventListener('blur', function (e) {
+                // Al salir del campo, aplicamos el formato visual final: $ 4,334,335.00
+                const numericValue = parseFloat(realInput.value);
+                if (!isNaN(numericValue)) {
+                    e.target.value = formatter.format(numericValue);
+                }
+            });
+
+            maskInput.addEventListener('focus', function (e) {
+                // Al entrar al campo, quitamos el símbolo de pesos y comas para facilitar la edición
+                if (realInput.value) {
+                    e.target.value = realInput.value;
+                }
+            });
+        });
     </script>
 @endpush
