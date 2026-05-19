@@ -101,6 +101,7 @@
                                     <th>Baños</th>
                                     <th>Precio</th>
                                     <th>Estado</th>
+                                    <th>Destacado</th>
                                     <th style="text-align:right;">Acciones</th>
                                 </tr>
                             </thead>
@@ -146,6 +147,13 @@
                                                     Disponible</span>
                                             @else
                                                 <span class="badge-consignacion"><i class="bi bi-x-circle-fill"></i> Vendida</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if($property->is_featured)
+                                                <span class="badge-destacado"><i class="bi bi-star-fill"></i> Destacado</span>
+                                            @else
+                                                <span class="badge-destacado badge-no-destacado"><i class="bi bi-star"></i> No destacado</span>
                                             @endif
                                         </td>
                                         <td>
