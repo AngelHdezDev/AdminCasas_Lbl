@@ -5,6 +5,7 @@
 
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/autos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/modals.css') }}">
 @endpush
 
 @section('content')

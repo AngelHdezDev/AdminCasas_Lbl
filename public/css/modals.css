@@ -1,0 +1,331 @@
+/* ============================================================
+   CTP Realty — Admin: Modales de Vendedores / Clientes
+   Paleta: Azul marino #0F2167, Dorado #F5C518
+   Fuentes: Montserrat + DM Sans
+   ============================================================ */
+
+/* ── Variables (mismas del sistema) ── */
+:root {
+    --navy:           #0F2167;
+    --navy-dark:      #091547;
+    --navy-soft:      #1e3494;
+    --gold:           #F5C518;
+    --gold-dark:      #d9ab0e;
+    --white:          #FFFFFF;
+    --off-white:      #F7F8FC;
+    --border:         #E4E8F4;
+    --text-primary:   #0F2167;
+    --text-secondary: #5A6A9A;
+    --text-muted:     #8896C0;
+    --green:          #16a34a;
+    --red:            #dc2626;
+    --radius-sm:      8px;
+    --radius:         14px;
+    --radius-lg:      20px;
+    --shadow:         0 4px 20px rgba(15,33,103,0.12);
+    --shadow-lg:      0 8px 40px rgba(15,33,103,0.18);
+    --font-display:   'Montserrat', sans-serif;
+    --font-body:      'DM Sans', sans-serif;
+}
+
+/* ────────────────────────────────────────
+   MODAL BASE
+──────────────────────────────────────── */
+.modal-content {
+    border: none !important;
+    border-radius: var(--radius-lg) !important;
+    box-shadow: var(--shadow-lg) !important;
+    font-family: var(--font-body);
+    overflow: hidden;
+}
+
+/* ────────────────────────────────────────
+   MODAL HEADER
+──────────────────────────────────────── */
+.modal-header {
+    background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 100%);
+    border-bottom: none !important;
+    padding: 1.4rem 1.5rem !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-header::before {
+    content: '';
+    position: absolute;
+    right: -20px; top: -30px;
+    width: 110px; height: 110px;
+    border-radius: 50%;
+    background: rgba(245,197,24,0.07);
+    pointer-events: none;
+}
+
+.modal-header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+}
+
+.modal-title-group {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.modal-icon {
+    width: 42px;
+    height: 42px;
+    background: rgba(245,197,24,0.15);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold);
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+.modal-title-text {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--white);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+}
+
+.modal-subtitle-text {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.5);
+    margin-top: 0.15rem;
+    font-weight: 300;
+}
+
+/* Botón X cerrar */
+.btn-close-custom {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.8rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s;
+}
+
+.btn-close-custom:hover {
+    background: rgba(255,255,255,0.2);
+    color: var(--white);
+}
+
+/* ────────────────────────────────────────
+   MODAL BODY
+──────────────────────────────────────── */
+.modal-body {
+    padding: 1.5rem !important;
+    background: var(--off-white);
+}
+
+/* ── Form sections ── */
+.form-section {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 1.25rem;
+    height: 100%;
+}
+
+.form-section-title {
+    font-family: var(--font-display);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--navy);
+    padding-left: 0.6rem;
+    border-left: 3px solid var(--gold);
+    margin-bottom: 1.1rem;
+}
+
+/* ── Field groups ── */
+.field-group {
+    margin-bottom: 0.9rem;
+}
+
+.field-group:last-child { margin-bottom: 0; }
+
+.field-label {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.4rem;
+}
+
+.required { color: var(--red); }
+
+.field-input {
+    width: 100%;
+    height: 40px;
+    padding: 0 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    color: var(--text-primary);
+    background: var(--off-white);
+    outline: none;
+    transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+}
+
+textarea.field-input {
+    height: auto;
+    padding: 0.75rem 0.9rem;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+input[type="file"].field-input {
+    padding: 0.45rem 0.9rem;
+    height: auto;
+    cursor: pointer;
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+input[type="file"].field-input::-webkit-file-upload-button {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-soft) 100%);
+    color: var(--white);
+    border: none;
+    border-radius: 100px;
+    padding: 0.25rem 0.85rem;
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-right: 0.75rem;
+    transition: background 0.15s;
+}
+
+input[type="file"].field-input::-webkit-file-upload-button:hover {
+    background: var(--navy-dark);
+}
+
+.field-input::placeholder { color: var(--text-muted); }
+
+.field-input:focus {
+    border-color: var(--navy-soft);
+    box-shadow: 0 0 0 3px rgba(30,52,148,0.1);
+    background: var(--white);
+}
+
+/* Validation states */
+.field-input.is-invalid {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+
+.invalid-feedback {
+    font-size: 0.71rem;
+    color: var(--red);
+    margin-top: 0.3rem;
+    display: block;
+}
+
+/* ────────────────────────────────────────
+   MODAL FOOTER
+──────────────────────────────────────── */
+.modal-footer-custom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+}
+
+.footer-note {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.footer-note i { color: var(--green); }
+
+.footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+/* Botón cancelar */
+.btn-cancel {
+    height: 38px;
+    padding: 0 1.15rem;
+    border: 1.5px solid var(--border);
+    border-radius: 100px;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    background: var(--white);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.btn-cancel:hover {
+    border-color: var(--navy-soft);
+    color: var(--navy);
+    background: var(--off-white);
+}
+
+/* Botón guardar */
+.btn-submit {
+    height: 38px;
+    padding: 0 1.35rem;
+    border: none;
+    border-radius: 100px;
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--navy-dark);
+    background: var(--gold);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    box-shadow: 0 4px 14px rgba(245,197,24,0.35);
+    transition: background 0.18s, transform 0.18s, box-shadow 0.18s;
+}
+
+.btn-submit:hover {
+    background: var(--gold-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(245,197,24,0.45);
+}
+
+/* ────────────────────────────────────────
+   BOOTSTRAP OVERRIDES (row/col dentro del modal)
+──────────────────────────────────────── */
+.modal-body .row { --bs-gutter-x: 1rem; --bs-gutter-y: 1rem; }
+
+/* ────────────────────────────────────────
+   RESPONSIVE
+──────────────────────────────────────── */
+@media (max-width: 768px) {
+    .modal-footer-custom { flex-direction: column; align-items: stretch; }
+    .footer-actions      { justify-content: flex-end; }
+    .modal-title-text    { font-size: 0.9rem; }
+}
