@@ -56,6 +56,60 @@ class GalleryController extends Controller
         }
     }
 
+    public function asignarMasivo(Request $request)
+    {
+        // 1. Validamos que venga la propiedad y un array de IDs válidos
+        $request->validate([
+            'property_id' => 'required|exists:properties,id',
+            'imagenes_ids' => 'required|array',
+            // Cambiado de 'imagenes_temporales' a 'imagen_temporals'
+            'imagenes_ids.*' => 'exists:imagen_temporals,id'
+        ]);
+
+        try {
+            DB::transaction(function () use ($request) {
+                $propertyId = $request->property_id;
+                $imagenesIds = $request->imagenes_ids;
+
+                // 2. Revisamos de golpe si la propiedad ya cuenta con una imagen principal
+                $tienePrincipal = PropertyImage::where('property_id', $propertyId)
+                    ->where('is_main', 1)
+                    ->exists();
+
+                // 3. Recuperamos los registros temporales seleccionados
+                $temporales = ImagenTemporal::whereIn('id', $imagenesIds)->get();
+
+                foreach ($temporales as $index => $temp) {
+                    // Si la casa ya tiene principal, todas las nuevas entran en 0.
+                    // Si NO tiene, la PRIMERA del lote ($index === 0) será la principal, las demás en 0.
+                    $esPrincipal = 0;
+                    if (!$tienePrincipal && $index === 0) {
+                        $esPrincipal = 1;
+                        $tienePrincipal = true; // Marcamos como true para que las siguientes no entren aquí
+                    }
+
+                    // 4. Insertamos en la tabla final de imágenes de propiedades
+                    PropertyImage::create([
+                        'property_id' => $propertyId,
+                        'path' => $temp->ruta_archivo,
+                        'is_main' => $esPrincipal,
+                        'is_hero' => 0,
+                        'created_at' => now()
+                    ]);
+
+                    // 5. Marcamos la temporal como procesada
+                    $temp->update(['status' => 1]);
+                }
+            });
+
+            return redirect()->back()->with('success', '¡Imágenes asignadas a la propiedad correctamente!');
+
+        } catch (\Exception $e) {
+            \Log::error("Error en asignación masiva de galería: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al asignar en lote: ' . $e->getMessage());
+        }
+    }
+
     public function destroy($id)
     {
         try {
@@ -119,5 +173,5 @@ class GalleryController extends Controller
         }
     }
 
-    
+
 }

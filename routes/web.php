@@ -58,6 +58,7 @@ Route::delete('/marcas/{id}', [MarcaController::class, 'changeStatus'])->middlew
 Route::get('/galeria', [GalleryController::class, 'index'])->middleware('auth')->name('galeria.index');
 Route::post('/galeria', [GaleriaController::class, 'store'])->middleware('auth')->name('galeria.store');
 Route::post('/galeria/asignar/{id}', [GalleryController::class, 'asignar'])->middleware('auth')->name('galeria.asignar');
+Route::post('/galeria/asignar-masivo', [GalleryController::class, 'asignarMasivo'])->middleware('auth')->name('galeria.asignarMasivo');
 Route::delete('/galeria/{id}', [GalleryController::class, 'destroy'])->middleware('auth')->name('galeria.destroy');
 
 Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')->name('clientes.index');
