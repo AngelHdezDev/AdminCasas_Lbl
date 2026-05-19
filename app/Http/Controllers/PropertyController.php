@@ -102,14 +102,26 @@ class PropertyController extends Controller
 
     public function destroy($id)
     {
-        $property = Property::findOrFail($id);
+        try {
+            $property = Property::findOrFail($id);
 
-        $property->update([
-            'active' => false
-        ]);
+            // Actualizamos el estado 'active' a false y, si estaba destacada, la bajamos a 0
+            $property->update([
+                'active' => false,
+                'is_featured' => 0 // Si ya era 0 se queda en 0, si era 1 pasa a 0 y libera el cupo
+            ]);
 
-        return redirect()->route('propiedades.index')
-            ->with('success', 'La propiedad ha sido dada de baja correctamente.');
+            return redirect()->route('propiedades.index')
+                ->with('success', 'La propiedad ha sido dada de baja correctamente.');
+
+        } catch (\Exception $e) {
+            // Registramos el error en los logs por si acaso
+            \Log::error("Error al dar de baja la propiedad ID {$id}: " . $e->getMessage());
+
+            // Redirigimos con un mensaje de error que pueda capturar tu SweetAlert en el index
+            return redirect()->route('propiedades.index')
+                ->with('error_sistema', 'No se pudo dar de baja la propiedad: ' . $e->getMessage());
+        }
     }
 
     public function create()
