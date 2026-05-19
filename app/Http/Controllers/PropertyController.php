@@ -60,14 +60,39 @@ class PropertyController extends Controller
     }
     public function update(UpdatePropertyRequest $request, $id): RedirectResponse
     {
-        $property = Property::findOrFail($id);
-        $this->service->updateProperty($property, $request->validated());
-        $property->amenities()->sync($request->input('amenities', []));
+        try {
+            $property = Property::findOrFail($id);
 
-        return redirect()->route('propiedades.index')
-            ->with('success', 'Propiedad actualizada con éxito');
+            // 1. Validar el límite de destacados antes de procesar el servicio
+            if ($request->input('is_featured', 0) == 1) {
+                $totalDestacados = Property::where('is_featured', 1)
+                    ->where('id', '!=', $id)
+                    ->count();
+
+                if ($totalDestacados >= 6) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error_destacados', 'No se puede destacar esta propiedad. Ya alcanzaste el límite máximo de 6 propiedades destacadas.');
+                }
+            }
+
+            // 2. Intentar guardar los cambios en la base de datos
+            $this->service->updateProperty($property, $request->validated());
+            $property->amenities()->sync($request->input('amenities', []));
+
+            return redirect()->route('propiedades.index')
+                ->with('success', 'Propiedad actualizada con éxito');
+
+        } catch (\Exception $e) {
+            // Loggeamos el error real por detrás por si necesitas revisarlo en storage/logs/laravel.log
+            \Log::error("Error al actualizar la propiedad ID {$id}: " . $e->getMessage());
+
+            // Regresamos al usuario avisando que algo salió mal
+            return redirect()->back()
+                ->withInput()
+                ->with('error_sistema', 'Ocurrió un error inesperado al guardar los cambios: ' . $e->getMessage());
+        }
     }
-
     public function showDetail($id_property)
     {
         $property = Property::with(['client', 'seller', 'amenities'])->findOrFail($id_property);

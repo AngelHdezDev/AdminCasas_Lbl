@@ -250,6 +250,11 @@
                                         <input type="checkbox" name="is_featured" value="1" {{ old('is_featured', $property->is_featured) ? 'checked' : '' }}>
                                         <span class="slider"></span>
                                     </label>
+                                    @error('is_featured')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
                                 <div class="toggle-item">
                                     <div class="toggle-info">
@@ -324,215 +329,229 @@
             </form>
         </main>
     </body>
+    @if($errors->has('is_featured'))
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Swal.fire({
+                    title: 'Límite de destacados alcanzado',
+                    text: "{{ $errors->first('is_featured') }}",
+                    icon: 'warning',
+                    confirmButtonColor: '#c0392b',
+                    confirmButtonText: 'Entendido'
+                });
+            });
+        </script>
+    @endif
 @endsection
 
 
-@push('scripts')
-    <script
-        src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
+    @push('scripts')
 
-    <script>
-        let map, marker, autocomplete, geocoder;
+        <script
+            src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
 
-        function initMap() {
-            const initialLat = {{ old('latitude', $property->latitude) ?? 20.6596 }};
-            const initialLng = {{ old('longitude', $property->longitude) ?? -103.3496 }};
+        <script>
+            let map, marker, autocomplete, geocoder;
 
-            const initialPos = { lat: initialLat, lng: initialLng }; // GDL
+            function initMap() {
+                const initialLat = {{ old('latitude', $property->latitude) ?? 20.6596 }};
+                const initialLng = {{ old('longitude', $property->longitude) ?? -103.3496 }};
 
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: initialPos,
-                zoom: 18,
-                mapTypeControl: false
-            });
+                const initialPos = { lat: initialLat, lng: initialLng }; // GDL
 
-            marker = new google.maps.Marker({
-                position: initialPos,
-                map: map,
-                draggable: true
-            });
-
-            geocoder = new google.maps.Geocoder();
-
-            // Autocomplete
-            const searchInput = document.getElementById("address-search");
-            autocomplete = new google.maps.places.Autocomplete(searchInput);
-            autocomplete.bindTo("bounds", map);
-
-            autocomplete.addListener("place_changed", () => {
-                const place = autocomplete.getPlace();
-                if (!place.geometry) return;
-
-                map.setCenter(place.geometry.location);
-                map.setZoom(17);
-                marker.setPosition(place.geometry.location);
-                fillAddressFields(place);
-            });
-
-            // Al arrastrar el pin
-            marker.addListener("dragend", () => {
-                const pos = marker.getPosition();
-                geocoder.geocode({ location: pos }, (results, status) => {
-                    if (status === "OK" && results[0]) {
-                        fillAddressFields(results[0]);
-                        searchInput.value = results[0].formatted_address;
-                    }
+                map = new google.maps.Map(document.getElementById("map"), {
+                    center: initialPos,
+                    zoom: 18,
+                    mapTypeControl: false
                 });
-            });
 
-            // Al hacer clic en el mapa
-            map.addListener("click", (e) => {
-                marker.setPosition(e.latLng);
-                geocoder.geocode({ location: e.latLng }, (results, status) => {
-                    if (status === "OK" && results[0]) {
-                        fillAddressFields(results[0]);
-                        searchInput.value = results[0].formatted_address;
-                    }
+                marker = new google.maps.Marker({
+                    position: initialPos,
+                    map: map,
+                    draggable: true
                 });
-            });
-        }
 
-        function fillAddressFields(place) {
-            // Lat/Lng
-            document.getElementById("lat").value = place.geometry.location.lat();
-            document.getElementById("lng").value = place.geometry.location.lng();
+                geocoder = new google.maps.Geocoder();
 
-            // Resetear campos
-            document.getElementById("cp").value = "";
-            document.getElementById("state").value = "";
-            document.getElementById("city").value = "";
-            document.getElementById("neighborhood").value = "";
-            document.getElementById("address").value = "";
+                // Autocomplete
+                const searchInput = document.getElementById("address-search");
+                autocomplete = new google.maps.places.Autocomplete(searchInput);
+                autocomplete.bindTo("bounds", map);
 
-            let streetName = "";
-            let streetNumber = "";
+                autocomplete.addListener("place_changed", () => {
+                    const place = autocomplete.getPlace();
+                    if (!place.geometry) return;
 
-            place.address_components.forEach(component => {
-                const types = component.types; // Usamos el array completo de tipos
+                    map.setCenter(place.geometry.location);
+                    map.setZoom(17);
+                    marker.setPosition(place.geometry.location);
+                    fillAddressFields(place);
+                });
 
-                // Código Postal
-                if (types.includes("postal_code")) {
-                    document.getElementById("cp").value = component.long_name;
-                }
-                // Estado
-                if (types.includes("administrative_area_level_1")) {
-                    document.getElementById("state").value = component.long_name;
-                }
-                // Ciudad (Municipio)
-                if (types.includes("locality")) {
-                    document.getElementById("city").value = component.long_name;
-                }
+                // Al arrastrar el pin
+                marker.addListener("dragend", () => {
+                    const pos = marker.getPosition();
+                    geocoder.geocode({ location: pos }, (results, status) => {
+                        if (status === "OK" && results[0]) {
+                            fillAddressFields(results[0]);
+                            searchInput.value = results[0].formatted_address;
+                        }
+                    });
+                });
 
-                // --- OBTENER COLONIA ---
-                // Google suele enviar la colonia en una de estas 3 etiquetas:
-                // 1. sublocality_level_1 (La más común en ciudades grandes como GDL)
-                // 2. neighborhood (Colonias específicas o barrios)
-                // 3. sublocality (Genérico)
-                if (types.includes("sublocality_level_1") ||
-                    types.includes("neighborhood") ||
-                    types.includes("sublocality")) {
-
-                    document.getElementById("neighborhood").value = component.long_name;
-                }
-
-                // Dirección (Calle y Número)
-                if (types.includes("route")) streetName = component.long_name;
-                if (types.includes("street_number")) streetNumber = component.long_name;
-            });
-
-            document.getElementById("address").value = `${streetName} ${streetNumber}`.trim();
-        }
-
-        google.maps.event.addDomListener(window, 'load', initMap);
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const displayInput = document.getElementById('price_display');
-            const hiddenInput = document.getElementById('price_hidden');
-
-            // Configuración del formateador de moneda MXN
-            const formatter = new Intl.NumberFormat('es-MX', {
-                style: 'currency',
-                currency: 'MXN',
-                minimumFractionDigits: 2
-            });
-
-            // 1. Cargar valor inicial desde la DB
-            if (hiddenInput.value) {
-                displayInput.value = formatter.format(hiddenInput.value);
+                // Al hacer clic en el mapa
+                map.addListener("click", (e) => {
+                    marker.setPosition(e.latLng);
+                    geocoder.geocode({ location: e.latLng }, (results, status) => {
+                        if (status === "OK" && results[0]) {
+                            fillAddressFields(results[0]);
+                            searchInput.value = results[0].formatted_address;
+                        }
+                    });
+                });
             }
 
-            // 2. Al escribir: Limpiar y guardar valor real
-            displayInput.addEventListener('input', function (e) {
-                let value = e.target.value.replace(/[^\d.]/g, '');
+            function fillAddressFields(place) {
+                // Lat/Lng
+                document.getElementById("lat").value = place.geometry.location.lat();
+                document.getElementById("lng").value = place.geometry.location.lng();
 
-                // Evitar múltiples puntos decimales
-                const parts = value.split('.');
-                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+                // Resetear campos
+                document.getElementById("cp").value = "";
+                document.getElementById("state").value = "";
+                document.getElementById("city").value = "";
+                document.getElementById("neighborhood").value = "";
+                document.getElementById("address").value = "";
 
-                hiddenInput.value = value;
-            });
+                let streetName = "";
+                let streetNumber = "";
 
-            // 3. Al entrar (Focus): Mostrar el número limpio para editar fácil
-            displayInput.addEventListener('focus', function (e) {
+                place.address_components.forEach(component => {
+                    const types = component.types; // Usamos el array completo de tipos
+
+                    // Código Postal
+                    if (types.includes("postal_code")) {
+                        document.getElementById("cp").value = component.long_name;
+                    }
+                    // Estado
+                    if (types.includes("administrative_area_level_1")) {
+                        document.getElementById("state").value = component.long_name;
+                    }
+                    // Ciudad (Municipio)
+                    if (types.includes("locality")) {
+                        document.getElementById("city").value = component.long_name;
+                    }
+
+                    // --- OBTENER COLONIA ---
+                    // Google suele enviar la colonia en una de estas 3 etiquetas:
+                    // 1. sublocality_level_1 (La más común en ciudades grandes como GDL)
+                    // 2. neighborhood (Colonias específicas o barrios)
+                    // 3. sublocality (Genérico)
+                    if (types.includes("sublocality_level_1") ||
+                        types.includes("neighborhood") ||
+                        types.includes("sublocality")) {
+
+                        document.getElementById("neighborhood").value = component.long_name;
+                    }
+
+                    // Dirección (Calle y Número)
+                    if (types.includes("route")) streetName = component.long_name;
+                    if (types.includes("street_number")) streetNumber = component.long_name;
+                });
+
+                document.getElementById("address").value = `${streetName} ${streetNumber}`.trim();
+            }
+
+            google.maps.event.addDomListener(window, 'load', initMap);
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const displayInput = document.getElementById('price_display');
+                const hiddenInput = document.getElementById('price_hidden');
+
+                // Configuración del formateador de moneda MXN
+                const formatter = new Intl.NumberFormat('es-MX', {
+                    style: 'currency',
+                    currency: 'MXN',
+                    minimumFractionDigits: 2
+                });
+
+                // 1. Cargar valor inicial desde la DB
                 if (hiddenInput.value) {
-                    e.target.value = hiddenInput.value;
-                }
-            });
-
-            // 4. Al salir (Blur): Poner el formato bonito $ 0,000.00
-            displayInput.addEventListener('blur', function (e) {
-                const numericValue = parseFloat(hiddenInput.value);
-                if (!isNaN(numericValue)) {
-                    e.target.value = formatter.format(numericValue);
-                }
-            });
-        });
-        document.addEventListener('DOMContentLoaded', function () {
-            const m2Masks = document.querySelectorAll('.m2-mask');
-
-            // Formateador de números (Estilo mexicano: comas para miles)
-            const m2Formatter = new Intl.NumberFormat('es-MX', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-            });
-
-            m2Masks.forEach(displayInput => {
-                // Obtenemos el ID del input oculto (está justo después en el HTML o por ID)
-                const realInput = displayInput.nextElementSibling;
-
-                // 1. CARGA INICIAL: Si ya hay datos en la DB, formatearlos
-                if (realInput.value) {
-                    displayInput.value = m2Formatter.format(realInput.value);
+                    displayInput.value = formatter.format(hiddenInput.value);
                 }
 
-                // 2. EVENTO INPUT: Mientras escriben, limpiamos y guardamos el valor real
+                // 2. Al escribir: Limpiar y guardar valor real
                 displayInput.addEventListener('input', function (e) {
                     let value = e.target.value.replace(/[^\d.]/g, '');
 
-                    // Evitar doble punto decimal
+                    // Evitar múltiples puntos decimales
                     const parts = value.split('.');
                     if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
 
-                    realInput.value = value;
+                    hiddenInput.value = value;
                 });
 
-                // 3. EVENTO FOCUS: Al hacer clic para editar, quitar comas para que no estorben
+                // 3. Al entrar (Focus): Mostrar el número limpio para editar fácil
                 displayInput.addEventListener('focus', function (e) {
-                    if (realInput.value) {
-                        e.target.value = realInput.value;
+                    if (hiddenInput.value) {
+                        e.target.value = hiddenInput.value;
                     }
                 });
 
-                // 4. EVENTO BLUR: Al salir, volver a poner el formato legible
+                // 4. Al salir (Blur): Poner el formato bonito $ 0,000.00
                 displayInput.addEventListener('blur', function (e) {
-                    const numericValue = parseFloat(realInput.value);
+                    const numericValue = parseFloat(hiddenInput.value);
                     if (!isNaN(numericValue)) {
-                        e.target.value = m2Formatter.format(numericValue);
+                        e.target.value = formatter.format(numericValue);
                     }
                 });
             });
-        });
-    </script>
-@endpush
+            document.addEventListener('DOMContentLoaded', function () {
+                const m2Masks = document.querySelectorAll('.m2-mask');
+
+                // Formateador de números (Estilo mexicano: comas para miles)
+                const m2Formatter = new Intl.NumberFormat('es-MX', {
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 2
+                });
+
+                m2Masks.forEach(displayInput => {
+                    // Obtenemos el ID del input oculto (está justo después en el HTML o por ID)
+                    const realInput = displayInput.nextElementSibling;
+
+                    // 1. CARGA INICIAL: Si ya hay datos en la DB, formatearlos
+                    if (realInput.value) {
+                        displayInput.value = m2Formatter.format(realInput.value);
+                    }
+
+                    // 2. EVENTO INPUT: Mientras escriben, limpiamos y guardamos el valor real
+                    displayInput.addEventListener('input', function (e) {
+                        let value = e.target.value.replace(/[^\d.]/g, '');
+
+                        // Evitar doble punto decimal
+                        const parts = value.split('.');
+                        if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+
+                        realInput.value = value;
+                    });
+
+                    // 3. EVENTO FOCUS: Al hacer clic para editar, quitar comas para que no estorben
+                    displayInput.addEventListener('focus', function (e) {
+                        if (realInput.value) {
+                            e.target.value = realInput.value;
+                        }
+                    });
+
+                    // 4. EVENTO BLUR: Al salir, volver a poner el formato legible
+                    displayInput.addEventListener('blur', function (e) {
+                        const numericValue = parseFloat(realInput.value);
+                        if (!isNaN(numericValue)) {
+                            e.target.value = m2Formatter.format(numericValue);
+                        }
+                    });
+                });
+            });
+        </script>
+    @endpush

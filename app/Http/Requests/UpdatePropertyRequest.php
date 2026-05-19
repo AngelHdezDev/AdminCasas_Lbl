@@ -26,7 +26,24 @@ class UpdatePropertyRequest extends FormRequest
             'bathrooms' => 'nullable|integer|min:0',
             'parking_spots' => 'nullable|integer|min:0',
             'description' => 'nullable|string',
-            'is_featured' => 'sometimes|boolean',       // CORREGIDO
+            'is_featured' => [
+                'nullable',
+                'boolean',
+                function ($attribute, $value, $fail) {
+                    if ($value == 1) {
+                        // Obtenemos el ID de la propiedad desde la ruta de la petición URL
+                        $propertyId = $this->route('id') ?? $this->route('propiedade');
+
+                        $totalDestacados = \App\Models\Property::where('is_featured', 1)
+                            ->where('id', '!=', $propertyId)
+                            ->count();
+
+                        if ($totalDestacados >= 6) {
+                            $fail('No se puede destacar esta propiedad. Ya alcanzaste el límite máximo de 6 propiedades destacadas.');
+                        }
+                    }
+                },
+            ],      // CORREGIDO
             'show_public_address' => 'sometimes|boolean',      // CORREGIDO + RENOMBRADO
             'state' => 'required|string|max:255', // NUEVO
             'city' => 'required|string|max:255', // NUEVO
