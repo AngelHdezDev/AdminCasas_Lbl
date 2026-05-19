@@ -110,6 +110,40 @@ class GalleryController extends Controller
         }
     }
 
+    public function destroyMasivo(Request $request)
+    {
+        // 1. Validamos que llegue el array de IDs
+        $request->validate([
+            'imagenes_ids' => 'required|array',
+            'imagenes_ids.*' => 'exists:imagen_temporals,id'
+        ]);
+
+        try {
+            DB::transaction(function () use ($request) {
+                $imagenesIds = $request->imagenes_ids;
+
+                // 2. Recuperamos todos los registros temporales que se van a eliminar
+                $temporales = ImagenTemporal::whereIn('id', $imagenesIds)->get();
+
+                foreach ($temporales as $temp) {
+                    // 3. Borramos el archivo físico del storage usando tu misma validación
+                    if ($temp->ruta_archivo && Storage::disk('public')->exists($temp->ruta_archivo)) {
+                        Storage::disk('public')->delete($temp->ruta_archivo);
+                    }
+
+                    // 4. Borramos el registro de la Base de Datos
+                    $temp->delete();
+                }
+            });
+
+            return redirect()->back()->with('success', 'Las imágenes seleccionadas han sido eliminadas correctamente.');
+
+        } catch (\Exception $e) {
+            \Log::error("Error en eliminación masiva de galería: " . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al eliminar en lote: ' . $e->getMessage());
+        }
+    }
+
     public function destroy($id)
     {
         try {

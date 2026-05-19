@@ -155,6 +155,9 @@
                 @endforeach
             </select>
             <button type="submit" class="btn-bulk-submit">Asignar lote</button>
+            <button type="button" class="btn-bulk-submit btn-danger-bulk" id="btnBulkDelete" style="background-color: #7f8c8d;">
+                <i class="bi bi-trash"></i> Eliminar lote
+            </button>
         </div>
 
         <div class="main-wrapper">
@@ -192,10 +195,7 @@
                                             <i class="bi bi-eye"></i>
                                         </button>
 
-                                        <button type="button" class="btn-image-action delete btn-delete" title="Eliminar"
-                                            onclick="executeIndividualDelete({{ $imagen->id }})">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
+                                        
                                     </div>
                                 </div>
 
@@ -210,16 +210,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="vehicle-select-group">
-                                        <select class="vehicle-select" onchange="submitIndividualAssign(this, {{ $imagen->id }})">
-                                            <option value="">— Sin asignar —</option>
-                                            @foreach($properties as $property)
-                                                <option value="{{ $property->id }}" {{ $imagen->property_id == $property->id ? 'selected' : '' }}>
-                                                    {{ $property->title }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                    
                                 </div>
                             </div>
                         @endforeach
@@ -319,12 +310,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/galeria.js') }}"></script>
 
-    <script>
+   <script>
         document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelectorAll('.bulk-checkbox');
             const bulkBar = document.getElementById('bulkBar');
             const bulkCount = document.getElementById('bulkCount');
             const btnSelectAllPage = document.getElementById('btnSelectAllPage');
+            
+            // Formulario maestro y sus elementos
+            const formMaster = document.getElementById('formBulkAssign');
+            const btnBulkDelete = document.getElementById('btnBulkDelete');
+            const selectProp = formMaster ? formMaster.querySelector('.bulk-select-input') : null;
+
+            // Guardamos el action original del form (asignar-masivo) para poder alternar sin problemas
+            const originalAction = formMaster ? formMaster.action : '';
 
             // Actualiza el contador y activa/desactiva la barra inferior
             function updateBulkBar() {
@@ -381,6 +380,56 @@
 
                 updateBulkBar();
             });
+
+            // Manejo del click en "Eliminar lote"
+            if (btnBulkDelete) {
+                btnBulkDelete.addEventListener('click', function () {
+                    const checkedCount = document.querySelectorAll('.bulk-checkbox:checked').length;
+
+                    if (checkedCount === 0) {
+                        Swal.fire({ 
+                            title: 'Atención', 
+                            text: 'Por favor, selecciona al menos una imagen.', 
+                            icon: 'warning',
+                            confirmButtonColor: '#c0392b'
+                        });
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: `Vas a eliminar permanentemente ${checkedCount} imágenes del servidor.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#c0392b',
+                        cancelButtonColor: '#7f8c8d',
+                        confirmButtonText: 'Sí, eliminar lote',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // 1. Apuntamos el formulario a la ruta de borrado masivo
+                            formMaster.action = "{{ route('galeria.destroy-masivo') }}";
+                            
+                            // 2. Quitamos el required del select para que no bloquee el submit
+                            if (selectProp) selectProp.removeAttribute('required');
+                            
+                            // 3. Enviamos
+                            formMaster.submit();
+                        }
+                    });
+                });
+            }
+
+            // Si se hace un submit normal al formulario (Asignar lote), nos aseguramos de restaurar el action y el required
+            if (formMaster) {
+                formMaster.addEventListener('submit', function(e) {
+                    // Solo si el submit NO vino provocado por el botón de borrar
+                    if (formMaster.action !== "{{ route('galeria.destroy-masivo') }}") {
+                        formMaster.action = originalAction;
+                        if (selectProp) selectProp.setAttribute('required', 'required');
+                    }
+                });
+            }
         });
 
         // Dispara el envío del formulario oculto individual rápido

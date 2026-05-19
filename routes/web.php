@@ -60,6 +60,7 @@ Route::post('/galeria', [GaleriaController::class, 'store'])->middleware('auth')
 Route::post('/galeria/asignar/{id}', [GalleryController::class, 'asignar'])->middleware('auth')->name('galeria.asignar');
 Route::post('/galeria/asignar-masivo', [GalleryController::class, 'asignarMasivo'])->middleware('auth')->name('galeria.asignarMasivo');
 Route::delete('/galeria/{id}', [GalleryController::class, 'destroy'])->middleware('auth')->name('galeria.destroy');
+Route::post('/galeria/eliminar-masivo', [GalleryController::class, 'destroyMasivo'])->name('galeria.destroy-masivo');
 
 Route::get('/clientes', [ClientController::class, 'index'])->middleware('auth')->name('clientes.index');
 Route::post('/clientes', [ClientController::class, 'store'])->middleware('auth')->name('clientes.store');
