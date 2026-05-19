@@ -135,4 +135,48 @@ class PropertyController extends Controller
             'message' => 'Imagen eliminada correctamente.'
         ], 200);
     }
+
+    public function toggleDestacado(Request $request, $id)
+    {
+        try {
+            $propiedad = Property::findOrFail($id);
+
+            // Asumiendo que tu columna se llama 'is_featured' (cambialo si es 'destacado', etc.)
+            $columna = 'is_featured';
+
+            // Si el usuario la quiere marcar como destacada (actualmente está en 0)
+            if ($propiedad->$columna == 0) {
+                // Contamos cuántas propiedades ya están destacadas en total
+                $totalDestacados = Property::where($columna, 1)->count();
+
+                if ($totalDestacados >= 6) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Límite alcanzado. Solo se permiten 6 propiedades destacadas a la vez.'
+                    ], 422);
+                }
+
+                $propiedad->$columna = 1;
+                $mensaje = 'Propiedad marcada como destacada.';
+            } else {
+                // Si ya estaba destacada, simplemente la desmarcamos (pasar de 1 a 0)
+                $propiedad->$columna = 0;
+                $mensaje = 'Propiedad quitada de destacados.';
+            }
+
+            $propiedad->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje,
+                'is_featured' => $propiedad->$columna
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

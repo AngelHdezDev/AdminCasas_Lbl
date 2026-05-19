@@ -102,3 +102,5 @@ Route::get('/vendedores/archivo/{id}', function ($id) {
     abort(404, "Archivo no encontrado");
 })->middleware('auth')->name('vendedores.archivo');
 
+
+Route::post('/propiedades/{id}/toggle-destacado', [PropertyController::class, 'toggleDestacado'])->name('propiedades.toggle-destacado');

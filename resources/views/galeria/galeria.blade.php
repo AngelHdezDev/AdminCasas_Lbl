@@ -174,7 +174,7 @@
                                             class="bulk-checkbox">
                                     </label>
 
-                                    <img src="{{ asset('storage/' . $imagen->ruta_archivo) }}" alt="{{ $imagen->nombre_original }}">
+                                    <img src="{{ asset('storage/' . $imagen->ruta_archivo) }}" alt="{{ $imagen->nombre_original }}" loading="lazy">
                                     <div class="image-overlay"></div>
 
                                     @if($imagen->id_auto)

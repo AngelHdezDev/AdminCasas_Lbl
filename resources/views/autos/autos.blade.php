@@ -133,7 +133,8 @@
                                         <td>
                                             <span class="badge-tipo">{{ $property->type }}</span>
                                         </td>
-                                        <td style="font-weight: 500; color: var(--gray-700);">{{ number_format($property->m2_construction, 0, '.', ',') }} m²
+                                        <td style="font-weight: 500; color: var(--gray-700);">
+                                            {{ number_format($property->m2_construction, 0, '.', ',') }} m²
                                         </td>
                                         <td style="color: var(--gray-500);">{{ $property->bedrooms }}</td>
                                         <td style="color: var(--gray-500);">{{ $property->bathrooms }}</td>
@@ -149,12 +150,14 @@
                                                 <span class="badge-consignacion"><i class="bi bi-x-circle-fill"></i> Vendida</span>
                                             @endif
                                         </td>
-                                        <td>
-                                            @if($property->is_featured)
-                                                <span class="badge-destacado"><i class="bi bi-star-fill"></i> Destacado</span>
-                                            @else
-                                                <span class="badge-destacado badge-no-destacado"><i class="bi bi-star"></i> No destacado</span>
-                                            @endif
+                                        <td class="text-center">
+                                            <button type="button" class="btn-toggle-destacado" data-id="{{ $property->id }}"
+                                                style="background: none; border: none; cursor: pointer; font-size: 1.2rem; outline: none;">
+
+                                                @if($property->is_featured == 1)
+                                                <i class="bi bi-star-fill text-warning star-icon"></i> @else
+                                                <i class="bi bi-star text-muted star-icon"></i> @endif
+                                            </button>
                                         </td>
                                         <td>
                                             <div class="action-buttons" style="justify-content: flex-end;">
@@ -163,7 +166,8 @@
                                                     <i class="bi bi-eye"></i>
                                                 </a>
 
-                                                <a class="btn-action btn-edit" title="Editar" href="{{ route('propiedades.edit', $property->id) }}"
+                                                <a class="btn-action btn-edit" title="Editar"
+                                                    href="{{ route('propiedades.edit', $property->id) }}"
                                                     data-bs-target="#modalPropiedad" data-id="{{ $property->id }}"
                                                     data-title="{{ $property->title }}" data-cp="{{ $property->cp }}"
                                                     data-neighborhood="{{ $property->neighborhood }}"
@@ -243,6 +247,68 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/autos.js') }}"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Escuchamos los clics en los botones de destacados
+            document.querySelectorAll('.btn-toggle-destacado').forEach(button => {
+                button.addEventListener('click', function () {
+                    const propertyId = this.getAttribute('data-id');
+                    const icon = this.querySelector('.star-icon');
+
+                    // Generamos la URL dinámica de Laravel usando la ruta que creamos
+                    const url = `/propiedades/${propertyId}/toggle-destacado`;
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
+                        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                        .then(res => {
+                            if (res.status === 200 && res.body.success) {
+                                // Si el backend guardó con éxito, cambiamos el diseño de la estrella
+                                if (res.body.is_featured == 1) {
+                                    icon.className = 'bi bi-star-fill text-warning star-icon';
+                                } else {
+                                    icon.className = 'bi bi-star text-muted star-icon';
+                                }
+
+                                // Notificación rápida tipo Toast (opcional, se quita sola en 2 segundos)
+                                Swal.fire({
+                                    toast: true,
+                                    position: 'top-end',
+                                    icon: 'success',
+                                    title: res.body.message,
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            } else {
+                                // Si dio error de validación (por ejemplo, ya hay 6)
+                                Swal.fire({
+                                    title: 'No se puede destacar',
+                                    text: res.body.message || 'Ocurrió un problema.',
+                                    icon: 'warning',
+                                    confirmButtonColor: '#c0392b'
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'No se pudo conectar con el servidor.',
+                                icon: 'error',
+                                confirmButtonColor: '#c0392b'
+                            });
+                        });
+                });
+            });
+        });
+    </script>
+
     @if(session('success'))
         <script>
             Swal.fire({
@@ -257,4 +323,3 @@
 
 
 @endsection
-
