@@ -299,7 +299,9 @@
                                 </select>
                             </div>
                         </div>
-
+                        <div class="btn-group">
+                            <a href="{{ route('galeria.index') }}" class="btn btn-primary">Ir a galería</a>
+                        </div>
                     </div>
 
                 </div>
