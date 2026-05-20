@@ -47,8 +47,8 @@
                     <option value="house" {{ request('type') == 'house' ? 'selected' : '' }}>Casas</option>
                     <option value="apartment" {{ request('type') == 'apartment' ? 'selected' : '' }}>Departamentos
                     </option>
-                    <option value="terreno" {{ request('type') == 'terreno' ? 'selected' : '' }}>Terrenos</option>
-                    <option value="local" {{ request('type') == 'local' ? 'selected' : '' }}>Locales</option>
+                    <option value="land" {{ request('type') == 'land' ? 'selected' : '' }}>Terrenos</option>
+                    <option value="commercial" {{ request('type') == 'commercial' ? 'selected' : '' }}>Locales</option>
                 </select>
 
                 <select class="filter-select" name="state" onchange="this.form.submit()">
@@ -130,8 +130,18 @@
                                         <td style="color: var(--gray-500);">
                                             <i class="bi bi-geo-alt"></i> {{ $property->neighborhood }}
                                         </td>
-                                        <td>
-                                            <span class="badge-tipo">{{ $property->type }}</span>
+                                       <td>
+                                            @php
+                                                $tiposEspanol = [
+                                                    'house'      => 'Casa',
+                                                    'apartment'  => 'Departamento',
+                                                    'land'       => 'Terreno',
+                                                    'commercial' => 'Comercial'
+                                                ];
+                                            @endphp
+                                            <span class="badge-tipo">
+                                                {{ $tiposEspanol[$property->type] ?? ucfirst($property->type) }}
+                                            </span>
                                         </td>
                                         <td style="font-weight: 500; color: var(--gray-700);">
                                             {{ number_format($property->m2_construction, 0, '.', ',') }} m²
