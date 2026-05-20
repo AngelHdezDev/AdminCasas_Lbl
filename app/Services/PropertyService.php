@@ -25,7 +25,8 @@ class PropertyService
                 $search = $filters['search'];
                 $q->where('title', 'LIKE', "%{$search}%")
                     ->orWhere('description', 'LIKE', "%{$search}%")
-                    ->orWhere('address', 'LIKE', "%{$search}%");
+                    ->orWhere('address', 'LIKE', "%{$search}%")
+                    ->orWhere('neighborhood', 'LIKE', "%{$search}%");
             });
         }
 
