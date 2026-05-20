@@ -320,29 +320,28 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}"></script>
 
     <script>
-        function initMap() {
-            // Coordenadas desde tu modelo
-            const pos = {
-                lat: {{ $property->latitude }},
-                lng: {{ $property->longitude }} 
-                };
+    function initMap() {
+        const pos = {
+            lat: {{ $property->latitude ?? 0 }},
+            lng: {{ $property->longitude ?? 0 }} 
+        };
+        
+        const map = new google.maps.Map(document.getElementById("map"), {
+            center: pos,
+            zoom: 17,
+            mapTypeControl: false,
+            streetViewControl: false, 
+            fullscreenControl: true
+        });
 
-            const map = new google.maps.Map(document.getElementById("map"), {
-                center: pos,
-                zoom: 17,
-                mapTypeControl: false,
-                streetViewControl: false, // Opcional: quita el monito de Street View
-                fullscreenControl: true
-            });
+        // Marcador Estático
+        new google.maps.Marker({
+            position: pos,
+            map: map,
+            draggable: false // Aseguramos que no se pueda mover
+        });
+    }
 
-            // Marcador Estático
-            new google.maps.Marker({
-                position: pos,
-                map: map,
-                draggable: false // Aseguramos que no se pueda mover
-            });
-        }
-
-        google.maps.event.addDomListener(window, 'load', initMap);
-    </script>
+    google.maps.event.addDomListener(window, 'load', initMap);
+</script>
 @endpush
