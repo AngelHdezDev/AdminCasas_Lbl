@@ -95,11 +95,21 @@ class PropertyController extends Controller
     }
     public function showDetail($id_property)
     {
-        $property = Property::with(['client', 'seller', 'amenities'])->findOrFail($id_property);
+        // Filtramos las relaciones para que solo carguen si el registro está activo
+        $property = Property::with([
+            'client' => function ($query) {
+                $query->where('is_active', 1); // Cambia 'active' por 'is_active' si así se llama en la tabla clients
+            },
+            'seller' => function ($query) {
+                $query->where('is_active', 1); // Cambia 'active' por 'is_active' si así se llama en la tabla sellers
+            },
+            'amenities'
+        ])
+            ->where('active', 1)
+            ->findOrFail($id_property);
 
         return view('autos.autosDetail', compact('property'));
     }
-
     public function destroy($id)
     {
         try {
