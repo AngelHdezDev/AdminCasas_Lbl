@@ -150,8 +150,8 @@ class PropertyController extends Controller
     public function edit($id)
     {
         $property = Property::findOrFail($id);
-        $vendedores = Seller::orderBy('name', 'asc')->get();
-        $clientes = Client::orderBy('name', 'asc')->get();
+        $vendedores = Seller::where('is_active', 1)->orderBy('name', 'asc')->get();
+        $clientes = Client::where('is_active', 1)->orderBy('name', 'asc')->get();
         $amenities = Amenity::all();
         return view('autos.editPropiedad', compact('property', 'vendedores', 'clientes', 'amenities'));
     }
