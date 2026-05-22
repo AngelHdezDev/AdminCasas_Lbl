@@ -151,11 +151,14 @@
             <select class="bulk-select-input" name="property_id" required>
                 <option value="">— Seleccionar Propiedad —</option>
                 @foreach($properties as $property)
-                    <option value="{{ $property->id }}">{{ $property->title }}</option>
+                    <option value="{{ $property->id }}" {{ (isset($propiedadSeleccionadaId) && $propiedadSeleccionadaId == $property->id) ? 'selected' : '' }}>
+                        {{ $property->title }}
+                    </option>
                 @endforeach
             </select>
             <button type="submit" class="btn-bulk-submit">Asignar lote</button>
-            <button type="button" class="btn-bulk-submit btn-danger-bulk" id="btnBulkDelete" style="background-color: #7f8c8d;">
+            <button type="button" class="btn-bulk-submit btn-danger-bulk" id="btnBulkDelete"
+                style="background-color: #7f8c8d;">
                 <i class="bi bi-trash"></i> Eliminar lote
             </button>
         </div>
@@ -174,7 +177,8 @@
                                             class="bulk-checkbox">
                                     </label>
 
-                                    <img src="{{ asset('storage/' . $imagen->ruta_archivo) }}" alt="{{ $imagen->nombre_original }}" loading="lazy">
+                                    <img src="{{ asset('storage/' . $imagen->ruta_archivo) }}" alt="{{ $imagen->nombre_original }}"
+                                        loading="lazy">
                                     <div class="image-overlay"></div>
 
                                     @if($imagen->id_auto)
@@ -195,7 +199,7 @@
                                             <i class="bi bi-eye"></i>
                                         </button>
 
-                                        
+
                                     </div>
                                 </div>
 
@@ -210,7 +214,7 @@
                                         </div>
                                     </div>
 
-                                    
+
                                 </div>
                             </div>
                         @endforeach
@@ -310,13 +314,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/galeria.js') }}"></script>
 
-   <script>
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             const checkboxes = document.querySelectorAll('.bulk-checkbox');
             const bulkBar = document.getElementById('bulkBar');
             const bulkCount = document.getElementById('bulkCount');
             const btnSelectAllPage = document.getElementById('btnSelectAllPage');
-            
+
             // Formulario maestro y sus elementos
             const formMaster = document.getElementById('formBulkAssign');
             const btnBulkDelete = document.getElementById('btnBulkDelete');
@@ -387,9 +391,9 @@
                     const checkedCount = document.querySelectorAll('.bulk-checkbox:checked').length;
 
                     if (checkedCount === 0) {
-                        Swal.fire({ 
-                            title: 'Atención', 
-                            text: 'Por favor, selecciona al menos una imagen.', 
+                        Swal.fire({
+                            title: 'Atención',
+                            text: 'Por favor, selecciona al menos una imagen.',
                             icon: 'warning',
                             confirmButtonColor: '#c0392b'
                         });
@@ -409,10 +413,10 @@
                         if (result.isConfirmed) {
                             // 1. Apuntamos el formulario a la ruta de borrado masivo
                             formMaster.action = "{{ route('galeria.destroy-masivo') }}";
-                            
+
                             // 2. Quitamos el required del select para que no bloquee el submit
                             if (selectProp) selectProp.removeAttribute('required');
-                            
+
                             // 3. Enviamos
                             formMaster.submit();
                         }
@@ -422,7 +426,7 @@
 
             // Si se hace un submit normal al formulario (Asignar lote), nos aseguramos de restaurar el action y el required
             if (formMaster) {
-                formMaster.addEventListener('submit', function(e) {
+                formMaster.addEventListener('submit', function (e) {
                     // Solo si el submit NO vino provocado por el botón de borrar
                     if (formMaster.action !== "{{ route('galeria.destroy-masivo') }}") {
                         formMaster.action = originalAction;

@@ -11,15 +11,21 @@ use Illuminate\Support\Facades\Storage;
 
 class GalleryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // 1. Capturamos el ID de la propiedad desde el query string de la URL (si es que viene)
+        $propiedadSeleccionadaId = $request->query('propiedad_id');
+
+        // 2. Tu lógica original para traer las imágenes temporales sin asignar
         $imagenes = ImagenTemporal::where('status', 0)
             ->orderBy('created_at', 'desc')
             ->paginate(12);
 
+        // 3. Tu lógica original para traer las propiedades activas ordenadas por título
         $properties = Property::where('active', 1)->orderBy('title', 'asc')->get();
 
-        return view('galeria.galeria', compact('imagenes', 'properties'));
+        // 4. Retornamos la vista inyectando la nueva variable '$propiedadSeleccionadaId'
+        return view('galeria.galeria', compact('imagenes', 'properties', 'propiedadSeleccionadaId'));
     }
 
     public function asignar(Request $request, $id)
