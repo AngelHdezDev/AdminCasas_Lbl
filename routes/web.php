@@ -67,14 +67,14 @@ Route::post('/clientes', [ClientController::class, 'store'])->middleware('auth')
 Route::put('/clientes/{client}', [ClientController::class, 'update'])->middleware('auth')->name('clientes.update');
 Route::delete('/clientes/{client}', [ClientController::class, 'destroy'])->middleware('auth')->name('clientes.destroy');
 Route::delete('/clientes/{id}/archivo', [ClientController::class, 'deleteFile'])->middleware('auth')->name('clientes.deleteFile');
-
+Route::get('/clientes/details/{client}', [ClientController::class, 'showDetail'])->middleware('auth')->name('clientes.show');
 
 Route::get('/vendedores', [SellerController::class, 'index'])->middleware('auth')->name('vendedores.index');
 Route::post('/vendedores', [SellerController::class, 'store'])->middleware('auth')->name('vendedores.store');
 Route::put('/vendedores/{seller}', [SellerController::class, 'update'])->middleware('auth')->name('vendedores.update');
 Route::delete('/vendedores/{seller}', [SellerController::class, 'destroy'])->middleware('auth')->name('vendedores.destroy');
 Route::delete('/vendedores/{id}/archivo', [SellerController::class, 'deleteFile'])->middleware('auth')->name('vendedores.deleteFile');
-
+Route::get('/vendedores/details/{seller}', [SellerController::class, 'showDetail'])->middleware('auth')->name('vendedores.show');
 
 
 

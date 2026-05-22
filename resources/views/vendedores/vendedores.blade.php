@@ -143,6 +143,10 @@
                                         </td>
                                         <td>
                                             <div class="action-buttons" style="justify-content: flex-end;">
+                                                <a href="{{ route('vendedores.show', $seller->id) }}" class="btn-action"
+                                                    title="Ver detalle">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
                                                 {{-- Botón Editar con todos los data-attributes para el JS --}}
                                                 <a class="btn-action btn-edit" title="Editar Vendedor" data-bs-toggle="modal"
                                                     data-bs-target="#modalEditarVendedor" data-id="{{ $seller->id }}"

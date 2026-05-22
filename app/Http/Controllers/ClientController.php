@@ -87,4 +87,23 @@ class ClientController extends Controller
 
         return redirect()->back()->with('success', 'Identificación eliminada del registro.');
     }
+
+    public function showDetail($client)
+    {
+        try {
+            // 1. Buscamos al cliente por su ID usando el modelo correcto
+            $clientModel = Client::findOrFail($client);
+
+            // 2. Renombramos a '$client' para que coincida exactamente con la vista Blade
+            $client = $clientModel;
+
+            // 3. Retornamos la vista premium de detalles
+            return view('clientes.show', compact('client'));
+
+        } catch (\Exception $e) {
+            // En caso de que busquen un ID que no exista, redirige con error
+            return redirect()->route('clientes.index')
+                ->with('error', 'El cliente solicitado no existe o fue eliminado.');
+        }
+    }
 }

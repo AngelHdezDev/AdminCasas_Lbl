@@ -59,4 +59,23 @@ class SellerController extends Controller
 
         return redirect()->back()->with('error', 'No se pudo procesar la solicitud.');
     }
+
+    public function showDetail($seller)
+    {
+        try {
+            // 1. Buscamos al cliente por su ID usando el modelo correcto
+            $sellerModel = seller::findOrFail($seller);
+
+            // 2. Renombramos a '$client' para que coincida exactamente con la vista Blade
+            $seller = $sellerModel;
+
+            // 3. Retornamos la vista premium de detalles
+            return view('vendedores.show', compact('seller'));
+
+        } catch (\Exception $e) {
+            // En caso de que busquen un ID que no exista, redirige con error
+            return redirect()->route('vendedores.index')
+                ->with('error', 'El vendedor solicitado no existe o fue eliminado.');
+        }
+    }
 }
