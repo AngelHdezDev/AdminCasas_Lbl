@@ -307,7 +307,9 @@
                             </div>
                         </div>
                         <div class="btn-group">
-                            <a href="{{ route('galeria.index') }}" class="btn btn-primary">Ir a galería</a>
+                            <a href="{{ route('galeria.index', ['propiedad_id' => $property->id]) }}" class="btn btn-primary">
+                                <i class="bi bi-images"></i> Ir a la Galería
+                            </a>
                         </div>
                     </div>
 
