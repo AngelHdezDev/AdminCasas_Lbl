@@ -1,6 +1,5 @@
 @extends('layouts.app')
 
-
 @section('title', 'Detalle de la Propiedad')
 
 @push('styles')
@@ -17,11 +16,87 @@
         .map-card {
             overflow: hidden;
         }
+
+        /* ── CONTENEDOR DE LA IMAGEN GRANDE (REQUISITO PARA POSICIONAMIENTO ABSOLUTO) ── */
+        .gallery-featured {
+            position: relative;
+        }
+
+        /* ── PANEL DE ACCIONES FLOTANTE SOBRE LA IMAGEN PRINCIPAL ── */
+        .featured-actions-bar {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 8px;
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 6px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-featured-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background-color: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-featured-action:hover {
+            background-color: #f8f9fa;
+            color: #0d6efd;
+            transform: translateY(-1px);
+        }
+
+        .btn-delete-thumbnail:hover {
+            color: #dc3545;
+            border-color: #f5c2c7;
+            background-color: #f8d7da;
+        }
+
+        /* Ocultar los botones de las miniaturas para mantener limpio abajo */
+        .thumbnail-actions {
+            display: none !important;
+        }
+
+        /* ── BARRA DE BADGES FLOTANTE (ARRIBA A LA IZQUIERDA) ── */
+        .featured-badges-bar {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 10;
+        }
+
+        /* Ajustes de diseño para los badges flotantes grandes */
+        .featured-badges-bar .badge-portada,
+        .featured-badges-bar .badge-hero {
+            position: static;
+            /* Resetea el absoluto que tengan en las miniaturas */
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
     </style>
 @endpush
 
 @section('content')
-    <!-- ── PAGE HEADER ── -->
     <div class="page-header">
         <div class="container-fluid px-4">
             <div class="page-header-inner">
@@ -38,13 +113,16 @@
                         ${{ number_format($property->price, 2) }}
                     </p>
                 </div>
-                <div class="header-actions">
+                <div>
+                    <a href="{{ route('propiedades.edit', $property->id) }}" class="btn btn-outline-primary"
+                        title="Editar Ubicación">
+                        <i class="bi bi-geo-alt-fill"></i> Editar Propiedad
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ── MAIN CONTENT ── -->
     <div class="main-wrapper">
         <div class="container-fluid px-4">
             <div class="row g-4">
@@ -55,56 +133,74 @@
                         <input type="hidden" name="longitude" id="lng" value="{{ old('longitude', $property->longitude) }}">
                         <div class="card-body-custom p-0">
                             @if($property->images->count() > 0)
+                                @php $firstImage = $property->images->first(); @endphp
                                 <div class="gallery-main">
+
                                     <div class="gallery-featured" id="galleryFeatured">
-                                        <img src="{{ asset('storage/' . $property->images->first()->path) }}"
-                                            alt="{{ $property->title }}" id="featuredImage">
-                                        <button class="btn-fullscreen" onclick="viewFullscreen()"><i
-                                                class="bi bi-arrows-fullscreen"></i></button>
+                                        <img src="{{ asset('storage/' . $firstImage->path) }}" alt="{{ $property->title }}"
+                                            id="featuredImage">
+
+                                        <div class="featured-badges-bar" id="featuredBadgesBar">
+                                            <span class="badge-portada" id="featured-badge-portada"
+                                                style="display: {{ $firstImage->is_main ? 'inline-flex' : 'none' }};">
+                                                <i class="bi bi-star-fill"></i>
+                                                <span>Portada</span>
+                                            </span>
+                                            <span class="badge-hero" id="featured-badge-hero"
+                                                style="display: {{ $firstImage->is_hero ? 'inline-flex' : 'none' }};">
+                                                <i class="bi bi-image-fill"></i>
+                                                <span>Hero</span>
+                                            </span>
+                                        </div>
+
+                                        <div class="featured-actions-bar">
+                                            <form id="form-portada"
+                                                action="{{ route('propiedades.imagen.portada', $firstImage->id) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="btn-featured-action" id="btn-action-portada"
+                                                    title="Marcar como portada"
+                                                    style="display: {{ $firstImage->is_main ? 'none' : 'inline-flex' }};">
+                                                    <i class="bi bi-star"></i>
+                                                </button>
+                                            </form>
+
+                                            <form id="form-hero"
+                                                action="{{ route('propiedades.imagen.hero', $firstImage->id) }}" method="POST"
+                                                class="d-inline">
+                                                @csrf @method('PATCH')
+                                                <button type="submit" class="btn-featured-action" id="btn-action-hero"
+                                                    title="Marcar como Hero"
+                                                    style="display: {{ $firstImage->is_hero ? 'none' : 'inline-flex' }};">
+                                                    <i class="bi bi-image-fill"></i>
+                                                </button>
+                                            </form>
+
+                                            <form id="form-delete"
+                                                action="{{ route('propiedades.imagen.delete', $firstImage->id) }}" method="POST"
+                                                class="d-inline delete-image-form">
+                                                @csrf @method('DELETE')
+                                                <button type="button" class="btn-featured-action btn-delete-thumbnail"
+                                                    title="Eliminar esta imagen">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </form>
+
+                                            <button class="btn-featured-action" onclick="viewFullscreen()"
+                                                title="Pantalla Completa">
+                                                <i class="bi bi-arrows-fullscreen"></i>
+                                            </button>
+                                        </div>
                                     </div>
+
                                     <div class="gallery-thumbnails">
                                         @foreach($property->images as $index => $image)
                                             <div class="thumbnail-item {{ $index === 0 ? 'active' : '' }}"
-                                                data-imagen-id="{{ $image->id }}">
-                                                <img src="{{ asset('storage/' . $image->path) }}" alt="Imagen {{ $index + 1 }}"
-                                                    onclick="changeImage('{{ asset('storage/' . $image->path) }}', this.parentElement)">
-                                                @if($image->is_main)
-                                                    <span class="badge-portada">
-                                                        <i class="bi bi-star-fill"></i>
-                                                        <span>Portada</span>
-                                                    </span>
-                                                @endif
+                                                data-imagen-id="{{ $image->id }}" data-is-main="{{ $image->is_main ? '1' : '0' }}"
+                                                data-is-hero="{{ $image->is_hero ? '1' : '0' }}">
 
-                                                @if($image->is_hero)
-                                                    <span class="badge-hero">
-                                                        <i class="bi bi-image-fill"></i>
-                                                        <span>Hero</span>
-                                                    </span>
-                                                @endif
-                                                <div class="thumbnail-actions">
-                                                    @if(!$image->is_main)
-                                                        <form action="{{ route('propiedades.imagen.portada', $image->id) }}"
-                                                            method="POST" class="d-inline">
-                                                            @csrf @method('PATCH')
-                                                            <button type="submit" class="btn-portada-thumbnail"
-                                                                title="Marcar como portada"><i class="bi bi-star"></i></button>
-                                                        </form>
-                                                    @endif
-                                                    @if(!$image->is_hero)
-                                                        <form action="{{ route('propiedades.imagen.hero', $image->id) }}" method="POST"
-                                                            class="d-inline">
-                                                            @csrf @method('PATCH')
-                                                            <button type="submit" class="btn-hero-thumbnail" title="Marcar como Hero"><i
-                                                                    class="bi bi-image-fill"></i></button>
-                                                        </form>
-                                                    @endif
-                                                    <form action="{{ route('propiedades.imagen.delete', $image->id) }}"
-                                                        method="POST" class="delete-image-form">
-                                                        @csrf @method('DELETE')
-                                                        <button type="button" class="btn-delete-thumbnail"
-                                                            title="Eliminar imagen"><i class="bi bi-trash"></i></button>
-                                                    </form>
-                                                </div>
+                                                <img src="{{ asset('storage/' . $image->path) }}" alt="Imagen {{ $index + 1 }}"
+                                                    onclick="changeImageWithActions('{{ asset('storage/' . $image->path) }}', this.parentElement, '{{ $image->id }}')">
                                             </div>
                                         @endforeach
                                     </div>
@@ -143,7 +239,6 @@
                                     <div class="spec-icon"><i class="bi bi-rulers"></i></div>
                                     <div class="spec-content">
                                         <div class="spec-label">Terreno</div>
-                                        {{-- Formato: variable, decimales, separador decimal, separador miles --}}
                                         <div class="spec-value">{{ number_format($property->m2_land, 0, '.', ',') }} m²
                                         </div>
                                     </div>
@@ -174,12 +269,10 @@
                                 </div>
                             </div>
 
-
                             <div class="map-card mt-4">
                                 <div class="spec-label mb-2"><i class="bi bi-map"></i> Ubicación en el Mapa</div>
                                 <div id="map" style="height: 400px; width: 100%; border-radius: 8px;"></div>
                             </div>
-
 
                             <div class="address-box mt-4 p-3 bg-light rounded">
                                 <div class="spec-label mb-2"><i class="bi bi-geo"></i> Dirección Exacta</div>
@@ -254,6 +347,7 @@
                                 </div>
                             </div>
                         </div>
+
                         <div class="content-card mt-4">
                             <div class="card-header-custom">
                                 <h2 class="card-title-custom"><i class="bi bi-stars"></i> Amenidades y Servicios</h2>
@@ -263,7 +357,6 @@
                                     @forelse($property->amenities as $amenity)
                                         <div class="amenity-display-item">
                                             <div class="amenity-display-icon">
-                                                {{-- Lógica para detectar si es clase de icono o emoji --}}
                                                 @if(str_contains($amenity->icon, 'bi-'))
                                                     <i class="{{ $amenity->icon }}"></i>
                                                 @else
@@ -273,8 +366,7 @@
                                             <span class="amenity-display-name">{{ $amenity->name }}</span>
                                         </div>
                                     @empty
-                                        <div class="text-muted small">No hay amenidades registradas para esta propiedad.
-                                        </div>
+                                        <div class="text-muted small">No hay amenidades registradas para esta propiedad.</div>
                                     @endforelse
                                 </div>
                             </div>
@@ -289,6 +381,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/detalle-vehiculo.js') }}"></script>
+
     @if(session('success'))
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -313,35 +406,62 @@
             });
         </script>
     @endif
-
 @endsection
 
 @push('scripts')
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}"></script>
 
     <script>
-    function initMap() {
-        const pos = {
-            lat: {{ $property->latitude ?? 0 }},
-            lng: {{ $property->longitude ?? 0 }} 
-        };
-        
-        const map = new google.maps.Map(document.getElementById("map"), {
-            center: pos,
-            zoom: 17,
-            mapTypeControl: false,
-            streetViewControl: false, 
-            fullscreenControl: true
-        });
+        function changeImageWithActions(imageSrc, element, imageId) {
+            // 1. Cambiar la imagen principal
+            if (typeof changeImage === 'function') {
+                changeImage(imageSrc, element);
+            } else {
+                document.getElementById('featuredImage').src = imageSrc;
+                document.querySelectorAll('.thumbnail-item').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+            }
 
-        // Marcador Estático
-        new google.maps.Marker({
-            position: pos,
-            map: map,
-            draggable: false // Aseguramos que no se pueda mover
-        });
-    }
+            // 2. Actualizar los endpoints de los formularios de acción
+            const baseUrl = "{{ url('propiedades/imagen') }}";
+            document.getElementById('form-portada').action = `${baseUrl}/${imageId}/portada`;
+            document.getElementById('form-hero').action = `${baseUrl}/${imageId}/hero`;
+            document.getElementById('form-delete').action = `${baseUrl}/${imageId}`;
 
-    google.maps.event.addDomListener(window, 'load', initMap);
-</script>
+            // 3. Leer estados de la miniatura actual
+            const isMain = element.getAttribute('data-is-main') === '1';
+            const isHero = element.getAttribute('data-is-hero') === '1';
+
+            // 4. Alternar visibilidad de los BOTONES de acción
+            document.getElementById('btn-action-portada').style.display = isMain ? 'none' : 'inline-flex';
+            document.getElementById('btn-action-hero').style.display = isHero ? 'none' : 'inline-flex';
+
+            // 5. Alternar visibilidad de los TEXTOS/BADGES flotantes en la imagen grande
+            document.getElementById('featured-badge-portada').style.display = isMain ? 'inline-flex' : 'none';
+            document.getElementById('featured-badge-hero').style.display = isHero ? 'inline-flex' : 'none';
+        }
+
+        function initMap() {
+            const latVal = Number("{{ $property->latitude }}") || 0;
+            const lngVal = Number("{{ $property->longitude }}") || 0;
+
+            const pos = { lat: latVal, lng: lngVal };
+
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: pos,
+                zoom: 17,
+                mapTypeControl: false,
+                streetViewControl: false,
+                fullscreenControl: true
+            });
+
+            new google.maps.Marker({
+                position: pos,
+                map: map,
+                draggable: false
+            });
+        }
+
+        google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
 @endpush
