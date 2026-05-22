@@ -16,11 +16,6 @@
             <h2 class="h3 text-white mt-1 mb-0">{{ $client->name }}</h2>
             <span class="text-warning small"><i class="bi bi-person-badge"></i> Expediente del Cliente</span>
         </div>
-        <div>
-            <button class="btn btn-warning px-3 d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#modalEditarCliente">
-                <i class="bi bi-pencil-square"></i> Editar Cliente
-            </button>
-        </div>
     </div>
 
     <div class="row g-4">
