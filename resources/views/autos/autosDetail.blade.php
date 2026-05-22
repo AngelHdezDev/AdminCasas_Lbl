@@ -93,6 +93,48 @@
             font-weight: 600;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
+
+        /* ── FLECHAS DE NAVEGACIÓN FLOTANTES ── */
+        .gallery-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            color: #212529;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 9;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+        }
+
+        .gallery-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0d6efd;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .nav-btn-left {
+            left: 15px;
+        }
+
+        .nav-btn-right {
+            right: 15px;
+        }
+
+        /* Ocultar las flechas si por alguna razón la propiedad tiene solo 1 imagen o ninguna */
+        .gallery-thumbnails:not(:has(.thumbnail-item:nth-child(2)))~.gallery-nav-btn,
+        #galleryFeatured:not(:has(+ .gallery-thumbnails)) .gallery-nav-btn {
+            display: none !important;
+        }
     </style>
 @endpush
 
@@ -139,6 +181,15 @@
                                     <div class="gallery-featured" id="galleryFeatured">
                                         <img src="{{ asset('storage/' . $firstImage->path) }}" alt="{{ $property->title }}"
                                             id="featuredImage">
+
+                                        <button type="button" class="gallery-nav-btn nav-btn-left" id="btn-gallery-prev"
+                                            title="Imagen anterior">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
+                                        <button type="button" class="gallery-nav-btn nav-btn-right" id="btn-gallery-next"
+                                            title="Siguiente imagen">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
 
                                         <div class="featured-badges-bar" id="featuredBadgesBar">
                                             <span class="badge-portada" id="featured-badge-portada"
@@ -412,6 +463,47 @@
     <script src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnPrev = document.getElementById('btn-gallery-prev');
+            const btnNext = document.getElementById('btn-gallery-next');
+
+            if (btnPrev && btnNext) {
+                // Función genérica para mover la imagen
+                function navigateGallery(direction) {
+                    const thumbnails = Array.from(document.querySelectorAll('.thumbnail-item'));
+                    const activeThumbnail = document.querySelector('.thumbnail-item.active');
+                    if (!activeThumbnail || thumbnails.length <= 1) return;
+
+                    let currentIndex = thumbnails.indexOf(activeThumbnail);
+
+                    if (direction === 'next') {
+                        // Si es la última, vuelve a la primera
+                        currentIndex = (currentIndex === thumbnails.length - 1) ? 0 : currentIndex + 1;
+                    } else if (direction === 'prev') {
+                        // Si es la primera, va a la última
+                        currentIndex = (currentIndex === 0) ? thumbnails.length - 1 : currentIndex - 1;
+                    }
+
+                    // Selecciona la miniatura destino y le da clic a su imagen para disparar toda la lógica
+                    const targetThumbnail = thumbnails[currentIndex];
+                    if (targetThumbnail) {
+                        const img = targetThumbnail.querySelector('img');
+                        if (img) img.click();
+                    }
+                }
+
+                // Asignar los eventos de click
+                btnPrev.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    navigateGallery('prev');
+                });
+
+                btnNext.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    navigateGallery('next');
+                });
+            }
+        });
         function changeImageWithActions(imageSrc, element, imageId) {
             // 1. Cambiar la imagen principal
             if (typeof changeImage === 'function') {
