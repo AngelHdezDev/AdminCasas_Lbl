@@ -100,7 +100,7 @@
                     <div class="panel-section-title d-flex justify-content-between align-items-center">
                         <span><i class="bi bi-card-image text-danger"></i> Identificación Oficial</span>
                         @if($seller->contract_path)
-                            <a href="{{ asset('storage/' . $seller->contract_path) }}" target="_blank" class="btn btn-sm btn-outline-light py-0 px-2" style="font-size:0.75rem;">
+                            <a href="{{ route('vendedores.archivo', $seller->id) }}" target="_blank" class="btn btn-sm btn-outline-light py-0 px-2" style="font-size:0.75rem;">
                                 <i class="bi bi-fullscreen"></i> Ver Completa
                             </a>
                         @endif
@@ -109,7 +109,7 @@
                     <div class="identification-display-area mt-3">
                         @if($seller->contract_path)
                             <div class="id-document-frame">
-                                <img src="{{ asset('storage/' . $seller->contract_path) }}" alt="Contrato de {{ $seller->name }}">
+                                <img src="{{ route('vendedores.archivo', $seller->id) }}" alt="Contrato de {{ $seller->name }}">
                             </div>
                         @else
                             <div class="id-document-empty">
