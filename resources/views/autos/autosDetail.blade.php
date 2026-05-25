@@ -210,17 +210,15 @@
                                                 </button>
                                             </div>
 
-                                            <form id="form-hero"
-                                                action="{{ route('propiedades.imagen.hero', $firstImage->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf @method('PATCH')
-                                                <button type="submit" class="btn-featured-action" id="btn-action-hero"
+                                            <div class="d-inline">
+                                                <button type="button" class="btn-featured-action" id="btn-action-hero"
+                                                    data-id="{{ $firstImage->id }}"
+                                                    data-url="{{ route('propiedades.imagen.hero', $firstImage->id) }}"
                                                     title="Marcar como Hero"
                                                     style="display: {{ $firstImage->is_hero ? 'none' : 'inline-flex' }};">
                                                     <i class="bi bi-image-fill"></i>
                                                 </button>
-                                            </form>
-
+                                            </div>
                                             <form id="form-delete"
                                                 action="{{ route('propiedades.imagen.delete', $firstImage->id) }}" method="POST"
                                                 class="d-inline delete-image-form">
@@ -513,15 +511,20 @@
                 element.classList.add('active');
             }
 
-            // 2. ACTUALIZACIÓN AJAX: Modificamos el botón de portada en lugar del formulario
-            const btnPortada = document.getElementById('btn-action-portada');
+            // 2. ACTUALIZACIÓN AJAX: Modificamos los botones en lugar de formularios
             const baseUrl = "{{ url('propiedades/imagen') }}";
 
+            // Actualizar botón de Portada
+            const btnPortada = document.getElementById('btn-action-portada');
             btnPortada.dataset.id = imageId;
             btnPortada.dataset.url = `${baseUrl}/${imageId}/portada`;
 
-            // Las demás rutas de los otros formularios se quedan igual por ahora
-            document.getElementById('form-hero').action = `${baseUrl}/${imageId}/hero`;
+            // Actualizar botón de Hero
+            const btnHero = document.getElementById('btn-action-hero');
+            btnHero.dataset.id = imageId;
+            btnHero.dataset.url = `${baseUrl}/${imageId}/hero`;
+
+            // El formulario de eliminación se queda igual por ahora
             document.getElementById('form-delete').action = `${baseUrl}/${imageId}`;
 
             // 3. Leer estados de la miniatura actual
@@ -530,22 +533,23 @@
 
             // 4. Alternar visibilidad de los BOTONES de acción
             btnPortada.style.display = isMain ? 'none' : 'inline-flex';
-            document.getElementById('btn-action-hero').style.display = isHero ? 'none' : 'inline-flex';
+            btnHero.style.display = isHero ? 'none' : 'inline-flex';
 
             // 5. Alternar visibilidad de los TEXTOS/BADGES flotantes en la imagen grande
             document.getElementById('featured-badge-portada').style.display = isMain ? 'inline-flex' : 'none';
-            document.getElementById('featured-badge-hero').style.display = isHero ? 'none' : 'inline-flex';
+            document.getElementById('featured-badge-hero').style.display = isHero ? 'inline-flex' : 'none';
         }
 
-        // Interceptamos el click del nuevo botón de portada asíncrono
+        // Controladores de eventos AJAX para Portada y Hero
         document.addEventListener('DOMContentLoaded', function () {
-            const btnPortada = document.getElementById('btn-action-portada');
+            const csrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
 
+            // --- ESCUCHAR CLIC EN PORTADA ---
+            const btnPortada = document.getElementById('btn-action-portada');
             if (btnPortada) {
                 btnPortada.addEventListener('click', function () {
                     const url = this.dataset.url;
                     const imageId = this.dataset.id;
-                    const csrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
 
                     fetch(url, {
                         method: 'POST',
@@ -556,40 +560,60 @@
                         },
                         body: JSON.stringify({ _method: 'PATCH' })
                     })
-                        .then(res => {
-                            if (!res.ok) throw new Error('Error en la respuesta del servidor');
-                            return res.json();
-                        })
+                        .then(res => { if (!res.ok) throw new Error(); return res.json(); })
                         .then(data => {
                             if (data.success) {
-                                Swal.fire({
-                                    title: '¡Portada Actualizada!',
-                                    text: data.message,
-                                    icon: 'success',
-                                    timer: 1300,
-                                    showConfirmButton: false
-                                });
+                                Swal.fire({ title: '¡Portada Actualizada!', text: data.message, icon: 'success', timer: 1300, showConfirmButton: false });
 
-                                // 1. Buscamos la miniatura vieja que era portada y le quitamos el estado
                                 const oldMain = document.querySelector('.thumbnail-item[data-is-main="1"]');
                                 if (oldMain) oldMain.setAttribute('data-is-main', '0');
 
-                                // 2. Buscamos la miniatura actual en el carrusel y le ponemos que ahora es la portada (is-main = 1)
                                 const currentThumbnail = document.querySelector(`.thumbnail-item[data-imagen-id="${imageId}"]`);
                                 if (currentThumbnail) currentThumbnail.setAttribute('data-is-main', '1');
 
-                                // 3. Ocultamos el botón de estrella (porque ya es portada) y mostramos el badge grande arriba a la izquierda
                                 btnPortada.style.display = 'none';
                                 document.getElementById('featured-badge-portada').style.display = 'inline-flex';
-
-                            } else {
-                                Swal.fire('Error', data.message || 'No se pudo actualizar.', 'error');
                             }
                         })
-                        .catch(err => {
-                            console.error(err);
-                            Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error');
-                        });
+                        .catch(() => Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error'));
+                });
+            }
+
+            // --- ESCUCHAR CLIC EN HERO ---
+            const btnHero = document.getElementById('btn-action-hero');
+            if (btnHero) {
+                btnHero.addEventListener('click', function () {
+                    const url = this.dataset.url;
+                    const imageId = this.dataset.id;
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ _method: 'PATCH' })
+                    })
+                        .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({ title: '¡Hero Actualizado!', text: data.message, icon: 'success', timer: 1300, showConfirmButton: false });
+
+                                // Como el Hero suele ser único globalmente, reseteamos el viejo si existe
+                                const oldHero = document.querySelector('.thumbnail-item[data-is-hero="1"]');
+                                if (oldHero) oldHero.setAttribute('data-is-hero', '0');
+
+                                // Marcamos la miniatura actual como el nuevo Hero
+                                const currentThumbnail = document.querySelector(`.thumbnail-item[data-imagen-id="${imageId}"]`);
+                                if (currentThumbnail) currentThumbnail.setAttribute('data-is-hero', '1');
+
+                                // Ocultamos su botón y encendemos el Badge de texto grande arriba
+                                btnHero.style.display = 'none';
+                                document.getElementById('featured-badge-hero').style.display = 'inline-flex';
+                            }
+                        })
+                        .catch(() => Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error'));
                 });
             }
         });

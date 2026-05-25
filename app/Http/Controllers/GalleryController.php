@@ -197,6 +197,7 @@ class GalleryController extends Controller
             ], 500);
         }
     }
+
     public function setHero($id)
     {
         try {
@@ -205,18 +206,30 @@ class GalleryController extends Controller
             $yaEraHero = $imagen->is_hero;
 
             DB::transaction(function () use ($imagen, $yaEraHero) {
+                // Desmarcamos la imagen Hero actual
                 PropertyImage::where('is_hero', 1)->update(['is_hero' => 0]);
 
+                // Si la imagen clickeada NO era hero, la marcamos como el nuevo Hero.
+                // Si ya era hero, se queda en 0 (acción de "quitar" que ya tenías contemplada).
                 if (!$yaEraHero) {
                     $imagen->update(['is_hero' => 1]);
                 }
             });
 
             $msg = !$yaEraHero ? 'Nueva imagen destacada global establecida.' : 'Se ha quitado la imagen destacada.';
-            return back()->with('success', $msg);
+
+            // RESPUESTA AJAX EXITOSA
+            return response()->json([
+                'success' => true,
+                'message' => $msg
+            ], 200);
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Error al procesar el Hero: ' . $e->getMessage());
+            // RESPUESTA AJAX EN CASO DE ERROR
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar el Hero: ' . $e->getMessage()
+            ], 500);
         }
     }
 
