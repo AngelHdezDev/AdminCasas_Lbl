@@ -168,21 +168,31 @@ class PropertyController extends Controller
 
     public function eliminarImagen($id)
     {
-        $imagen = PropertyImage::findOrFail($id);
+        try {
+            $imagen = PropertyImage::findOrFail($id);
 
-        // Eliminar archivo y registro...
-        if (Storage::exists($imagen->path)) {
-            Storage::delete($imagen->path);
+            // Eliminar archivo del Storage si existe
+            if (Storage::exists($imagen->path)) {
+                Storage::delete($imagen->path);
+            }
+
+            // Eliminar el registro de la base de datos
+            $imagen->delete();
+
+            // Respuesta AJAX exitosa
+            return response()->json([
+                'success' => true,
+                'message' => 'Imagen eliminada correctamente.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            // En caso de que falle el Storage, BD o cualquier otra cosa
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo eliminar la imagen: ' . $e->getMessage()
+            ], 500);
         }
-        $imagen->delete();
-
-        // ESTO ES LO QUE EL JS NECESITA LEER:
-        return response()->json([
-            'success' => true,
-            'message' => 'Imagen eliminada correctamente.'
-        ], 200);
     }
-
     public function toggleDestacado(Request $request, $id)
     {
         try {

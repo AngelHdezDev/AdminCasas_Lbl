@@ -219,15 +219,14 @@
                                                     <i class="bi bi-image-fill"></i>
                                                 </button>
                                             </div>
-                                            <form id="form-delete"
-                                                action="{{ route('propiedades.imagen.delete', $firstImage->id) }}" method="POST"
-                                                class="d-inline delete-image-form">
-                                                @csrf @method('DELETE')
+                                            <div class="d-inline">
                                                 <button type="button" class="btn-featured-action btn-delete-thumbnail"
+                                                    id="btn-action-delete" data-id="{{ $firstImage->id }}"
+                                                    data-url="{{ route('propiedades.imagen.delete', $firstImage->id) }}"
                                                     title="Eliminar esta imagen">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
-                                            </form>
+                                            </div>
 
                                             <button class="btn-featured-action" onclick="viewFullscreen()"
                                                 title="Pantalla Completa">
@@ -511,21 +510,25 @@
                 element.classList.add('active');
             }
 
-            // 2. ACTUALIZACIÓN AJAX: Modificamos los botones en lugar de formularios
+            // 2. ACTUALIZACIÓN AJAX: Modificamos los data attributes de los botones
             const baseUrl = "{{ url('propiedades/imagen') }}";
 
-            // Actualizar botón de Portada
+            // Portada
             const btnPortada = document.getElementById('btn-action-portada');
             btnPortada.dataset.id = imageId;
             btnPortada.dataset.url = `${baseUrl}/${imageId}/portada`;
 
-            // Actualizar botón de Hero
+            // Hero
             const btnHero = document.getElementById('btn-action-hero');
             btnHero.dataset.id = imageId;
             btnHero.dataset.url = `${baseUrl}/${imageId}/hero`;
 
-            // El formulario de eliminación se queda igual por ahora
-            document.getElementById('form-delete').action = `${baseUrl}/${imageId}`;
+            // Eliminar
+            const btnDelete = document.getElementById('btn-action-delete');
+            if (btnDelete) {
+                btnDelete.dataset.id = imageId;
+                btnDelete.dataset.url = `${baseUrl}/${imageId}`;
+            }
 
             // 3. Leer estados de la miniatura actual
             const isMain = element.getAttribute('data-is-main') === '1';
@@ -540,7 +543,7 @@
             document.getElementById('featured-badge-hero').style.display = isHero ? 'inline-flex' : 'none';
         }
 
-        // Controladores de eventos AJAX para Portada y Hero
+        // Controladores de eventos AJAX para Portada, Hero y Eliminar
         document.addEventListener('DOMContentLoaded', function () {
             const csrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
 
@@ -553,29 +556,21 @@
 
                     fetch(url, {
                         method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         body: JSON.stringify({ _method: 'PATCH' })
                     })
                         .then(res => { if (!res.ok) throw new Error(); return res.json(); })
                         .then(data => {
                             if (data.success) {
                                 Swal.fire({ title: '¡Portada Actualizada!', text: data.message, icon: 'success', timer: 1300, showConfirmButton: false });
-
                                 const oldMain = document.querySelector('.thumbnail-item[data-is-main="1"]');
                                 if (oldMain) oldMain.setAttribute('data-is-main', '0');
-
                                 const currentThumbnail = document.querySelector(`.thumbnail-item[data-imagen-id="${imageId}"]`);
                                 if (currentThumbnail) currentThumbnail.setAttribute('data-is-main', '1');
-
                                 btnPortada.style.display = 'none';
                                 document.getElementById('featured-badge-portada').style.display = 'inline-flex';
                             }
-                        })
-                        .catch(() => Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error'));
+                        }).catch(() => Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error'));
                 });
             }
 
@@ -588,32 +583,78 @@
 
                     fetch(url, {
                         method: 'POST',
-                        headers: {
-                            'X-CSRF-TOKEN': csrfToken,
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
+                        headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json', 'Accept': 'application/json' },
                         body: JSON.stringify({ _method: 'PATCH' })
                     })
                         .then(res => { if (!res.ok) throw new Error(); return res.json(); })
                         .then(data => {
                             if (data.success) {
                                 Swal.fire({ title: '¡Hero Actualizado!', text: data.message, icon: 'success', timer: 1300, showConfirmButton: false });
-
-                                // Como el Hero suele ser único globalmente, reseteamos el viejo si existe
                                 const oldHero = document.querySelector('.thumbnail-item[data-is-hero="1"]');
                                 if (oldHero) oldHero.setAttribute('data-is-hero', '0');
-
-                                // Marcamos la miniatura actual como el nuevo Hero
                                 const currentThumbnail = document.querySelector(`.thumbnail-item[data-imagen-id="${imageId}"]`);
                                 if (currentThumbnail) currentThumbnail.setAttribute('data-is-hero', '1');
-
-                                // Ocultamos su botón y encendemos el Badge de texto grande arriba
                                 btnHero.style.display = 'none';
                                 document.getElementById('featured-badge-hero').style.display = 'inline-flex';
                             }
-                        })
-                        .catch(() => Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error'));
+                        }).catch(() => Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error'));
+                });
+            }
+
+            // --- ESCUCHAR CLIC EN ELIMINAR ---
+            const btnDelete = document.getElementById('btn-action-delete');
+            if (btnDelete) {
+                btnDelete.addEventListener('click', function () {
+                    const url = this.dataset.url;
+                    const imageId = this.dataset.id;
+
+                    // Confirmación de seguridad de SweetAlert antes de borrar
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: "Esta acción eliminará permanentemente la imagen.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            fetch(url, {
+                                method: 'POST',
+                                headers: { 'X-CSRF-TOKEN': csrfToken, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                                body: JSON.stringify({ _method: 'DELETE' })
+                            })
+                                .then(res => { if (!res.ok) throw new Error(); return res.json(); })
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({ title: '¡Eliminada!', text: data.message, icon: 'success', timer: 1300, showConfirmButton: false });
+
+                                        // Encontrar la miniatura que acabamos de borrar en el DOM
+                                        const thumbnailToRemove = document.querySelector(`.thumbnail-item[data-imagen-id="${imageId}"]`);
+                                        if (thumbnailToRemove) {
+                                            // Buscamos si hay otra miniatura al lado para heredar el foco
+                                            const nextTarget = thumbnailToRemove.nextElementSibling || thumbnailToRemove.previousElementSibling;
+                                            thumbnailToRemove.remove(); // Remover del DOM
+
+                                            if (nextTarget && nextTarget.classList.contains('thumbnail-item')) {
+                                                // Le damos clic a la siguiente imagen disponible
+                                                nextTarget.querySelector('img').click();
+                                            } else {
+                                                // Si ya no quedan más imágenes, renderizar la vista vacía dinámicamente
+                                                const galleryMain = document.querySelector('.gallery-main');
+                                                if (galleryMain) {
+                                                    galleryMain.innerHTML = `<div class="gallery-empty-large"><i class="bi bi-image"></i><p>Esta propiedad no tiene imágenes</p></div>`;
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        Swal.fire('Error', data.message, 'error');
+                                    }
+                                })
+                                .catch(() => Swal.fire('Error', 'No se pudo eliminar la imagen.', 'error'));
+                        }
+                    });
                 });
             }
         });
