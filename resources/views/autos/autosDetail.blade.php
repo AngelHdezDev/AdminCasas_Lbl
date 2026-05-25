@@ -155,12 +155,7 @@
                         ${{ number_format($property->price, 2) }}
                     </p>
                 </div>
-                <div>
-                    <a href="{{ route('propiedades.edit', $property->id) }}" class="btn btn-outline-primary"
-                        title="Editar Ubicación">
-                        <i class="bi bi-geo-alt-fill"></i> Editar Propiedad
-                    </a>
-                </div>
+              
             </div>
         </div>
     </div>
