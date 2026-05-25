@@ -33,6 +33,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     @stack('scripts') {{-- Para JS específico (como el que hicimos para el modal) --}}
+    <script>
+        window.addEventListener('pageshow', function (event) {
+            // event.persisted es true si el navegador cargó la página desde el caché del historial (Bfcache)
+            if (event.persisted) {
+                window.location.reload();
+            }
+        });
+    </script>
 </body>
 
 </html>

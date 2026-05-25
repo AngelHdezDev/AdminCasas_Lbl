@@ -155,7 +155,7 @@
                         ${{ number_format($property->price, 2) }}
                     </p>
                 </div>
-              
+
             </div>
         </div>
     </div>
@@ -200,16 +200,15 @@
                                         </div>
 
                                         <div class="featured-actions-bar">
-                                            <form id="form-portada"
-                                                action="{{ route('propiedades.imagen.portada', $firstImage->id) }}"
-                                                method="POST" class="d-inline">
-                                                @csrf @method('PATCH')
-                                                <button type="submit" class="btn-featured-action" id="btn-action-portada"
+                                            <div class="d-inline">
+                                                <button type="button" class="btn-featured-action" id="btn-action-portada"
+                                                    data-id="{{ $firstImage->id }}"
+                                                    data-url="{{ route('propiedades.imagen.portada', $firstImage->id) }}"
                                                     title="Marcar como portada"
                                                     style="display: {{ $firstImage->is_main ? 'none' : 'inline-flex' }};">
                                                     <i class="bi bi-star"></i>
                                                 </button>
-                                            </form>
+                                            </div>
 
                                             <form id="form-hero"
                                                 action="{{ route('propiedades.imagen.hero', $firstImage->id) }}" method="POST"
@@ -514,9 +513,14 @@
                 element.classList.add('active');
             }
 
-            // 2. Actualizar los endpoints de los formularios de acción
+            // 2. ACTUALIZACIÓN AJAX: Modificamos el botón de portada en lugar del formulario
+            const btnPortada = document.getElementById('btn-action-portada');
             const baseUrl = "{{ url('propiedades/imagen') }}";
-            document.getElementById('form-portada').action = `${baseUrl}/${imageId}/portada`;
+
+            btnPortada.dataset.id = imageId;
+            btnPortada.dataset.url = `${baseUrl}/${imageId}/portada`;
+
+            // Las demás rutas de los otros formularios se quedan igual por ahora
             document.getElementById('form-hero').action = `${baseUrl}/${imageId}/hero`;
             document.getElementById('form-delete').action = `${baseUrl}/${imageId}`;
 
@@ -525,14 +529,70 @@
             const isHero = element.getAttribute('data-is-hero') === '1';
 
             // 4. Alternar visibilidad de los BOTONES de acción
-            document.getElementById('btn-action-portada').style.display = isMain ? 'none' : 'inline-flex';
+            btnPortada.style.display = isMain ? 'none' : 'inline-flex';
             document.getElementById('btn-action-hero').style.display = isHero ? 'none' : 'inline-flex';
 
             // 5. Alternar visibilidad de los TEXTOS/BADGES flotantes en la imagen grande
             document.getElementById('featured-badge-portada').style.display = isMain ? 'inline-flex' : 'none';
-            document.getElementById('featured-badge-hero').style.display = isHero ? 'inline-flex' : 'none';
+            document.getElementById('featured-badge-hero').style.display = isHero ? 'none' : 'inline-flex';
         }
 
+        // Interceptamos el click del nuevo botón de portada asíncrono
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnPortada = document.getElementById('btn-action-portada');
+
+            if (btnPortada) {
+                btnPortada.addEventListener('click', function () {
+                    const url = this.dataset.url;
+                    const imageId = this.dataset.id;
+                    const csrfToken = document.querySelector('input[name="_token"]')?.value || '{{ csrf_token() }}';
+
+                    fetch(url, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify({ _method: 'PATCH' })
+                    })
+                        .then(res => {
+                            if (!res.ok) throw new Error('Error en la respuesta del servidor');
+                            return res.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({
+                                    title: '¡Portada Actualizada!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    timer: 1300,
+                                    showConfirmButton: false
+                                });
+
+                                // 1. Buscamos la miniatura vieja que era portada y le quitamos el estado
+                                const oldMain = document.querySelector('.thumbnail-item[data-is-main="1"]');
+                                if (oldMain) oldMain.setAttribute('data-is-main', '0');
+
+                                // 2. Buscamos la miniatura actual en el carrusel y le ponemos que ahora es la portada (is-main = 1)
+                                const currentThumbnail = document.querySelector(`.thumbnail-item[data-imagen-id="${imageId}"]`);
+                                if (currentThumbnail) currentThumbnail.setAttribute('data-is-main', '1');
+
+                                // 3. Ocultamos el botón de estrella (porque ya es portada) y mostramos el badge grande arriba a la izquierda
+                                btnPortada.style.display = 'none';
+                                document.getElementById('featured-badge-portada').style.display = 'inline-flex';
+
+                            } else {
+                                Swal.fire('Error', data.message || 'No se pudo actualizar.', 'error');
+                            }
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            Swal.fire('Error', 'No se pudo procesar la solicitud.', 'error');
+                        });
+                });
+            }
+        });
         function initMap() {
             const latVal = Number("{{ $property->latitude }}") || 0;
             const lngVal = Number("{{ $property->longitude }}") || 0;

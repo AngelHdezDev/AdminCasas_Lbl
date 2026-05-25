@@ -184,12 +184,19 @@ class GalleryController extends Controller
                 $imagen->update(['is_main' => 1]);
             });
 
-            return back()->with('success', 'Portada de la propiedad actualizada.');
+            // Retornamos JSON con código de éxito 200
+            return response()->json([
+                'success' => true,
+                'message' => 'Portada de la propiedad actualizada.'
+            ], 200);
+
         } catch (\Exception $e) {
-            return back()->with('error', 'No se pudo actualizar la portada.');
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo actualizar la portada.'
+            ], 500);
         }
     }
-
     public function setHero($id)
     {
         try {
