@@ -1126,9 +1126,9 @@
                     </span>
                     <div class="btn-group">
                         <a href="{{ route('propiedades.index') }}" class="btn btn-secondary">Cancelar</a>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary" id="btnActualizarPropiedad">
                             <i class="bi bi-plus-lg"></i>
-                            Actualizar propiedad
+                            <span>Actualizar propiedad</span>
                         </button>
                     </div>
                 </div>
@@ -1272,6 +1272,115 @@
         }
 
         google.maps.event.addDomListener(window, 'load', initMap);
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formPropiedad');
+            const submitButton = document.getElementById('btnActualizarPropiedad');
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+            if (!form || !submitButton) return;
+
+            function clearAjaxErrors() {
+                form.querySelectorAll('.is-invalid').forEach(field => field.classList.remove('is-invalid'));
+                form.querySelectorAll('.ajax-invalid-feedback').forEach(feedback => feedback.remove());
+            }
+
+            function findField(name) {
+                const displayFieldIds = {
+                    price: 'price_display',
+                    m2_land: 'm2_land_display',
+                    m2_construction: 'm2_construction_display',
+                };
+
+                if (displayFieldIds[name]) {
+                    return document.getElementById(displayFieldIds[name]);
+                }
+
+                return form.querySelector(`[name="${name}"]`) || form.querySelector(`[name="${name}[]"]`);
+            }
+
+            function showFieldErrors(errors) {
+                let firstInvalidField = null;
+
+                Object.entries(errors).forEach(([name, messages]) => {
+                    const field = findField(name);
+                    if (!field) return;
+
+                    field.classList.add('is-invalid');
+
+                    const feedback = document.createElement('div');
+                    feedback.className = 'invalid-feedback ajax-invalid-feedback';
+                    feedback.style.display = 'block';
+                    feedback.textContent = messages[0];
+
+                    const container = field.closest('.field') || field.closest('.toggle-item') || field.parentElement;
+                    container.appendChild(feedback);
+
+                    if (!firstInvalidField) firstInvalidField = field;
+                });
+
+                if (firstInvalidField) {
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalidField.focus({ preventScroll: true });
+                }
+            }
+
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                clearAjaxErrors();
+
+                const originalHtml = submitButton.innerHTML;
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="bi bi-arrow-repeat"></i><span>Guardando...</span>';
+
+                fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    body: new FormData(form),
+                })
+                    .then(async response => {
+                        const data = await response.json().catch(() => ({}));
+
+                        if (!response.ok || !data.success) {
+                            if (response.status === 422 && data.errors) {
+                                showFieldErrors(data.errors);
+                            }
+
+                            throw new Error(data.message || 'Revisa los campos marcados e intenta de nuevo.');
+                        }
+
+                        return data;
+                    })
+                    .then(data => {
+                        Swal.fire({
+                            toast: true,
+                            position: 'top-end',
+                            icon: 'success',
+                            title: data.message || 'Propiedad actualizada.',
+                            showConfirmButton: false,
+                            timer: 2200
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            title: 'No se pudo actualizar',
+                            text: error.message,
+                            icon: 'error',
+                            confirmButtonColor: '#c0392b'
+                        });
+                    })
+                    .finally(() => {
+                        submitButton.disabled = false;
+                        submitButton.innerHTML = originalHtml;
+                    });
+            });
+        });
     </script>
 
     <script>

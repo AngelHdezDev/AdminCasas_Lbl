@@ -58,7 +58,7 @@ class PropertyController extends Controller
 
         return view('autos.autos', compact('properties', 'vendedores', 'clientes', 'states'));
     }
-    public function update(UpdatePropertyRequest $request, $id): RedirectResponse
+    public function update(UpdatePropertyRequest $request, $id)
     {
         try {
             $property = Property::findOrFail($id);
@@ -70,6 +70,16 @@ class PropertyController extends Controller
                     ->count();
 
                 if ($totalDestacados >= 6) {
+                    if ($request->expectsJson()) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'No se puede destacar esta propiedad. Ya alcanzaste el limite maximo de 6 propiedades destacadas.',
+                            'errors' => [
+                                'is_featured' => ['No se puede destacar esta propiedad. Ya alcanzaste el limite maximo de 6 propiedades destacadas.']
+                            ]
+                        ], 422);
+                    }
+
                     return redirect()->back()
                         ->withInput()
                         ->with('error_destacados', 'No se puede destacar esta propiedad. Ya alcanzaste el límite máximo de 6 propiedades destacadas.');
@@ -80,12 +90,32 @@ class PropertyController extends Controller
             $this->service->updateProperty($property, $request->validated());
             $property->amenities()->sync($request->input('amenities', []));
 
+            if ($request->expectsJson()) {
+                $property->refresh();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Propiedad actualizada con exito.',
+                    'property' => [
+                        'id' => $property->id,
+                        'title' => $property->title,
+                    ],
+                ]);
+            }
+
             return redirect()->route('propiedades.index')
                 ->with('success', 'Propiedad actualizada con éxito');
 
         } catch (\Exception $e) {
             // Loggeamos el error real por detrás por si necesitas revisarlo en storage/logs/laravel.log
             \Log::error("Error al actualizar la propiedad ID {$id}: " . $e->getMessage());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrio un error inesperado al guardar los cambios: ' . $e->getMessage()
+                ], 500);
+            }
 
             // Regresamos al usuario avisando que algo salió mal
             return redirect()->back()
