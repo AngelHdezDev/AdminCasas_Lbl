@@ -27,12 +27,38 @@ class ClientController extends Controller
     public function store(StoreClientRequest $request)
     {
         try {
-            $this->clientService->createClient($request->validated());
+            $client = $this->clientService->createClient($request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cliente guardado con exito.',
+                    'client' => [
+                        'id' => $client->id,
+                        'name' => $client->name,
+                        'email' => $client->email,
+                        'phone' => $client->phone,
+                        'notes' => $client->notes,
+                        'created_at' => $client->created_at->format('d/m/Y'),
+                        'identification_path' => $client->identification_path,
+                        'identification_url' => route('clientes.archivo', $client->id),
+                        'show_url' => route('clientes.show', $client->id),
+                        'delete_url' => route('clientes.destroy', $client->id),
+                    ],
+                ], 201);
+            }
 
             return redirect()->route('clientes.index')
                 ->with('success', '¡Cliente guardado con éxito!');
 
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al procesar el registro.'
+                ], 500);
+            }
+
             return redirect()->back()
                 ->with('error', 'Error al procesar el registro.')
                 ->withInput();
@@ -121,6 +147,17 @@ class ClientController extends Controller
 
         // El servicio se encarga de todo el proceso
         $this->clientService->deleteClientFile($client);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Identificacion eliminada del registro.',
+                'client' => [
+                    'id' => $client->id,
+                    'identification_path' => null,
+                ],
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Identificación eliminada del registro.');
     }

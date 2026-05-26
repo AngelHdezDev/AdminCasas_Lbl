@@ -27,7 +27,7 @@ class StoreSellerRequest extends FormRequest
             'phone' => 'nullable|string|max:20',
             'notes' => 'nullable|string',
             'is_active' => 'nullable',
-            'contract_file' => 'nullable|file|mimes:jpg,jpeg,png|max:1048',
+            'contract_path' => 'nullable|file|mimes:jpg,jpeg,png|max:1048',
         ];
     }
 
@@ -37,8 +37,8 @@ class StoreSellerRequest extends FormRequest
             'name.required'  => 'El nombre del vendedor es obligatorio.',
             'email.required' => 'El correo electrónico es obligatorio.',
             'email.unique'   => 'Este correo ya está registrado en el sistema.',
-            'contract_file.mimes' => 'El contrato debe ser una imagen (JPG, PNG).',
-            'contract_file.max' => 'El contrato no debe superar los 1MB.',
+            'contract_path.mimes' => 'El contrato debe ser una imagen (JPG, PNG).',
+            'contract_path.max' => 'El contrato no debe superar los 1MB.',
             
         ];
     }

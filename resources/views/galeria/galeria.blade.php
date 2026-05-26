@@ -320,19 +320,18 @@
             const bulkBar = document.getElementById('bulkBar');
             const bulkCount = document.getElementById('bulkCount');
             const btnSelectAllPage = document.getElementById('btnSelectAllPage');
+            const countVisible = document.getElementById('countVisible');
 
             // Formulario maestro y sus elementos
             const formMaster = document.getElementById('formBulkAssign');
             const btnBulkDelete = document.getElementById('btnBulkDelete');
             const selectProp = formMaster ? formMaster.querySelector('.bulk-select-input') : null;
-
-            // Guardamos el action original del form (asignar-masivo) para poder alternar sin problemas
             const originalAction = formMaster ? formMaster.action : '';
 
             // Actualiza el contador y activa/desactiva la barra inferior
             function updateBulkBar() {
                 const checkedCount = document.querySelectorAll('.bulk-checkbox:checked').length;
-                bulkCount.textContent = `${checkedCount} seleccionadas`;
+                if (bulkCount) bulkCount.textContent = `${checkedCount} seleccionadas`;
 
                 if (checkedCount > 0) {
                     bulkBar.classList.add('active');
@@ -359,44 +358,112 @@
             });
 
             // Botón superior para "Seleccionar todas / Deseleccionar todas"
-            btnSelectAllPage.addEventListener('click', function () {
-                const totalChecked = document.querySelectorAll('.bulk-checkbox:checked').length;
-                const totalCheckboxes = checkboxes.length;
-                const shouldCheck = totalChecked !== totalCheckboxes;
+            if (btnSelectAllPage) {
+                btnSelectAllPage.addEventListener('click', function () {
+                    const totalChecked = document.querySelectorAll('.bulk-checkbox:checked').length;
+                    const totalCheckboxes = document.querySelectorAll('.bulk-checkbox').length;
+                    const shouldCheck = totalChecked !== totalCheckboxes;
 
-                checkboxes.forEach(cb => {
-                    cb.checked = shouldCheck;
-                    const wrapper = cb.closest('.image-checkbox-wrapper');
+                    document.querySelectorAll('.bulk-checkbox').forEach(cb => {
+                        cb.checked = shouldCheck;
+                        const wrapper = cb.closest('.image-checkbox-wrapper');
+                        const card = cb.closest('.gallery-item');
+
+                        if (shouldCheck) {
+                            wrapper.classList.add('has-checked');
+                            card.classList.add('selected-card');
+                        } else {
+                            wrapper.classList.remove('has-checked');
+                            card.classList.remove('selected-card');
+                        }
+                    });
+
+                    this.innerHTML = shouldCheck
+                        ? '<i class="bi bi-dash-circle"></i> Deseleccionar todas'
+                        : '<i class="bi bi-check2-all"></i> Seleccionar todas';
+
+                    updateBulkBar();
+                });
+            }
+
+            // FUNCIÓN AUXILIAR: Remueve las imágenes del DOM animadamente y actualiza contadores
+            function removeImagesFromDOM() {
+                const checkedCheckboxes = document.querySelectorAll('.bulk-checkbox:checked');
+                checkedCheckboxes.forEach(cb => {
                     const card = cb.closest('.gallery-item');
+                    if (card) {
+                        card.style.transition = 'all 0.4s ease';
+                        card.style.opacity = '0';
+                        card.style.transform = 'scale(0.7)';
+                        setTimeout(() => {
+                            card.remove();
+                            // Actualiza el contador general de imágenes visibles en la barra de filtros
+                            const remaining = document.querySelectorAll('.gallery-item').length;
+                            if (countVisible) countVisible.textContent = remaining;
 
-                    if (shouldCheck) {
-                        wrapper.classList.add('has-checked');
-                        card.classList.add('selected-card');
-                    } else {
-                        wrapper.classList.remove('has-checked');
-                        card.classList.remove('selected-card');
+                            // Si ya no quedan imágenes, recargamos para mostrar el "Empty State"
+                            if (remaining === 0) {
+                                window.location.reload();
+                            }
+                        }, 400);
                     }
                 });
+                // Ocultar barra de acciones masivas
+                if (bulkBar) bulkBar.classList.remove('active');
+            }
 
-                this.innerHTML = shouldCheck
-                    ? '<i class="bi bi-dash-circle"></i> Deseleccionar todas'
-                    : '<i class="bi bi-check2-all"></i> Seleccionar todas';
+            // ─── ACCIÓN 1: ASIGNACIÓN MASIVA POR AJAX ───
+            if (formMaster) {
+                formMaster.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Frenamos la recarga de página
 
-                updateBulkBar();
-            });
+                    // Asegurar que el action sea el de asignación
+                    formMaster.action = originalAction;
+                    if (selectProp) selectProp.setAttribute('required', 'required');
 
-            // Manejo del click en "Eliminar lote"
+                    if (!selectProp.value) {
+                        Swal.fire({ title: 'Atención', text: 'Por favor, selecciona una propiedad.', icon: 'warning', confirmButtonColor: '#c0392b' });
+                        return;
+                    }
+
+                    Swal.fire({
+                        title: 'Asignando lote...',
+                        text: 'Actualizando las propiedades de las imágenes.',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
+
+                    const formData = new FormData(formMaster);
+
+                    fetch(formMaster.action, {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json' },
+                        body: formData
+                    })
+                        .then(response => {
+                            if (!response.ok) throw new Error('Error en el servidor');
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire({ title: '¡Asignadas!', text: data.message || 'Lote asignado correctamente.', icon: 'success', confirmButtonColor: '#c0392b', timer: 1500, showConfirmButton: false });
+                                removeImagesFromDOM(); // Quita las fotos de la vista actual limpia y dinámicamente
+                            }
+                        })
+                        .catch(error => {
+                            console.error(error);
+                            Swal.fire({ title: 'Error', text: 'No se pudo procesar la asignación masiva.', icon: 'error', confirmButtonColor: '#c0392b' });
+                        });
+                });
+            }
+
+            // ─── ACCIÓN 2: ELIMINACIÓN MASIVA POR AJAX ───
             if (btnBulkDelete) {
                 btnBulkDelete.addEventListener('click', function () {
                     const checkedCount = document.querySelectorAll('.bulk-checkbox:checked').length;
 
                     if (checkedCount === 0) {
-                        Swal.fire({
-                            title: 'Atención',
-                            text: 'Por favor, selecciona al menos una imagen.',
-                            icon: 'warning',
-                            confirmButtonColor: '#c0392b'
-                        });
+                        Swal.fire({ title: 'Atención', text: 'Por favor, selecciona al menos una imagen.', icon: 'warning', confirmButtonColor: '#c0392b' });
                         return;
                     }
 
@@ -411,61 +478,60 @@
                         cancelButtonText: 'Cancelar'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            // 1. Apuntamos el formulario a la ruta de borrado masivo
-                            formMaster.action = "{{ route('galeria.destroy-masivo') }}";
+                            Swal.fire({
+                                title: 'Eliminando imágenes...',
+                                text: 'Por favor, espera.',
+                                allowOutsideClick: false,
+                                didOpen: () => { Swal.showLoading(); }
+                            });
 
-                            // 2. Quitamos el required del select para que no bloquee el submit
+                            // Seteamos temporalmente el action de borrado masivo
+                            formMaster.action = "{{ route('galeria.destroy-masivo') }}";
                             if (selectProp) selectProp.removeAttribute('required');
 
-                            // 3. Enviamos
-                            formMaster.submit();
+                            const formData = new FormData(formMaster);
+
+                            fetch(formMaster.action, {
+                                method: 'POST',
+                                headers: { 'Accept': 'application/json' },
+                                body: formData
+                            })
+                                .then(response => {
+                                    if (!response.ok) throw new Error('Error al eliminar');
+                                    return response.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        Swal.fire({ title: '¡Eliminadas!', text: data.message || 'Imágenes borradas correctamente.', icon: 'success', confirmButtonColor: '#c0392b', timer: 1500, showConfirmButton: false });
+                                        removeImagesFromDOM(); // Quita las fotos eliminadas de la cuadrícula
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error(error);
+                                    Swal.fire({ title: 'Error', text: 'No se pudieron eliminar las imágenes seleccionadas.', icon: 'error', confirmButtonColor: '#c0392b' });
+                                })
+                                .finally(() => {
+                                    // Dejar el action original listo por seguridad
+                                    formMaster.action = originalAction;
+                                });
                         }
                     });
                 });
             }
-
-            // Si se hace un submit normal al formulario (Asignar lote), nos aseguramos de restaurar el action y el required
-            if (formMaster) {
-                formMaster.addEventListener('submit', function (e) {
-                    // Solo si el submit NO vino provocado por el botón de borrar
-                    if (formMaster.action !== "{{ route('galeria.destroy-masivo') }}") {
-                        formMaster.action = originalAction;
-                        if (selectProp) selectProp.setAttribute('required', 'required');
-                    }
-                });
-            }
         });
 
-        // Dispara el envío del formulario oculto individual rápido
-        function submitIndividualAssign(selectElement, imagenId) {
-            const targetForm = document.getElementById(`assign-individual-${imagenId}`);
-            const targetInput = document.getElementById(`input-individual-${imagenId}`);
-            targetInput.value = selectElement.value;
-            targetForm.submit();
-        }
-
-        // Dispara la eliminación individual
-        function executeIndividualDelete(imagenId) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta imagen?')) {
-                document.getElementById(`delete-form-${imagenId}`).submit();
-            }
+        // Mantener la función global para visualizar imágenes (la que llama tu botón de ojo)
+        function viewImage(url) {
+            Swal.fire({
+                imageUrl: url,
+                imageAlt: 'Visualización multimedia',
+                showCloseButton: true,
+                showConfirmButton: false,
+                customClass: { popup: 'swal2-preview-modal' }
+            });
         }
     </script>
 
-    {{-- Notificaciones SweetAlert --}}
-    @if(session('success'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                Swal.fire({ title: '¡Hecho!', text: "{{ session('success') }}", icon: 'success', confirmButtonColor: '#c0392b' });
-            });
-        </script>
-    @endif
-    @if(session('error'))
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                Swal.fire({ title: 'Hubo un problema', text: "{{ session('error') }}", icon: 'error', confirmButtonColor: '#c0392b' });
-            });
-        </script>
-    @endif
+
 
 @endsection

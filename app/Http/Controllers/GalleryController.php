@@ -8,6 +8,7 @@ use App\Models\Property;      // Tu modelo de casas
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\JsonResponse;
 
 class GalleryController extends Controller
 {
@@ -62,13 +63,12 @@ class GalleryController extends Controller
         }
     }
 
-    public function asignarMasivo(Request $request)
+    public function asignarMasivo(Request $request): JsonResponse
     {
         // 1. Validamos que venga la propiedad y un array de IDs válidos
         $request->validate([
             'property_id' => 'required|exists:properties,id',
             'imagenes_ids' => 'required|array',
-            // Cambiado de 'imagenes_temporales' a 'imagen_temporals'
             'imagenes_ids.*' => 'exists:imagen_temporals,id'
         ]);
 
@@ -108,15 +108,23 @@ class GalleryController extends Controller
                 }
             });
 
-            return redirect()->back()->with('success', '¡Imágenes asignadas a la propiedad correctamente!');
+            // Retornamos JSON en lugar de redirect()->back()
+            return response()->json([
+                'success' => true,
+                'message' => '¡Imágenes asignadas a la propiedad correctamente!'
+            ], 200);
 
         } catch (\Exception $e) {
-            \Log::error("Error en asignación masiva de galería: " . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al asignar en lote: ' . $e->getMessage());
+            Log::error("Error en asignación masiva de galería: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al asignar en lote: ' . $e->getMessage()
+            ], 500);
         }
     }
 
-    public function destroyMasivo(Request $request)
+    public function destroyMasivo(Request $request): JsonResponse
     {
         // 1. Validamos que llegue el array de IDs
         $request->validate([
@@ -142,11 +150,19 @@ class GalleryController extends Controller
                 }
             });
 
-            return redirect()->back()->with('success', 'Las imágenes seleccionadas han sido eliminadas correctamente.');
+            // Retornamos JSON en lugar de redirect()->back()
+            return response()->json([
+                'success' => true,
+                'message' => 'Las imágenes seleccionadas han sido eliminadas correctamente.'
+            ], 200);
 
         } catch (\Exception $e) {
-            \Log::error("Error en eliminación masiva de galería: " . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al eliminar en lote: ' . $e->getMessage());
+            Log::error("Error en eliminación masiva de galería: " . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar en lote: ' . $e->getMessage()
+            ], 500);
         }
     }
 

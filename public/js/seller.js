@@ -5,6 +5,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ── MODAL EDITAR: Poblar datos al abrir ──
     if (modalEditar) {
+        document.addEventListener('click', function (event) {
+            const button = event.target.closest('.btn-edit[data-bs-target="#modalEditarVendedor"]');
+            if (!button) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            bootstrap.Modal.getOrCreateInstance(modalEditar).show(button);
+        }, true);
+
         modalEditar.addEventListener('show.bs.modal', function (event) {
             // Si el modal se abre por error de validación (sin botón disparador), no hacemos nada
             if (!event.relatedTarget) return;
@@ -102,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // ── FUNCIÓN: Confirmación para Eliminar solo el Archivo ──
-function confirmDeleteContract(sellerId) {
+window.confirmDeleteContract = function (sellerId) {
     Swal.fire({
         title: '¿Eliminar documento?',
         text: "El archivo se borrará permanentemente del servidor.",
@@ -131,7 +141,7 @@ function confirmDeleteContract(sellerId) {
             form.submit();
         }
     });
-}
+};
 
 document.addEventListener('DOMContentLoaded', function () {
     document.addEventListener('click', function (e) {
@@ -280,9 +290,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!modalElement) return;
 
         const modal = bootstrap.Modal.getInstance(modalElement) || bootstrap.Modal.getOrCreateInstance(modalElement);
-        modal.hide();
-
-        setTimeout(() => {
+        const cleanup = () => {
             document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
             document.body.classList.remove('modal-open');
             document.body.style.removeProperty('overflow');
@@ -292,7 +300,13 @@ document.addEventListener('DOMContentLoaded', function () {
             modalElement.setAttribute('aria-hidden', 'true');
             modalElement.removeAttribute('aria-modal');
             modalElement.removeAttribute('role');
-        }, 300);
+            bootstrap.Modal.getInstance(modalElement)?.dispose();
+        };
+
+        modalElement.addEventListener('hidden.bs.modal', cleanup, { once: true });
+        modal.hide();
+
+        setTimeout(cleanup, 350);
     }
 
     form.addEventListener('submit', function (e) {
@@ -358,3 +372,268 @@ document.addEventListener('DOMContentLoaded', function () {
             });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('formVendedor');
+    if (!form) return;
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    const laravelData = document.getElementById('laravel-data');
+    const csrfToken = laravelData ? laravelData.getAttribute('data-csrf-token') : '';
+
+    function escapeHtml(value) {
+        return String(value ?? '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function clearAjaxErrors() {
+        form.querySelectorAll('.is-invalid').forEach(field => field.classList.remove('is-invalid'));
+        form.querySelectorAll('.ajax-invalid-feedback').forEach(feedback => feedback.remove());
+    }
+
+    function showAjaxErrors(errors) {
+        let firstField = null;
+
+        Object.entries(errors).forEach(([name, messages]) => {
+            const field = form.querySelector(`[name="${name}"]`);
+            if (!field) return;
+
+            field.classList.add('is-invalid');
+
+            const feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback ajax-invalid-feedback';
+            feedback.style.display = 'block';
+            feedback.textContent = messages[0];
+
+            const container = field.closest('.field-group') || field.parentElement;
+            container.appendChild(feedback);
+
+            if (!firstField) firstField = field;
+        });
+
+        if (firstField) firstField.focus();
+    }
+
+    function closeCreateModal() {
+        const modalElement = document.getElementById('modalNuevoVendedor');
+        if (!modalElement) return;
+
+        const modal = bootstrap.Modal.getInstance(modalElement) || bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.hide();
+
+        setTimeout(() => {
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.removeAttribute('aria-modal');
+            modalElement.removeAttribute('role');
+        }, 300);
+    }
+
+    function appendSellerRow(seller) {
+        const tableBody = document.querySelector('#clientsTable tbody');
+        if (!tableBody) {
+            window.location.reload();
+            return;
+        }
+
+        const contractCell = seller.contract_path
+            ? `<div class="position-relative d-inline-block">
+                    <img src="${escapeHtml(seller.contract_url)}" alt="ID ${escapeHtml(seller.name)}"
+                        loading="lazy" class="rounded shadow-sm border"
+                        style="width: 50px; height: 40px; object-fit: cover; cursor: pointer;"
+                        onclick="window.open(this.src, '_blank')">
+                </div>`
+            : `<span class="badge bg-light text-muted border">
+                    <i class="bi bi-x-circle"></i> Sin ID
+                </span>`;
+
+        tableBody.insertAdjacentHTML('afterbegin', `
+            <tr>
+                <td>
+                    <div class="vehicle-cell">
+                        <div class="vehicle-thumb">
+                            <i class="bi bi-person-circle" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+                        </div>
+                        <div>
+                            <div class="vehicle-name">${escapeHtml(seller.name)}</div>
+                            <div class="vehicle-brand">Registrado el ${escapeHtml(seller.created_at)}</div>
+                        </div>
+                    </div>
+                </td>
+                <td style="font-weight: 500; color: var(--gray-700);">
+                    <i class="bi bi-telephone text-muted me-1"></i> ${escapeHtml(seller.phone)}
+                </td>
+                <td style="color: var(--gray-500);">${seller.email ? escapeHtml(seller.email) : 'Sin correo'}</td>
+                <td style="color: var(--gray-500); max-width: 200px;" class="text-truncate">${escapeHtml(seller.notes)}</td>
+                <td class="align-middle text-center">${contractCell}</td>
+                <td>
+                    <div class="action-buttons" style="justify-content: flex-end;">
+                        <a href="${escapeHtml(seller.show_url)}" class="btn-action" title="Ver detalle">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a class="btn-action btn-edit" title="Editar Vendedor" data-bs-toggle="modal"
+                            data-bs-target="#modalEditarVendedor" data-id="${escapeHtml(seller.id)}"
+                            data-name="${escapeHtml(seller.name)}" data-email="${escapeHtml(seller.email)}"
+                            data-phone="${escapeHtml(seller.phone)}" data-notes="${escapeHtml(seller.notes)}"
+                            data-contract="${escapeHtml(seller.contract_path)}" style="cursor: pointer;">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <div style="display:inline;">
+                            <button type="button" class="btn-action delete btn-delete btn-eliminar-vendedor"
+                                data-id="${escapeHtml(seller.id)}" data-name="${escapeHtml(seller.name)}"
+                                data-url="${escapeHtml(seller.delete_url)}" title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        `);
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearAjaxErrors();
+
+        const originalText = submitButton ? submitButton.innerHTML : '';
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Guardando...';
+        }
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: new FormData(form),
+        })
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || !data.success) {
+                    if (response.status === 422 && data.errors) {
+                        showAjaxErrors(data.errors);
+                    }
+                    throw new Error(data.message || 'Revisa los campos marcados e intenta de nuevo.');
+                }
+
+                return data;
+            })
+            .then(data => {
+                appendSellerRow(data.seller);
+                form.reset();
+                closeCreateModal();
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2200
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'No se pudo guardar',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#c0392b'
+                });
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            });
+    });
+});
+
+window.confirmDeleteContract = function (sellerId) {
+    Swal.fire({
+        title: 'Eliminar documento?',
+        text: 'El archivo se borrara permanentemente del servidor.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Si, eliminar',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (!result.isConfirmed) return;
+
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+        fetch(`/vendedores/${sellerId}/archivo`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'No se pudo eliminar el archivo.');
+                }
+
+                return data;
+            })
+            .then(data => {
+                const previewContainer = document.getElementById('preview-container-edit');
+                if (previewContainer) {
+                    previewContainer.innerHTML = `
+                        <div class="text-center text-muted">
+                            <i class="bi bi-file-earmark-x" style="font-size: 2rem; opacity: 0.5;"></i>
+                            <p class="small mb-0">Sin archivo adjunto</p>
+                        </div>`;
+                }
+
+                const editButton = document.querySelector(`.btn-edit[data-bs-target="#modalEditarVendedor"][data-id="${sellerId}"]`);
+                if (editButton) {
+                    editButton.dataset.contract = '';
+                    const row = editButton.closest('tr');
+                    const fileCell = row ? row.querySelectorAll('td')[4] : null;
+                    if (fileCell) {
+                        fileCell.innerHTML = `
+                            <span class="badge bg-light text-muted border">
+                                <i class="bi bi-x-circle"></i> Sin ID
+                            </span>`;
+                    }
+                }
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2200
+                });
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#c0392b'
+                });
+            });
+    });
+};

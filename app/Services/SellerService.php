@@ -63,7 +63,7 @@ class SellerService
             }
 
             // 2. Limpiar el path en la base de datos a través del repositorio
-            return $this->repo->update($id, ['contract_path' => null]);
+            return $this->repo->update($seller, ['contract_path' => null]);
         }
 
         return false;

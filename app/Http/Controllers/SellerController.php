@@ -26,7 +26,27 @@ class SellerController extends Controller
 
     public function store(StoreSellerRequest $request)
     {
-        $this->service->storeSeller($request->validated());
+        $seller = $this->service->storeSeller($request->validated());
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Vendedor guardado correctamente.',
+                'seller' => [
+                    'id' => $seller->id,
+                    'name' => $seller->name,
+                    'email' => $seller->email,
+                    'phone' => $seller->phone,
+                    'notes' => $seller->notes,
+                    'created_at' => $seller->created_at->format('d/m/Y'),
+                    'contract_path' => $seller->contract_path,
+                    'contract_url' => route('vendedores.archivo', $seller->id),
+                    'show_url' => route('vendedores.show', $seller->id),
+                    'delete_url' => route('vendedores.destroy', $seller->id),
+                ],
+            ], 201);
+        }
+
         return redirect()->back()->with('success', 'Vendedor guardado correctamente.');
     }
 
@@ -59,7 +79,25 @@ class SellerController extends Controller
         $success = $this->service->deleteSellerFile($id);
 
         if ($success) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Archivo eliminado correctamente.',
+                    'seller' => [
+                        'id' => $id,
+                        'contract_path' => null,
+                    ],
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Archivo eliminado correctamente.');
+        }
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo eliminar el archivo.'
+            ], 500);
         }
 
         return redirect()->back()->with('error', 'No se pudo eliminar el archivo.');
