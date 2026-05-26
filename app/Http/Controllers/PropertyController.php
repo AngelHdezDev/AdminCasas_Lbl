@@ -34,16 +34,29 @@ class PropertyController extends Controller
     }
 
 
-    public function store(StorePropertyRequest $request): RedirectResponse
+    public function store(StorePropertyRequest $request): JsonResponse
     {
-        $property = $this->service->createProperty($request->validated());
+        try {
+            // Tu servicio se encarga de todo el registro pesado, lo dejamos exactamente igual
+            $property = $this->service->createProperty($request->validated());
 
-        if ($request->has('amenities')) {
-            $property->amenities()->sync($request->amenities);
+            if ($request->has('amenities')) {
+                $property->amenities()->sync($request->amenities);
+            }
+
+            // Cambiamos la redirección tradicional por la respuesta JSON que espera el SweetAlert
+            return response()->json([
+                'success' => true,
+                'message' => 'Propiedad registrada con éxito.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            // Por si llega a tronar algo dentro del Service o la sincronización
+            return response()->json([
+                'success' => false,
+                'message' => 'Hubo un error al registrar la propiedad: ' . $e->getMessage()
+            ], 500);
         }
-
-        return redirect()->route('propiedades.index')
-            ->with('success', 'Propiedad registrada con éxito');
     }
 
     public function index(Request $request)

@@ -331,6 +331,90 @@
         src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google.maps_api_key') }}&libraries=places"></script>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('formPropiedad');
+
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault(); // Detiene el envío síncrono tradicional
+
+                    // 1. Mostrar loader para congelar la pantalla mientras procesa el Service
+                    Swal.fire({
+                        title: 'Registrando propiedad...',
+                        text: 'Por favor, espera un momento.',
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // 2. Mapear automáticamente todos los inputs (incluye ocultos del mapa y precios)
+                    const formData = new FormData(form);
+
+                    // 3. Petición AJAX por Fetch apuntando al action del formulario
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                            'Accept': 'application/json' // Le avisa a tu FormRequest que regrese JSON si falla
+                        },
+                        body: formData
+                    })
+                        .then(response => {
+                            // Si la respuesta no es un 200 OK (e.g., 422 Validación o 500 Servidor)
+                            if (!response.ok) {
+                                return response.json().then(err => { throw err; });
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // 4. Alerta de éxito controlada
+                                Swal.fire({
+                                    title: '¡Registrada!',
+                                    text: data.message,
+                                    icon: 'success',
+                                    confirmButtonColor: '#3085d6',
+                                    confirmButtonText: 'Aceptar'
+                                }).then((result) => {
+                                    // 5. Redirección limpia por JS (cero problemas con el botón "Atrás")
+                                    window.location.href = "{{ route('propiedades.index') }}";
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error en el registro:', error);
+
+                            let errorMsg = 'No se pudo registrar la propiedad en el sistema.';
+
+                            // Si el error viene de tu StorePropertyRequest (Errores de validación 422)
+                            if (error.errors) {
+                                // Mapeamos los errores en una lista legible para el SweetAlert
+                                errorMsg = '<ul style="text-align: left; font-size: 0.9rem;">';
+                                Object.values(error.errors).flat().forEach(msg => {
+                                    errorMsg += `<li>❌ ${msg}</li>`;
+                                });
+                                errorMsg += '</ul>';
+                            } else if (error.message) {
+                                // Si viene del catch de la excepción del controlador (500)
+                                errorMsg = error.message;
+                            }
+
+                            // 6. Mostrar el SweetAlert de error sin refrescar la pantalla ni perder lo escrito
+                            Swal.fire({
+                                title: 'Hubo un problema',
+                                html: errorMsg,
+                                icon: 'error',
+                                confirmButtonColor: '#d33',
+                                confirmButtonText: 'Corregir campos'
+                            });
+                        });
+                });
+            }
+        });
+    </script>
+
+    <script>
         let map, marker, autocomplete, geocoder;
 
         function initMap() {
