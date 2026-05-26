@@ -107,7 +107,7 @@
                                             <div class="vehicle-cell">
                                                 <div class="vehicle-thumb">
                                                     {{-- Icono de usuario por defecto --}}
-                                                    <i class="bi bi-person-circle"
+                                                    <i class="bi bi-person-fill"
                                                         style="font-size: 1.5rem; color: var(--primary-color);"></i>
                                                 </div>
                                                 <div>
