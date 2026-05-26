@@ -192,3 +192,76 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('click', function (e) {
+        const button = e.target.closest('.btn-eliminar-propiedad');
+        if (!button) return;
+
+        const url = button.getAttribute('data-url');
+        const title = button.getAttribute('data-title') || 'esta propiedad';
+        const laravelData = document.getElementById('laravel-data');
+        const csrfToken = laravelData ? laravelData.getAttribute('data-csrf-token') : '';
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: `La propiedad "${title}" será dada de baja.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            button.disabled = true;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(async response => {
+                    const data = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'No se pudo eliminar la propiedad.');
+                    }
+
+                    return data;
+                })
+                .then(data => {
+                    const row = button.closest('tr');
+                    if (row) row.remove();
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 2200
+                    });
+
+                    const tableBody = document.querySelector('#propertiesTable tbody');
+                    if (tableBody && tableBody.children.length === 0) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: error.message,
+                        icon: 'error',
+                        confirmButtonColor: '#c0392b'
+                    });
+                })
+                .finally(() => {
+                    button.disabled = false;
+                });
+        });
+    });
+});

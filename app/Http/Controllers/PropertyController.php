@@ -121,12 +121,26 @@ class PropertyController extends Controller
                 'is_featured' => 0 // Si ya era 0 se queda en 0, si era 1 pasa a 0 y libera el cupo
             ]);
 
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'La propiedad ha sido dada de baja correctamente.'
+                ]);
+            }
+
             return redirect()->route('propiedades.index')
                 ->with('success', 'La propiedad ha sido dada de baja correctamente.');
 
         } catch (\Exception $e) {
             // Registramos el error en los logs por si acaso
             \Log::error("Error al dar de baja la propiedad ID {$id}: " . $e->getMessage());
+
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se pudo dar de baja la propiedad: ' . $e->getMessage()
+                ], 500);
+            }
 
             // Redirigimos con un mensaje de error que pueda capturar tu SweetAlert en el index
             return redirect()->route('propiedades.index')

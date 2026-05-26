@@ -130,12 +130,12 @@
                                         <td style="color: var(--gray-500);">
                                             <i class="bi bi-geo-alt"></i> {{ $property->neighborhood }}
                                         </td>
-                                       <td>
+                                        <td>
                                             @php
                                                 $tiposEspanol = [
-                                                    'house'      => 'Casa',
-                                                    'apartment'  => 'Departamento',
-                                                    'land'       => 'Terreno',
+                                                    'house' => 'Casa',
+                                                    'apartment' => 'Departamento',
+                                                    'land' => 'Terreno',
                                                     'commercial' => 'Comercial'
                                                 ];
                                             @endphp
@@ -198,14 +198,16 @@
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
 
-                                                <form action="{{ route('propiedades.destroy', $property->id) }}" method="POST"
-                                                    class="form-eliminar" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn-action delete btn-delete" title="Eliminar">
+                                                <div style="display:inline;">
+                                                    <button type="button"
+                                                        class="btn-action delete btn-delete btn-eliminar-propiedad"
+                                                        data-id="{{ $property->id }}"
+                                                        data-url="{{ route('propiedades.destroy', $property->id) }}"
+                                                        data-title="{{ $property->title }}"
+                                                        title="Eliminar Propiedad">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
-                                                </form>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -250,7 +252,7 @@
 
     <!-- DATA PARA JS -->
     <div id="laravel-data" data-has-errors="{{ $errors->any() ? 'true' : 'false' }}" data-success="{{ session('success') }}"
-        data-error-msg="{{ $errors->first() }}">
+        data-error-msg="{{ $errors->first() }}" data-csrf-token="{{ csrf_token() }}">
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
