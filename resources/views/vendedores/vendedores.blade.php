@@ -92,7 +92,7 @@
                         <table class="vms-table" id="clientsTable">
                             <thead>
                                 <tr>
-                                    <th>Cliente</th>
+                                    <th>Vendedor</th>
                                     <th>Teléfono</th>
                                     <th>Correo Electrónico</th>
                                     <th>Notas</th>
