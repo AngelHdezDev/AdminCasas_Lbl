@@ -33,7 +33,23 @@ class SellerController extends Controller
     public function update(UpdateSellerRequest $request, Seller $seller)
     {
         // Pasamos el objeto directamente al servicio
-        $this->service->updateSeller($seller, $request->validated());
+        $seller = $this->service->updateSeller($seller, $request->validated());
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Vendedor actualizado con exito.',
+                'seller' => [
+                    'id' => $seller->id,
+                    'name' => $seller->name,
+                    'email' => $seller->email,
+                    'phone' => $seller->phone,
+                    'notes' => $seller->notes,
+                    'contract_path' => $seller->contract_path,
+                    'contract_url' => route('vendedores.archivo', $seller->id),
+                ],
+            ]);
+        }
 
         return redirect()->back()->with('success', 'Vendedor actualizado con éxito.');
     }
@@ -54,7 +70,21 @@ class SellerController extends Controller
         $result = $this->service->deleteSeller($id);
 
         if ($result) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Vendedor desactivado con exito.'
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Vendedor desactivado con éxito.');
+        }
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo procesar la solicitud.'
+            ], 500);
         }
 
         return redirect()->back()->with('error', 'No se pudo procesar la solicitud.');

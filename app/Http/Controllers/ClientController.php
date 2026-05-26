@@ -47,7 +47,23 @@ class ClientController extends Controller
             $clientModel = Client::findOrFail($client);
 
             // 2. Procesamos la actualización
-            $this->clientService->updateClient($clientModel, $request->validated());
+            $clientModel = $this->clientService->updateClient($clientModel, $request->validated());
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cliente actualizado correctamente.',
+                    'client' => [
+                        'id' => $clientModel->id,
+                        'name' => $clientModel->name,
+                        'email' => $clientModel->email,
+                        'phone' => $clientModel->phone,
+                        'notes' => $clientModel->notes,
+                        'identification_path' => $clientModel->identification_path,
+                        'identification_url' => route('clientes.archivo', $clientModel->id),
+                    ],
+                ]);
+            }
 
             return redirect()->route('clientes.index')
                 ->with('success', 'Cliente actualizado correctamente.');
@@ -60,6 +76,13 @@ class ClientController extends Controller
                 ->with('edit_client_id', $client); // <--- Aquí pasas el ID que recibiste arriba
 
         } catch (\Exception $e) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrio un error inesperado.'
+                ], 500);
+            }
+
             // Este catch atrapa errores generales del sistema
             return redirect()->back()
                 ->with('error', 'Ocurrió un error inesperado.')
@@ -72,7 +95,21 @@ class ClientController extends Controller
         $result = $this->clientService->deleteClient($id);
 
         if ($result) {
+            if (request()->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Cliente eliminado correctamente.'
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Cliente eliminado correctamente.');
+        }
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No se pudo eliminar el cliente.'
+            ], 500);
         }
 
         return redirect()->back()->with('error', 'No se pudo eliminar el cliente.');

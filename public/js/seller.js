@@ -132,3 +132,229 @@ function confirmDeleteContract(sellerId) {
         }
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('click', function (e) {
+        const button = e.target.closest('.btn-eliminar-vendedor');
+        if (!button) return;
+
+        const url = button.getAttribute('data-url');
+        const name = button.getAttribute('data-name') || 'este vendedor';
+        const laravelData = document.getElementById('laravel-data');
+        const csrfToken = laravelData ? laravelData.getAttribute('data-csrf-token') : '';
+
+        Swal.fire({
+            title: '¿Eliminar vendedor?',
+            text: `Se dara de baja a "${name}".`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Si, eliminar',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            button.disabled = true;
+
+            fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(async response => {
+                    const data = await response.json().catch(() => ({}));
+
+                    if (!response.ok || !data.success) {
+                        throw new Error(data.message || 'No se pudo eliminar el vendedor.');
+                    }
+
+                    return data;
+                })
+                .then(data => {
+                    const row = button.closest('tr');
+                    if (row) row.remove();
+
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message,
+                        showConfirmButton: false,
+                        timer: 2200
+                    });
+
+                    const tableBody = document.querySelector('#clientsTable tbody');
+                    if (tableBody && tableBody.children.length === 0) {
+                        window.location.reload();
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: error.message,
+                        icon: 'error',
+                        confirmButtonColor: '#c0392b'
+                    });
+                })
+                .finally(() => {
+                    button.disabled = false;
+                });
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('formEditarVendedor');
+    if (!form) return;
+
+    const submitButton = form.querySelector('button[type="submit"]');
+    const laravelData = document.getElementById('laravel-data');
+    const csrfToken = laravelData ? laravelData.getAttribute('data-csrf-token') : '';
+
+    function clearAjaxErrors() {
+        form.querySelectorAll('.is-invalid').forEach(field => field.classList.remove('is-invalid'));
+        form.querySelectorAll('.ajax-invalid-feedback').forEach(feedback => feedback.remove());
+    }
+
+    function showAjaxErrors(errors) {
+        let firstField = null;
+
+        Object.entries(errors).forEach(([name, messages]) => {
+            const field = form.querySelector(`[name="${name}"]`);
+            if (!field) return;
+
+            field.classList.add('is-invalid');
+
+            const feedback = document.createElement('div');
+            feedback.className = 'invalid-feedback ajax-invalid-feedback';
+            feedback.style.display = 'block';
+            feedback.textContent = messages[0];
+
+            const container = field.closest('.field-group') || field.parentElement;
+            container.appendChild(feedback);
+
+            if (!firstField) firstField = field;
+        });
+
+        if (firstField) firstField.focus();
+    }
+
+    function updateSellerRow(seller) {
+        const editButton = document.querySelector(`.btn-edit[data-bs-target="#modalEditarVendedor"][data-id="${seller.id}"]`);
+        if (!editButton) return;
+
+        const row = editButton.closest('tr');
+        editButton.dataset.name = seller.name || '';
+        editButton.dataset.email = seller.email || '';
+        editButton.dataset.phone = seller.phone || '';
+        editButton.dataset.notes = seller.notes || '';
+        editButton.dataset.contract = seller.contract_path || '';
+
+        if (!row) return;
+
+        const nameCell = row.querySelector('.vehicle-name');
+        if (nameCell) nameCell.textContent = seller.name || '';
+
+        const cells = row.querySelectorAll('td');
+        if (cells[1]) cells[1].innerHTML = `<i class="bi bi-telephone text-muted me-1"></i> ${seller.phone || ''}`;
+        if (cells[2]) cells[2].textContent = seller.email || 'Sin correo';
+        if (cells[3]) cells[3].textContent = seller.notes || '';
+        if (cells[4] && seller.contract_path) {
+            cells[4].innerHTML = `
+                <div class="position-relative d-inline-block">
+                    <img src="${seller.contract_url}" alt="ID ${seller.name || ''}"
+                        loading="lazy" class="rounded shadow-sm border"
+                        style="width: 50px; height: 40px; object-fit: cover; cursor: pointer;"
+                        onclick="window.open(this.src, '_blank')">
+                </div>`;
+        }
+    }
+
+    function closeSellerEditModal() {
+        const modalElement = document.getElementById('modalEditarVendedor');
+        if (!modalElement) return;
+
+        const modal = bootstrap.Modal.getInstance(modalElement) || bootstrap.Modal.getOrCreateInstance(modalElement);
+        modal.hide();
+
+        setTimeout(() => {
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => backdrop.remove());
+            document.body.classList.remove('modal-open');
+            document.body.style.removeProperty('overflow');
+            document.body.style.removeProperty('padding-right');
+            modalElement.classList.remove('show');
+            modalElement.style.display = 'none';
+            modalElement.setAttribute('aria-hidden', 'true');
+            modalElement.removeAttribute('aria-modal');
+            modalElement.removeAttribute('role');
+        }, 300);
+    }
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        clearAjaxErrors();
+
+        const originalText = submitButton ? submitButton.innerHTML : '';
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Guardando...';
+        }
+
+        fetch(form.action, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: new FormData(form),
+        })
+            .then(async response => {
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok || !data.success) {
+                    if (response.status === 422 && data.errors) {
+                        showAjaxErrors(data.errors);
+                    }
+                    throw new Error(data.message || 'Revisa los campos marcados e intenta de nuevo.');
+                }
+
+                return data;
+            })
+            .then(data => {
+                updateSellerRow(data.seller);
+
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: data.message,
+                    showConfirmButton: false,
+                    timer: 2200
+                });
+
+                closeSellerEditModal();
+                const fileInput = form.querySelector('input[type="file"]');
+                if (fileInput) fileInput.value = '';
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'No se pudo actualizar',
+                    text: error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#c0392b'
+                });
+            })
+            .finally(() => {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                }
+            });
+    });
+});

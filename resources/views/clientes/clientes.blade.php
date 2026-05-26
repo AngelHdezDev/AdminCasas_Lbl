@@ -158,13 +158,16 @@
                                                 </a>
 
                                                 {{-- Formulario de eliminación --}}
-                                                <form action="{{ route('clientes.destroy', $client->id) }}" method="POST" class="form-eliminar" style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn-action delete btn-delete" title="Eliminar">
+                                                <div style="display:inline;">
+                                                    <button type="button"
+                                                        class="btn-action delete btn-delete btn-eliminar-cliente"
+                                                        data-id="{{ $client->id }}"
+                                                        data-name="{{ $client->name }}"
+                                                        data-url="{{ route('clientes.destroy', $client->id) }}"
+                                                        title="Eliminar">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
-                                                </form>
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>
@@ -210,7 +213,7 @@
 
     <!-- DATA PARA JS -->
     <div id="laravel-data" data-has-errors="{{ $errors->any() ? 'true' : 'false' }}" data-success="{{ session('success') }}"
-        data-error-msg="{{ $errors->first() }}">
+        data-error-msg="{{ $errors->first() }}" data-csrf-token="{{ csrf_token() }}">
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
